@@ -31,10 +31,6 @@
     .tab-content:not(.active) {
       display: none;
     }
-    .login-success {
-      color: green;
-      font-weight: bold;
-    }
     .login-error {
       color: red;
       font-weight: bold;
@@ -109,13 +105,12 @@
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const password = document.getElementById('password').value;
-      const loginMessage = document.getElementById('loginMessage');
       const uploadSection = document.getElementById('uploadSection');
+      const loginMessage = document.getElementById('loginMessage');
       if (password === '1989') {
-        loginMessage.textContent = 'Login successful!';
-        loginMessage.className = 'login-success';
         document.getElementById('loginForm').style.display = 'none';
         uploadSection.style.display = 'block';
+        loginMessage.textContent = '';
       } else {
         loginMessage.textContent = 'Incorrect password. Please try again.';
         loginMessage.className = 'login-error';
