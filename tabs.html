@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tabs Example</title>
+  <style>
+    .tabs {
+      display: flex;
+      cursor: pointer;
+      margin-bottom: 1em;
+    }
+    .tab {
+      padding: 10px 20px;
+      border: 1px solid #ccc;
+      background: #f5f5f5;
+      margin-right: 5px;
+      border-bottom: none;
+      border-radius: 5px 5px 0 0;
+    }
+    .tab.active {
+      background: #fff;
+      font-weight: bold;
+      border-bottom: 1px solid #fff;
+    }
+    .tab-content {
+      border: 1px solid #ccc;
+      padding: 20px;
+      background: #fff;
+      border-radius: 0 5px 5px 5px;
+    }
+    .tab-content:not(.active) {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="tabs">
+    <div class="tab active" data-tab="home">Home</div>
+    <div class="tab" data-tab="admin">Admin</div>
+  </div>
+  <div class="tab-content active" id="home">
+    <h2>Home Tab</h2>
+    <p>Welcome to the Home tab!</p>
+  </div>
+  <div class="tab-content" id="admin">
+    <h2>Admin Tab</h2>
+    <p>Welcome to the Admin tab!</p>
+  </div>
+  <script>
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById(this.getAttribute('data-tab')).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
