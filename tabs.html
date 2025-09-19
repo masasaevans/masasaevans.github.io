@@ -31,6 +31,14 @@
     .tab-content:not(.active) {
       display: none;
     }
+    .login-success {
+      color: green;
+      font-weight: bold;
+    }
+    .login-error {
+      color: red;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -44,7 +52,12 @@
   </div>
   <div class="tab-content" id="admin">
     <h2>Admin Tab</h2>
-    <p>Welcome to the Admin tab!</p>
+    <form id="loginForm">
+      <label for="password">Enter Admin Password:</label><br>
+      <input type="password" id="password" name="password" autocomplete="off"><br><br>
+      <button type="submit">Login</button>
+    </form>
+    <div id="loginMessage"></div>
   </div>
   <script>
     document.querySelectorAll('.tab').forEach(tab => {
@@ -55,6 +68,24 @@
         document.getElementById(this.getAttribute('data-tab')).classList.add('active');
       });
     });
+
+    // Admin login logic
+    const loginForm = document.getElementById('loginForm');
+    const loginMessage = document.getElementById('loginMessage');
+    if (loginForm) {
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const password = document.getElementById('password').value;
+        if (password === '1989') {
+          loginMessage.textContent = 'Login successful!';
+          loginMessage.className = 'login-success';
+          loginForm.style.display = 'none';
+        } else {
+          loginMessage.textContent = 'Incorrect password. Please try again.';
+          loginMessage.className = 'login-error';
+        }
+      });
+    }
   </script>
 </body>
 </html>
