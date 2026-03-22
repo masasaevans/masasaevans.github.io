@@ -3,136 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Masasa Online | Quick Quiz Portal</title>
+    <title>Masasa Online | Professional Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
-    <style>
-        html { scroll-behavior: smooth; } /* Makes the auto-jump smooth */
-        .marquee-wrapper { display: inline-block; white-space: nowrap; animation: marquee-scroll 25s linear infinite; padding-left: 100%; }
-        @keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
-        
-        .bubble-text { font-family: 'Bubblegum Sans', cursive; transition: 0.3s; cursor: pointer; }
-        .bubble-text:hover { color: #f97316 !important; transform: scale(1.05); }
-        
-        /* THE FOCUS CSS */
-        .quiz-card { 
-            border-left: 12px solid #e2e8f0; 
-            border-radius: 2.5rem; 
-            background: white; 
-            margin-bottom: 2.5rem; 
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            opacity: 0.9;
-        }
-        .quiz-card.active-q { border-left-color: #4f46e5; opacity: 1; transform: scale(1.02); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
-        .quiz-card.answered { border-left-color: #22c55e; opacity: 0.7; transform: scale(0.95); }
-        
-        select { font-size: 16px !important; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-indigo-50 font-sans antialiased overflow-x-hidden">
+<body class="bg-indigo-50 font-sans antialiased no-scrollbar">
 
-<div class="bg-yellow-400 py-3 border-b-2 border-yellow-600 sticky top-0 z-[60] overflow-hidden">
+<div class="bg-yellow-400 py-3 border-b-2 border-yellow-600 sticky top-0 z-[70] overflow-hidden">
     <div class="marquee-wrapper">
         <span id="marquee-text" class="text-yellow-900 font-black text-lg uppercase tracking-widest">
-            Welcome to Masasa Online! Practice your CBC and JSS skills! 🚀
+            Welcome to Masasa Online! Practice Literacy & Numeracy! 🚀
         </span>
     </div>
 </div>
 
-<div id="role-overlay" class="fixed inset-0 bg-indigo-900 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-[3rem] p-8 max-w-md w-full text-center shadow-2xl border-8 border-white">
+<div id="role-overlay" class="fixed inset-0 bg-indigo-900 flex items-center justify-center z-[100] p-4">
+  <div class="bg-white rounded-[3rem] p-8 max-w-md w-full text-center shadow-2xl border-8 border-white animate-bounce-in">
     <div class="mb-6 p-4 bg-indigo-50 rounded-3xl border-2 border-indigo-100">
         <div id="live-time" class="text-4xl font-black text-slate-800">00:00:00</div>
-        <div id="location-display" class="text-indigo-500 font-bold text-xs uppercase mt-1">📍 Detecting...</div>
+        <div id="location-display" class="text-indigo-500 font-bold text-xs uppercase mt-1 italic tracking-widest">📍 Locating...</div>
     </div>
     <h1 class="bubble-text text-5xl font-black text-indigo-600 mb-8">Masasa Online</h1>
     <div id="role-buttons" class="space-y-4">
-        <button onclick="selectRole('student')" class="w-full bg-orange-500 text-white py-6 rounded-3xl text-2xl font-black shadow-[0_10px_0_#c2410c] active:translate-y-1 active:shadow-none transition-all">Learner Place 👩‍🎓</button>
-        <button onclick="showAdminLogin()" class="w-full bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold">Admin 🔐</button>
+        <button onclick="selectRole('student')" class="w-full bg-orange-500 text-white py-6 rounded-3xl text-2xl font-black shadow-[0_10px_0_#c2410c] active:translate-y-1 active:shadow-none transition-all">LEARNER PLACE 👩‍🎓</button>
+        <button onclick="showAdminLogin()" class="w-full bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold hover:bg-slate-200">ADMIN 🔐</button>
     </div>
     <div id="admin-login" class="hidden mt-6">
-      <input id="admin-pass" type="password" placeholder="Admin Key" class="w-full p-4 border-2 border-indigo-100 rounded-2xl mb-4 text-center font-bold outline-none">
+      <input id="admin-pass" type="password" placeholder="Admin Key" class="w-full p-4 border-2 border-indigo-100 rounded-2xl mb-4 text-center font-bold outline-none focus:border-indigo-600">
       <button onclick="validateAdmin()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg">Login as Evans</button>
       <button onclick="hideAdminLogin()" class="mt-4 text-slate-400 text-xs font-bold uppercase underline block w-full">Back</button>
     </div>
   </div>
 </div>
 
-<header id="main-header" class="hidden bg-white/90 backdrop-blur-md border-b-2 border-indigo-100 p-4 sticky top-12 z-40">
-  <div class="max-w-6xl mx-auto flex justify-between items-center px-4">
+<header id="main-header" class="hidden bg-white/90 backdrop-blur-md border-b-2 border-indigo-100 p-4 sticky top-12 z-50">
+  <div class="max-w-6xl mx-auto flex justify-between items-center">
     <div class="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full border-2 border-yellow-400">
         <span class="text-xl">⭐</span>
         <span id="star-count" class="font-black text-yellow-700 text-lg">0</span>
     </div>
-    <button onclick="quitPortal()" class="bg-red-50 text-red-500 px-6 py-2 rounded-full font-black text-xs border-2 border-red-100 uppercase">Exit School</button>
+    <h1 class="bubble-text text-2xl text-indigo-600">Masasa Portal</h1>
+    <button onclick="quitPortal()" class="bg-red-50 text-red-500 px-6 py-2 rounded-full font-black text-xs border-2 border-red-100">QUIT</button>
   </div>
 </header>
 
 <main id="main-content" class="max-w-6xl mx-auto p-4 md:p-6 hidden">
   <section id="admin-tools" class="hidden mb-10 p-6 bg-white rounded-[2.5rem] shadow-xl border-4 border-indigo-200">
-      <h3 class="text-xl font-black text-indigo-700 mb-4 uppercase">Admin: Evans Masasa</h3>
-      <div class="space-y-4">
-          <input id="ann-input" type="text" placeholder="Change Scrolling Banner" class="w-full p-4 border rounded-2xl bg-slate-50 font-bold">
-          <button onclick="updateAnnouncement()" class="w-full bg-yellow-400 py-3 rounded-2xl font-black text-yellow-900 shadow-md">Apply Update</button>
-      </div>
-      <div class="mt-6 bg-indigo-50 p-6 rounded-3xl border-2 border-indigo-100">
-          <label class="font-black text-indigo-700 block mb-3">Upload PDF Lesson</label>
-          <div class="grid gap-3">
-              <input id="pdf-title" type="text" placeholder="Lesson Title" class="p-4 rounded-xl border">
-              <input id="pdf-file" type="file" accept="application/pdf" onclick="this.value=null" class="p-3 rounded-xl border bg-white">
-              <input id="pdf-expiry" type="date" class="p-3 rounded-xl border">
-              <button onclick="uploadPDF()" class="bg-indigo-600 text-white font-black py-4 rounded-xl">Post to Learner Place</button>
+      <h3 class="text-xl font-black text-indigo-700 mb-4 uppercase">Evans' Control Panel</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-indigo-50 p-6 rounded-3xl border-2 border-indigo-100">
+              <label class="font-black text-indigo-700 block mb-3 uppercase text-xs">Post PDF Lesson</label>
+              <input id="pdf-title" type="text" placeholder="Lesson Name" class="w-full p-4 rounded-xl border mb-2">
+              <input id="pdf-file" type="file" accept="application/pdf" class="w-full p-2 mb-2 bg-white rounded-xl">
+              <button onclick="uploadPDF()" class="w-full bg-indigo-600 text-white font-black py-3 rounded-xl">Post PDF</button>
           </div>
-          <div class="mt-4">
-              <div class="flex justify-between text-[10px] font-black uppercase text-slate-500 mb-1">
-                  <span>Storage Used</span> <span id="storage-pct">0%</span>
+          <div class="bg-orange-50 p-6 rounded-3xl border-2 border-orange-100">
+              <label class="font-black text-orange-700 block mb-3 uppercase text-xs">Create Manual Quiz</label>
+              <input id="mq-title" type="text" placeholder="Quiz Title" class="w-full p-3 border rounded-xl mb-2">
+              <input id="mq-q" type="text" placeholder="Question" class="w-full p-3 border rounded-xl mb-2">
+              <div class="grid grid-cols-2 gap-2">
+                  <input id="mq-a" type="text" placeholder="Correct Ans" class="p-2 text-xs border rounded bg-green-50">
+                  <input id="mq-b" type="text" placeholder="Wrong 1" class="p-2 text-xs border rounded">
+                  <input id="mq-c" type="text" placeholder="Wrong 2" class="p-2 text-xs border rounded">
+                  <input id="mq-d" type="text" placeholder="Wrong 3" class="p-2 text-xs border rounded">
               </div>
-              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                  <div id="storage-bar" class="bg-indigo-500 h-full transition-all" style="width: 0%"></div>
-              </div>
+              <button onclick="publishTeacherQuiz()" class="w-full bg-orange-500 text-white font-black py-3 rounded-xl mt-3">Publish Quiz</button>
           </div>
       </div>
   </section>
 
-  <section id="quiz-selector" class="mb-8 p-6 md:p-10 bg-white rounded-[2.5rem] shadow-xl border-4 border-white text-center">
-    <h2 class="text-3xl font-black text-indigo-700 mb-6 uppercase">Quick Quiz 🚀</h2>
+  <section class="mb-8 p-6 md:p-10 bg-white rounded-[2.5rem] shadow-xl border-4 border-white text-center">
+    <h2 class="text-3xl font-black text-indigo-700 mb-6 uppercase">Cloud Practice ☁️</h2>
     <div class="flex flex-col gap-4 max-w-md mx-auto">
-        <select id="subject-select" onchange="handleSubjectChange()" class="w-full p-5 rounded-2xl border-4 border-indigo-50 font-black text-indigo-600">
+        <select id="subject-select" onchange="handleSubjectChange()" class="w-full p-5 rounded-2xl border-4 border-indigo-50 font-black text-indigo-600 outline-none">
             <option value="">Select Subject...</option>
-            <option value="literacy">Literacy 📖</option>
-            <option value="numeracy">Numeracy 🔢</option>
+            <option value="literacy">General Literacy 📖</option>
+            <option value="numeracy">Science/Numeracy 🔢</option>
         </select>
         <div id="grade-container" class="hidden">
-            <select id="grade-select" onchange="handleGradeChange()" class="w-full p-5 rounded-2xl border-4 border-orange-100 font-black text-orange-500">
-                <option value="">Choose Grade...</option>
-                <option value="G1">Grade 1</option><option value="G2">Grade 2</option><option value="G3">Grade 3</option>
-                <option value="G4">Grade 4</option><option value="G5">Grade 5</option><option value="G6">Grade 6</option>
-                <option value="G7">Grade 7</option><option value="G8">Grade 8</option><option value="G9">Grade 9</option>
+            <select id="grade-select" onchange="handleGradeChange()" class="w-full p-5 rounded-2xl border-4 border-orange-100 font-black text-orange-500 outline-none">
+                <option value="">Choose Level...</option>
+                <option value="easy">Beginner (Lower CBC)</option>
+                <option value="medium">Intermediate (Upper CBC)</option>
+                <option value="hard">Advanced (JSS)</option>
             </select>
         </div>
     </div>
-    <button onclick="generateAIQuiz()" id="start-btn" class="hidden mt-8 w-full md:w-auto bg-indigo-600 text-white px-12 py-5 rounded-full font-black text-xl shadow-xl">
-      START 10 QUESTIONS ✍️
+    <button onclick="generateCloudQuiz()" id="start-btn" class="hidden mt-8 w-full md:w-auto bg-indigo-600 text-white px-12 py-5 rounded-full font-black text-xl shadow-xl active:scale-95 transition-all">
+      FETCH 10 QUESTIONS ✍️
     </button>
   </section>
 
-  <section id="lessons-area" class="mb-12">
+  <section class="mb-12">
       <h3 class="text-2xl font-black text-indigo-700 mb-6 px-4">Learner Place 📚</h3>
-      <div id="pdf-list" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+      <div id="material-list" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
   </section>
 
-  <div id="quiz-area" class="hidden space-y-6 pb-40"></div>
+  <div id="quiz-area" class="hidden space-y-6 pb-60"></div>
 </main>
 
-<div id="score-modal" class="hidden fixed inset-0 bg-indigo-900/95 flex items-center justify-center z-[100] p-4">
-    <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center border-8 border-white">
+<div id="score-modal" class="hidden fixed inset-0 bg-indigo-900/95 flex items-center justify-center z-[200] p-4">
+    <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center border-8 border-white animate-bounce-in">
         <div class="text-8xl mb-4" id="score-emoji">🎉</div>
         <div id="final-percent" class="text-7xl font-black text-orange-500 mb-2">0%</div>
         <p id="score-feedback" class="text-lg font-bold text-slate-500 mb-8 italic"></p>
-        <button onclick="closeModal()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg uppercase">Next Lesson</button>
+        <button onclick="closeModal()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg">CONTINUE</button>
     </div>
 </div>
 
-<script src="index.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
