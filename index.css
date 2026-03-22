@@ -1,38 +1,41 @@
-/* BUBBLING EFFECT */
-.bubble-text {
-    font-family: 'Bubblegum Sans', cursive;
-    display: inline-block;
-    transition: color 0.3s ease;
-}
-
-.bubble-text:hover {
-    color: #f97316 !important; /* Changes to Orange on hover */
-    animation: jump 0.4s ease infinite alternate;
-}
-
-@keyframes jump {
-    from { transform: translateY(0); }
-    to { transform: translateY(-10px); }
-}
-
-/* MARQUEE MOVEMENT */
+/* SMOOTH CONTINUOUS MARQUEE */
 .marquee-wrapper {
     display: inline-block;
     white-space: nowrap;
-    animation: marquee-move 15s linear infinite;
+    animation: marquee-scroll 20s linear infinite;
+    padding-left: 100%;
 }
 
-@keyframes marquee-move {
-    0% { transform: translateX(100vw); }
-    100% { transform: translateX(-100%); }
+@keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+
+/* BUBBLING & HOVER COLORS */
+.bubble-text {
+    font-family: 'Bubblegum Sans', cursive;
+    transition: all 0.3s ease;
+}
+
+.bubble-text:hover {
+    color: #f97316 !important; /* Font color changes on hover */
+    animation: bubble-jump 0.4s ease infinite alternate;
+}
+
+@keyframes bubble-jump {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
 }
 
 /* LEARNER BUTTON HOVER */
 .learner-btn:hover {
-    background-color: #4f46e5 !important; /* Turns Indigo */
-    box-shadow: 0 12px 25px rgba(79, 70, 229, 0.4);
+    background-color: #4f46e5 !important; /* Changes to Indigo */
     transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(79, 70, 229, 0.4);
 }
 
-.tab-content { animation: fadeIn 0.4s ease; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.animate-pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes popIn { 
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
