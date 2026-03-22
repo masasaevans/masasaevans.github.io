@@ -10,9 +10,11 @@
 </head>
 <body class="bg-indigo-50 font-sans antialiased overflow-x-hidden">
 
-<div id="marquee-container" class="bg-yellow-400 py-2 border-b-2 border-yellow-600 overflow-hidden whitespace-nowrap sticky top-0 z-[60]">
-    <div id="marquee-text" class="inline-block font-bold text-yellow-900 px-4 animate-marquee">
-        Welcome to Masasa Online! Check out the new Daily Quizzes and Lessons. 🚀
+<div class="bg-yellow-400 py-3 border-b-2 border-yellow-600 sticky top-0 z-[60] overflow-hidden">
+    <div class="marquee-wrapper">
+        <span id="marquee-text" class="text-yellow-900 font-black text-lg uppercase tracking-wide">
+            Welcome to Masasa Online! New lessons are available now! 🚀
+        </span>
     </div>
 </div>
 
@@ -20,14 +22,14 @@
   <div class="bg-white rounded-[3rem] p-10 max-w-md w-full text-center shadow-2xl border-8 border-white">
     <div class="mb-6 p-4 bg-indigo-50 rounded-3xl border-2 border-indigo-100">
         <div id="live-time" class="text-4xl font-black text-slate-800 mb-1">00:00:00</div>
-        <div id="location-display" class="text-indigo-500 font-bold text-sm uppercase tracking-tighter">🌍 Finding your city...</div>
+        <div id="location-display" class="text-indigo-500 font-bold text-sm uppercase">📍 Finding City...</div>
     </div>
 
-    <h1 class="bubble-text text-5xl font-black text-indigo-600 mb-8">Masasa Online</h1>
+    <h1 class="bubble-text text-5xl font-black text-indigo-600 mb-8 cursor-default">Masasa Online</h1>
     
     <div id="role-buttons" class="space-y-4">
-        <button onclick="selectRole('student')" class="btn-pop w-full bg-orange-500 text-white py-6 rounded-3xl text-2xl font-black shadow-[0_10px_0_#c2410c] hover:bg-indigo-600 hover:shadow-[0_10px_0_#4338ca] transition-all">Learner 👩‍🎓</button>
-        <button onclick="showAdminLogin()" class="w-full bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold hover:bg-slate-200 transition-all">Admin 🔐</button>
+        <button onclick="selectRole('student')" class="learner-btn w-full bg-orange-500 text-white py-6 rounded-3xl text-2xl font-black shadow-[0_10px_0_#c2410c] transition-all">Learner 👩‍🎓</button>
+        <button onclick="showAdminLogin()" class="w-full bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold hover:bg-slate-200 transition-all">Admin 🔐</button>
     </div>
 
     <div id="admin-login" class="hidden mt-6 animate-fade-in">
@@ -41,82 +43,64 @@
   </div>
 </div>
 
-<header id="main-header" class="hidden bg-white/90 backdrop-blur-md border-b-2 border-indigo-100 p-4 sticky top-10 z-40">
-  <div class="max-w-6xl mx-auto flex justify-between items-center px-4">
+<header id="main-header" class="hidden bg-white/90 backdrop-blur-md border-b-2 border-indigo-100 p-4 sticky top-12 z-40">
+  <div class="max-w-6xl mx-auto flex justify-between items-center">
     <h1 class="bubble-text text-2xl text-indigo-600">Masasa Portal</h1>
-    <button onclick="location.reload()" class="bg-red-50 text-red-500 px-6 py-2 rounded-full font-black text-xs border-2 border-red-100 hover:bg-red-500 hover:text-white transition-all">LOGOUT</button>
+    <button onclick="location.reload()" class="bg-red-50 text-red-500 px-6 py-2 rounded-full font-black text-xs border-2 border-red-100">LOGOUT</button>
   </div>
 </header>
 
 <main id="main-content" class="max-w-6xl mx-auto p-6 hidden">
   
-  <section id="admin-tools" class="hidden mb-12 space-y-8 animate-fade-in">
-      <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border-2 border-indigo-50">
-          <h3 class="text-2xl font-black text-indigo-700 mb-6 flex items-center gap-2">📢 Post Announcement & PDF</h3>
+  <section id="admin-tools" class="hidden mb-12 space-y-6">
+      <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border-4 border-indigo-200">
+          <h3 class="text-2xl font-black text-indigo-700 mb-6">📢 Evans Masasa's Control Panel</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input id="ann-input" type="text" placeholder="Update running announcement..." class="p-4 border rounded-2xl bg-slate-50 font-bold outline-none focus:border-indigo-600">
-              <button onclick="updateAnnouncement()" class="bg-yellow-400 text-yellow-900 font-black rounded-2xl py-4 hover:bg-yellow-500">Update Marquee</button>
-              <input id="pdf-title" type="text" placeholder="Lesson Title" class="p-4 border rounded-2xl bg-slate-50 font-bold outline-none focus:border-indigo-600">
+              <input id="ann-input" type="text" placeholder="Update Running Text..." class="p-4 border rounded-2xl bg-slate-50 font-bold">
+              <button onclick="updateAnnouncement()" class="bg-yellow-400 text-yellow-900 font-black rounded-2xl py-4">Set Announcement</button>
+              
+              <input id="pdf-title" type="text" placeholder="Lesson Title" class="p-4 border rounded-2xl bg-slate-50 font-bold">
               <input id="pdf-file" type="file" accept="application/pdf" class="p-3 border rounded-2xl bg-slate-50">
           </div>
-          <button onclick="uploadPDF()" class="mt-4 w-full bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-indigo-700">UPLOAD TO HUB 🚀</button>
-      </div>
-
-      <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border-2 border-indigo-50">
-          <h3 class="text-2xl font-black text-indigo-700 mb-6">📝 Create Multiple Choice Quiz</h3>
-          <div id="quiz-builder" class="space-y-4">
-              <input id="quiz-q" type="text" placeholder="Question..." class="w-full p-4 border rounded-2xl">
-              <div class="grid grid-cols-2 gap-2">
-                  <input id="opt-0" type="text" placeholder="Option A" class="p-3 border rounded-xl">
-                  <input id="opt-1" type="text" placeholder="Option B" class="p-3 border rounded-xl">
-                  <input id="opt-2" type="text" placeholder="Option C" class="p-3 border rounded-xl">
-                  <select id="correct-opt" class="p-3 border rounded-xl bg-green-50 font-bold">
-                      <option value="0">A is correct</option>
-                      <option value="1">B is correct</option>
-                      <option value="2">C is correct</option>
-                  </select>
-              </div>
-              <button onclick="saveQuiz()" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-emerald-600">SAVE QUIZ QUESTION</button>
+          <button onclick="uploadPDF()" class="mt-4 w-full bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg">POST LESSON 🚀</button>
+          
+          <hr class="my-8">
+          
+          <h3 class="text-2xl font-black text-indigo-700 mb-4">📝 Add Quiz Question</h3>
+          <input id="quiz-q" type="text" placeholder="Question?" class="w-full p-4 border rounded-2xl mb-2">
+          <div class="grid grid-cols-3 gap-2 mb-4">
+              <input id="opt-0" type="text" placeholder="Option A" class="p-3 border rounded-xl">
+              <input id="opt-1" type="text" placeholder="Option B" class="p-3 border rounded-xl">
+              <input id="opt-2" type="text" placeholder="Option C" class="p-3 border rounded-xl">
           </div>
+          <select id="correct-opt" class="w-full p-4 border rounded-2xl mb-4 bg-green-50 font-bold text-green-700">
+              <option value="0">Answer is A</option>
+              <option value="1">Answer is B</option>
+              <option value="2">Answer is C</option>
+          </select>
+          <button onclick="saveQuiz()" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black">ADD TO DAILY QUIZ</button>
       </div>
   </section>
 
-  <div class="flex border-b-4 border-indigo-100 mb-8 overflow-x-auto whitespace-nowrap no-scrollbar">
-    <button onclick="switchTab('lessons')" id="tab-lessons" class="tab-btn active px-8 py-4 font-black text-indigo-700 border-b-4 border-indigo-600">Lessons 📚</button>
-    <button onclick="switchTab('quiz')" id="tab-quiz" class="tab-btn px-8 py-4 font-black text-slate-400 border-b-4 border-transparent">Daily Quiz ✍️</button>
-    <button onclick="switchTab('comprehension')" id="tab-comprehension" class="tab-btn px-8 py-4 font-black text-slate-400 border-b-4 border-transparent">Comprehension 📖</button>
+  <div class="flex gap-4 mb-8 overflow-x-auto pb-2">
+    <button onclick="switchTab('lessons')" id="tab-lessons" class="px-8 py-3 rounded-2xl font-black bg-indigo-600 text-white shadow-lg">Lessons 📚</button>
+    <button onclick="switchTab('quiz')" id="tab-quiz" class="px-8 py-3 rounded-2xl font-black bg-white text-slate-400 shadow-sm">Daily Quiz ✍️</button>
   </div>
 
-  <section id="lessons-section" class="tab-content grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in"></section>
+  <section id="lessons-section" class="tab-content grid grid-cols-1 md:grid-cols-3 gap-6"></section>
 
-  <section id="quiz-section" class="tab-content hidden animate-fade-in">
-      <div id="quiz-display" class="bg-white p-8 rounded-[3rem] shadow-xl text-center">
-          </div>
+  <section id="quiz-section" class="tab-content hidden">
+      <div id="quiz-display" class="bg-white p-8 rounded-[3rem] shadow-xl"></div>
   </section>
-
-  <section id="comprehension-section" class="tab-content hidden animate-fade-in">
-    <div class="bg-white p-10 rounded-[3rem] shadow-xl border-4 border-white">
-        <h2 class="text-3xl font-black text-indigo-700 mb-6">Story: The Wise Hare</h2>
-        <div class="bg-slate-50 p-6 rounded-2xl italic text-lg leading-relaxed text-slate-700 border-l-8 border-indigo-600 mb-8">
-            "In the Great Savanna, there lived a Hare who was very small but very clever. One day, a hungry Hyena caught him and said, 'I am going to eat you!' The Hare quickly replied, 'Wait! If you eat me now, you will never find the hidden honey cave...'"
-        </div>
-        <div class="space-y-6">
-            <p class="font-bold text-xl">1. Where does the story take place?</p>
-            <input id="comp-a1" type="text" class="w-full p-4 border rounded-xl" placeholder="Your answer...">
-            <button onclick="checkComprehension()" class="w-full bg-orange-500 text-white py-5 rounded-2xl font-black text-xl hover:bg-indigo-600 transition-all">Submit Answers</button>
-        </div>
-    </div>
-  </section>
-
 </main>
 
-<div id="score-modal" class="hidden fixed inset-0 bg-indigo-900/90 flex items-center justify-center z-[100] p-4">
-    <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl border-8 border-white animate-bounce-in">
+<div id="score-modal" class="hidden fixed inset-0 bg-indigo-900/95 flex items-center justify-center z-[100] p-4">
+    <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl border-8 border-white">
         <div class="text-8xl mb-4">🎉</div>
-        <h2 class="text-3xl font-black text-indigo-700 mb-2">Well Done!</h2>
-        <div id="final-percent" class="text-6xl font-black text-orange-500 mb-4">100%</div>
-        <p id="score-emoji" class="text-lg font-bold text-slate-500 mb-8 italic">Congratulations! You are a superstar! 🌟</p>
-        <button onclick="closeScore()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black">Back to Home</button>
+        <h2 class="text-3xl font-black text-indigo-700 mb-2">Result</h2>
+        <div id="final-percent" class="text-6xl font-black text-orange-500 mb-4">0%</div>
+        <p class="text-lg font-bold text-slate-500 mb-8 italic">Congratulations! You finished! 🌟</p>
+        <button onclick="closeScore()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black">Close</button>
     </div>
 </div>
 
