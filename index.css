@@ -1,22 +1,17 @@
-@layer base {
-  .hidden { display: none !important; }
-  
-  .btn-pop:active { transform: scale(0.92); }
-  
-  .tab-button.active {
-    border-bottom: 4px solid rgb(79 70 229);
-    color: rgb(79 70 229);
-    font-weight: 600;
-  }
-  
-  .password-toggle { transition: color 0.2s; }
-  
-  /* Success banner animation */
-  #success-banner {
-    animation: bannerPop 0.4s ease forwards;
-  }
-  @keyframes bannerPop {
-    from { transform: translate(-50%, -30px); opacity: 0; }
-    to { transform: translate(-50%, 0); opacity: 1; }
-  }
+#pdf-modal {
+    transition: opacity 0.3s ease;
+}
+
+/* Make sure the iframe looks good on mobile */
+#pdf-frame {
+    background-color: #525659; /* Standard PDF viewer background color */
+}
+
+/* Hover effects for the new buttons */
+.grid button, .grid a {
+    transition: transform 0.1s active;
+}
+
+.grid button:active, .grid a:active {
+    transform: scale(0.95);
 }
