@@ -21,29 +21,13 @@ const STORY = {
   ]
 };
 
-// === POPUP SYSTEM (no more alerts) ===
-function showPopup(message, type = "success") {
-  const popup = document.getElementById("popup");
-  const icon = document.getElementById("popup-icon");
-  const title = document.getElementById("popup-title");
-  const msg = document.getElementById("popup-message");
-
-  if (type === "success") {
-    icon.textContent = "🎉";
-    title.textContent = "Success!";
-    title.className = "text-2xl font-bold mb-2 text-emerald-600";
-  } else {
-    icon.textContent = "⚠️";
-    title.textContent = "Oops!";
-    title.className = "text-2xl font-bold mb-2 text-red-600";
-  }
-
-  msg.textContent = message;
-  popup.classList.remove("hidden");
-}
-
-function closePopup() {
-  document.getElementById("popup").classList.add("hidden");
+// Show temporary success banner
+function showSuccess(message) {
+  const banner = document.getElementById("success-banner");
+  const text = document.getElementById("banner-text");
+  text.textContent = message;
+  banner.classList.remove("hidden");
+  setTimeout(() => banner.classList.add("hidden"), 3000);
 }
 
 // === ROLE & LOGIN ===
@@ -58,6 +42,7 @@ function selectRole(role) {
 
 function showTeacherLogin() {
   document.getElementById("teacher-login").classList.remove("hidden");
+  document.getElementById("login-error").classList.add("hidden");
 }
 
 function toggleVisibility(btn) {
@@ -69,10 +54,13 @@ function toggleVisibility(btn) {
 function validateTeacher() {
   const u = document.getElementById("teacher-username").value.trim();
   const p = document.getElementById("teacher-pass").value;
+  const errorDiv = document.getElementById("login-error");
+
   if (teachers.some(t => t.username === u && t.password === p) || (u === "teacher" && p === "1234")) {
     selectRole("teacher");
   } else {
-    showPopup("Wrong username or password", "error");
+    errorDiv.textContent = "Wrong username or password";
+    errorDiv.classList.remove("hidden");
   }
 }
 
@@ -86,22 +74,12 @@ function resetRole() {
 // === ASSIGNMENTS ===
 function addAssignment() {
   const title = document.getElementById("ass-title").value.trim();
-  if (!title) {
-    showPopup("Title is required", "error");
-    return;
-  }
+  if (!title) return;
   assignments.unshift({ id: Date.now(), title });
   localStorage.setItem("assignments", JSON.stringify(assignments));
   renderAssignments();
+  showSuccess("Assignment posted successfully!");
   document.getElementById("ass-title").value = "";
-  document.getElementById("ass-desc").value = "";
-}
-
-function renderAssignments() {
-  const container = document.getElementById("assignments-list");
-  container.innerHTML = assignments.length 
-    ? assignments.map(a => `<div class="bg-white p-5 rounded-2xl shadow"><h3 class="font-bold">${a.title}</h3></div>`).join("")
-    : "<p class='text-gray-500 text-center py-8'>No assignments yet</p>";
 }
 
 // === DAILY ENGLISH ===
@@ -110,27 +88,40 @@ function renderDailyEnglish() {
   document.getElementById("story-box").innerHTML = `<strong>Story:</strong><br>${STORY.story}`;
   currentQuestions = STORY.questions;
   englishAnswers.fill(null);
-  document.getElementById("english-questions").innerHTML = STORY.questions.map((q,i) => `
+  
+  document.getElementById("questions-area").innerHTML = STORY.questions.map((q,i) => `
     <div class="mb-6">
       <p class="font-semibold">${i+1}. ${q.q}</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         ${q.o.map((opt,idx) => `<label class="flex items-center gap-3 p-3 border rounded-xl"><input type="radio" name="q${i}" onchange="englishAnswers[${i}]=${idx}"> ${opt}</label>`).join("")}
       </div>
     </div>`).join("");
+  
+  document.getElementById("questions-area").classList.remove("hidden");
+  document.getElementById("score-result").classList.add("hidden");
+  document.getElementById("submit-btn").classList.remove("hidden");
 }
 
 function submitEnglishQuiz() {
-  if (englishAnswers.includes(null)) {
-    showPopup("Please answer all 10 questions", "error");
-    return;
-  }
+  if (englishAnswers.includes(null)) return;
+  
   let correct = 0;
   englishAnswers.forEach((a,i) => { if (a === currentQuestions[i].c) correct++; });
   const percent = Math.round(correct / 10 * 100);
-  showPopup(`You scored ${percent}% ! 🎉`, "success");
+  
+  // Show score inside the same tab
+  document.getElementById("questions-area").classList.add("hidden");
+  document.getElementById("submit-btn").classList.add("hidden");
+  const result = document.getElementById("score-result");
+  result.classList.remove("hidden");
+  document.getElementById("score-percent").textContent = percent + "%";
+  document.getElementById("score-text").textContent = correct + "/10 correct";
 }
 
-// === TABS ===
+function restartQuiz() {
+  renderDailyEnglish();
+}
+
 function switchTab(n) {
   document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
   document.getElementById("tab-" + n).classList.add("active");
@@ -145,7 +136,6 @@ function renderAll() {
   renderAssignments();
 }
 
-// === INIT ===
 window.onload = () => {
   if (!currentRole) {
     document.getElementById("role-overlay").classList.remove("hidden");
