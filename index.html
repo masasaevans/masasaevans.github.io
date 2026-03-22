@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Masasa Online</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="index.css">
-  <script src="index.js" defer></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="min-h-screen bg-gray-50 font-sans antialiased">
 
@@ -35,19 +34,29 @@
 
     <!-- Teacher login form -->
     <div id="teacher-login" class="hidden mt-8">
-      <input id="teacher-username" type="text" placeholder="Username (given by admin)" class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-base sm:text-lg focus:outline-none focus:border-indigo-500">
-      <input id="teacher-pass" type="password" placeholder="Password" class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-base sm:text-lg focus:outline-none focus:border-indigo-500">
-      <button onclick="validateTeacher()" class="bg-green-600 text-white px-8 py-4 rounded-2xl text-base sm:text-lg font-bold w-full hover:bg-green-700 transition">
+      <input id="teacher-username" type="text" placeholder="Username (given by admin)" 
+        class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-base sm:text-lg focus:outline-none focus:border-indigo-500">
+      
+      <div class="relative">
+        <input id="teacher-pass" type="password" placeholder="Password" 
+          class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-base sm:text-lg focus:outline-none focus:border-indigo-500 pr-12">
+        <button type="button" onclick="toggleVisibility(this)" 
+          class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-2xl">👁️</button>
+      </div>
+
+      <button onclick="validateTeacher()" 
+        class="bg-green-600 text-white px-8 py-4 rounded-2xl text-base sm:text-lg font-bold w-full hover:bg-green-700 transition">
         Login as Teacher
       </button>
-      <button onclick="hideTeacherLogin()" class="text-gray-600 mt-4 underline block mx-auto text-sm sm:text-base">
+      <button onclick="hideTeacherLogin()" 
+        class="text-gray-600 mt-4 underline block mx-auto text-sm sm:text-base">
         Back to selection
       </button>
     </div>
   </div>
 </div>
 
-<!-- Header with date/time + weather -->
+<!-- Header -->
 <header id="main-header" class="hidden bg-gradient-to-r from-indigo-700 to-indigo-900 text-white shadow-lg sticky top-0 z-40">
   <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
     <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
@@ -59,7 +68,8 @@
         <span id="weather-icon" class="text-2xl sm:text-3xl"></span>
         <span id="weather-text">--°C • Loading…</span>
       </div>
-      <button onclick="resetRole()" class="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 text-sm sm:text-base">
+      <button onclick="resetRole()" 
+        class="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 text-sm sm:text-base">
         Change Role
       </button>
     </div>
@@ -70,13 +80,16 @@
 
   <!-- Tabs -->
   <div class="flex border-b mb-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
-    <button onclick="switchTab(0)" id="tab-0" class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap active">
+    <button onclick="switchTab(0)" id="tab-0" 
+      class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap active">
       Assignments
     </button>
-    <button onclick="switchTab(1)" id="tab-1" class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap">
+    <button onclick="switchTab(1)" id="tab-1" 
+      class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap">
       Quizzes
     </button>
-    <button onclick="switchTab(2)" id="tab-2" class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap">
+    <button onclick="switchTab(2)" id="tab-2" 
+      class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap">
       Daily English 📖
     </button>
   </div>
@@ -84,12 +97,24 @@
   <!-- Assignments -->
   <section id="assignments-section">
     <div id="teacher-assignments-form" class="hidden bg-white p-5 sm:p-6 rounded-2xl shadow mb-6 sm:mb-8">
-      <h2 class="text-lg sm:text-xl font-semibold mb-4">Post Assignment</h2>
-      <input id="ass-title" type="text" placeholder="Title" class="w-full mb-3 p-3 border rounded-lg">
-      <textarea id="ass-desc" placeholder="Description" class="w-full mb-3 p-3 border rounded-lg h-24"></textarea>
-      <input id="ass-pdf" type="text" placeholder="PDF link (optional)" class="w-full mb-4 p-3 border rounded-lg">
-      <button onclick="addAssignment()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 w-full sm:w-auto">
-        Post
+      <h2 class="text-lg sm:text-xl font-semibold mb-4">Post New Assignment</h2>
+      <input id="ass-title" type="text" placeholder="Title (required)" 
+        class="w-full mb-3 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <textarea id="ass-desc" placeholder="Description" 
+        class="w-full mb-3 p-3 border rounded-lg h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+      
+      <!-- PDF Upload -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Upload PDF (optional) + Name it</label>
+        <input id="ass-pdf-name" type="text" placeholder="Filename (e.g. Math-Chapter-5.pdf)" 
+          class="w-full p-3 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <input id="ass-pdf-file" type="file" accept="application/pdf" 
+          class="w-full p-3 border rounded-lg file:mr-4 file:py-2 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+      </div>
+
+      <button onclick="addAssignment()" 
+        class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 w-full sm:w-auto transition">
+        Post Assignment
       </button>
     </div>
 
@@ -97,14 +122,21 @@
     <div id="assignments-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
   </section>
 
+  <!-- Quizzes -->
+  <section id="quizzes-section" class="hidden">
+    <div class="bg-white rounded-3xl shadow-xl p-8 text-center">
+      <h2 class="text-3xl font-bold text-indigo-600 mb-4">Quizzes 📝</h2>
+      <p class="text-gray-500 text-lg">More interactive quizzes coming soon!<br>Stay tuned for daily challenges.</p>
+    </div>
+  </section>
+
   <!-- Daily English -->
   <section id="english-section" class="hidden">
     <div class="bg-white rounded-3xl shadow-xl p-5 sm:p-8">
-      <h2 class="text-2xl sm:text-3xl font-bold mb-2 text-red-600">Daily English Comprehension</h2>
+      <h2 class="text-2xl sm:text-3xl font-bold mb-2 text-red-600" id="english-title">Daily English Comprehension</h2>
       <p class="text-sm text-gray-500 mb-6">10 questions • New story each weekday</p>
 
-      <div class="bg-amber-50 p-5 sm:p-6 rounded-2xl mb-6 sm:mb-8 text-gray-800 leading-relaxed prose max-w-none">
-        <!-- story inserted here -->
+      <div id="story-box" class="bg-amber-50 p-5 sm:p-6 rounded-2xl mb-6 sm:mb-8 text-gray-800 leading-relaxed prose max-w-none">
       </div>
 
       <div id="english-questions" class="space-y-6 sm:space-y-8"></div>
@@ -132,20 +164,54 @@
 <div id="admin-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
   <div class="bg-white rounded-3xl p-6 sm:p-8 w-[90vw] max-w-sm">
     <h3 class="text-xl sm:text-2xl font-bold mb-6">Admin Login</h3>
-    <input id="admin-user" value="admin" class="w-full p-4 border rounded-xl mb-4">
-    <input id="admin-pass" type="password" class="w-full p-4 border rounded-xl mb-6">
-    <button onclick="loginAdmin()" class="bg-indigo-700 text-white w-full py-4 rounded-2xl text-lg">Login</button>
+    
+    <input id="admin-user" value="admin" 
+      class="w-full p-4 border rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    
+    <div class="relative">
+      <input id="admin-pass" type="password" placeholder="Password" 
+        class="w-full p-4 border rounded-xl mb-6 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <button type="button" onclick="toggleVisibility(this)" 
+        class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-2xl">👁️</button>
+    </div>
+
+    <button onclick="loginAdmin()" 
+      class="bg-indigo-700 text-white w-full py-4 rounded-2xl text-lg hover:bg-indigo-800 transition">
+      Login
+    </button>
 
     <div id="admin-panel" class="hidden mt-8">
-      <h4 class="font-semibold mb-4">Teachers</h4>
-      <div id="teacher-list" class="mb-6 max-h-60 overflow-y-auto"></div>
-      <input id="new-teacher-user" placeholder="New username" class="w-full p-3 border rounded-xl mb-3">
-      <input id="new-teacher-pass" placeholder="Password" class="w-full p-3 border rounded-xl mb-4">
-      <button onclick="addNewTeacher()" class="bg-emerald-600 text-white px-6 py-3 rounded-xl w-full">Add Teacher</button>
-      <button onclick="closeAdminModal()" class="mt-4 text-red-500 underline block mx-auto">Close</button>
+      <h4 class="font-semibold mb-4 flex items-center justify-between">
+        Teachers
+        <button onclick="logoutAdmin()" 
+          class="text-red-500 text-sm underline hover:text-red-600">Logout</button>
+      </h4>
+      <div id="teacher-list" class="mb-6 max-h-60 overflow-y-auto border rounded-xl p-2 bg-gray-50"></div>
+      
+      <div class="border-t pt-6">
+        <h4 class="font-semibold mb-4">Add New Teacher</h4>
+        <input id="new-teacher-user" placeholder="New username" 
+          class="w-full p-3 border rounded-xl mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        
+        <div class="relative">
+          <input id="new-teacher-pass" type="password" placeholder="Password" 
+            class="w-full p-3 border rounded-xl mb-4 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <button type="button" onclick="toggleVisibility(this)" 
+            class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-2xl">👁️</button>
+        </div>
+
+        <button onclick="addNewTeacher()" 
+          class="bg-emerald-600 text-white px-6 py-3 rounded-xl w-full hover:bg-emerald-700 transition">
+          Add Teacher
+        </button>
+      </div>
+
+      <button onclick="closeAdminModal()" 
+        class="mt-6 text-red-500 underline block mx-auto text-sm">Close Window</button>
     </div>
   </div>
 </div>
 
+<script src="script.js"></script>
 </body>
 </html>
