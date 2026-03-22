@@ -1,35 +1,34 @@
 const ADMIN_PASS = "admin123";
 let currentRole = null;
 let uploadedMaterials = JSON.parse(localStorage.getItem('masasa_materials')) || [];
+let savedQuizzes = JSON.parse(localStorage.getItem('masasa_quizzes')) || [];
+let marqueeText = localStorage.getItem('masasa_announcement') || "Welcome to Masasa Online! Check out our new lessons.";
 
-// 1. CLOCK & LOCATION
+// 1. INITIALIZE PAGE
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('marquee-text').textContent = marqueeText;
+    fetchCityLocation();
+    setInterval(updateClock, 1000);
+});
+
 function updateClock() {
     const timeEl = document.getElementById('live-time');
-    const dateEl = document.getElementById('live-date');
-    if(timeEl) {
-        const now = new Date();
-        timeEl.textContent = now.toLocaleTimeString('en-GB');
-        dateEl.textContent = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+    if(timeEl) timeEl.textContent = new Date().toLocaleTimeString('en-GB');
+}
+
+// 2. LOCATION (IP-BASED)
+async function fetchCityLocation() {
+    const locEl = document.getElementById('location-display');
+    try {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        locEl.textContent = `🌍 ${data.city}, ${data.country_name}`;
+    } catch (e) {
+        locEl.textContent = "🌍 Nairobi, Kenya";
     }
 }
-setInterval(updateClock, 1000);
-updateClock();
 
-async function initLocation() {
-    const locEl = document.getElementById('location-name');
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            try {
-                const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&localityLanguage=en`);
-                const data = await res.json();
-                locEl.textContent = `📍 ${data.city || data.locality || "Kenya"}`;
-            } catch (e) { locEl.textContent = "📍 Nairobi"; }
-        }, () => { locEl.textContent = "📍 Nairobi"; });
-    }
-}
-initLocation();
-
-// 2. ADMIN & ROLES
+// 3. ADMIN LOGIC
 function showAdminLogin() {
     document.getElementById('role-buttons').classList.add('hidden');
     document.getElementById('admin-login').classList.remove('hidden');
@@ -46,7 +45,7 @@ function validateAdmin() {
         currentRole = 'admin';
         document.getElementById('admin-tools').classList.remove('hidden');
         enterPortal();
-    } else { alert("❌ That is not the correct key, Mr. Masasa."); }
+    } else { alert("Incorrect Key!"); }
 }
 
 function selectRole(role) {
@@ -59,73 +58,128 @@ function enterPortal() {
     document.getElementById('main-header').classList.remove('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     renderMaterials();
+    renderQuiz();
 }
 
-// 3. PDF HANDLER
+// 4. ADMIN DASHBOARD ACTIONS
+function updateAnnouncement() {
+    const text = document.getElementById('ann-input').value;
+    if(text) {
+        marqueeText = text;
+        localStorage.setItem('masasa_announcement', text);
+        document.getElementById('marquee-text').textContent = text;
+        alert("Announcement Updated! 📣");
+    }
+}
+
+function saveQuiz() {
+    const q = document.getElementById('quiz-q').value;
+    const o0 = document.getElementById('opt-0').value;
+    const o1 = document.getElementById('opt-1').value;
+    const o2 = document.getElementById('opt-2').value;
+    const correct = document.getElementById('correct-opt').value;
+
+    if(!q || !o0 || !o1 || !o2) return alert("Fill all quiz fields!");
+
+    savedQuizzes.push({ q, options: [o0, o1, o2], correct: parseInt(correct) });
+    localStorage.setItem('masasa_quizzes', JSON.stringify(savedQuizzes));
+    alert("Quiz Question Added! ✍️");
+    renderQuiz();
+}
+
+// 5. LEARNER EXPERIENCE
+function renderQuiz() {
+    const area = document.getElementById('quiz-display');
+    if(savedQuizzes.length === 0) {
+        area.innerHTML = `<p class="font-bold text-slate-400">No quizzes available today.</p>`;
+        return;
+    }
+
+    area.innerHTML = savedQuizzes.map((q, idx) => `
+        <div class="mb-10 p-6 border-b-2 border-indigo-50 last:border-0">
+            <h4 class="text-2xl font-black text-slate-800 mb-6">${idx+1}. ${q.q}</h4>
+            <div class="grid grid-cols-1 gap-3 max-w-md mx-auto">
+                ${q.options.map((opt, oIdx) => `
+                    <button onclick="selectAnswer(this, ${idx}, ${oIdx})" 
+                            class="quiz-option p-4 rounded-2xl border-2 border-indigo-100 font-bold hover:bg-indigo-50 transition-all">
+                        ${opt}
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `).join('') + `<button onclick="gradeQuiz()" class="mt-8 bg-indigo-600 text-white px-12 py-4 rounded-full font-black text-xl shadow-lg">FINISH & GRADE</button>`;
+}
+
+let userAnswers = {};
+function selectAnswer(btn, qIdx, oIdx) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600'));
+    btn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
+    userAnswers[qIdx] = oIdx;
+}
+
+function gradeQuiz() {
+    let score = 0;
+    savedQuizzes.forEach((q, i) => {
+        if(userAnswers[i] === q.correct) score++;
+    });
+
+    const percent = Math.round((score / savedQuizzes.length) * 100);
+    document.getElementById('final-percent').textContent = `${percent}%`;
+    document.getElementById('score-modal').classList.remove('hidden');
+}
+
+function checkComprehension() {
+    const ans = document.getElementById('comp-a1').value.toLowerCase();
+    if(ans.includes("savanna")) {
+        alert("Correct! 🦁 Excellent reading skills!");
+    } else {
+        alert("Not quite! Hint: Look at the first sentence of the story.");
+    }
+}
+
+function closeScore() {
+    document.getElementById('score-modal').classList.add('hidden');
+    location.reload();
+}
+
+// REUSABLE TAB LOGIC
+function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active', 'text-indigo-700', 'border-indigo-600');
+        b.classList.add('text-slate-400', 'border-transparent');
+    });
+    
+    document.getElementById(`${tab}-section`).classList.remove('hidden');
+    const activeBtn = document.getElementById(`tab-${tab}`);
+    activeBtn.classList.add('active', 'text-indigo-700', 'border-indigo-600');
+}
+
+// PDF RENDERER (Modified)
 function uploadPDF() {
     const title = document.getElementById('pdf-title').value;
     const fileInput = document.getElementById('pdf-file');
     const file = fileInput.files[0];
-
-    if (!title || !file) return alert("Mr. Masasa, please add a title and select a file!");
+    if (!title || !file) return alert("Fill all PDF fields!");
 
     const reader = new FileReader();
-    reader.onload = function(e) {
-        uploadedMaterials.unshift({ 
-            title, 
-            data: e.target.result, 
-            date: new Date().toLocaleDateString() 
-        });
+    reader.onload = (e) => {
+        uploadedMaterials.unshift({ title, data: e.target.result, date: new Date().toLocaleDateString() });
         localStorage.setItem('masasa_materials', JSON.stringify(uploadedMaterials));
         renderMaterials();
-        alert("Lesson Uploaded Successfully! ✅");
-        document.getElementById('pdf-title').value = "";
-        fileInput.value = "";
+        alert("Lesson Uploaded!");
     };
     reader.readAsDataURL(file);
 }
 
 function renderMaterials() {
-    const container = document.getElementById('assignments-section');
-    if(uploadedMaterials.length === 0) {
-        container.innerHTML = `<p class="col-span-full text-center text-slate-400 font-bold py-20">No lessons uploaded yet. 📭</p>`;
-        return;
-    }
-
-    container.innerHTML = uploadedMaterials.map((item, idx) => `
-        <div class="bg-white p-6 rounded-[2rem] shadow-xl border-2 border-white hover:border-indigo-300 transition-all group overflow-hidden relative">
-            <div class="bg-indigo-50 w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">📚</div>
-            <h4 class="font-black text-xl text-slate-800 mb-1 truncate">${item.title}</h4>
-            <p class="text-xs font-bold text-slate-400 mb-6 uppercase tracking-widest">Released: ${item.date}</p>
-            
-            <div class="grid grid-cols-1 gap-3">
-                <button onclick="openPDF(${idx})" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-black hover:bg-orange-500 hover:text-white transition-all transform hover:-translate-y-1">OPEN LESSON</button>
-                <a href="${item.data}" download="${item.title}.pdf" class="w-full bg-slate-100 text-slate-600 py-3 rounded-xl font-black text-center text-sm hover:bg-emerald-100 hover:text-emerald-700 transition-all">SAVE PDF</a>
-            </div>
-
-            ${currentRole === 'admin' ? `
-                <button onclick="deleteMaterial(${idx})" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 transition-colors">🗑️</button>
-            ` : ''}
+    const container = document.getElementById('lessons-section');
+    container.innerHTML = uploadedMaterials.map((m, idx) => `
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border-2 border-white hover:scale-105 transition-transform">
+            <h4 class="font-black text-lg mb-4">${m.title}</h4>
+            <button onclick="openPDF('${m.data}')" class="w-full bg-indigo-600 text-white py-3 rounded-2xl font-bold mb-2">Open Lesson</button>
+            ${currentRole === 'admin' ? `<button onclick="deleteMaterial(${idx})" class="text-red-400 text-xs">Delete</button>` : ''}
         </div>
     `).join('');
-}
-
-function openPDF(index) {
-    document.getElementById('pdf-frame').src = uploadedMaterials[index].data;
-    document.getElementById('pdf-modal').classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-}
-
-function closePDF() {
-    document.getElementById('pdf-modal').classList.add('hidden');
-    document.getElementById('pdf-frame').src = "";
-    document.body.style.overflow = 'auto';
-}
-
-function deleteMaterial(idx) {
-    if(confirm("Are you sure you want to delete this lesson?")) {
-        uploadedMaterials.splice(idx, 1);
-        localStorage.setItem('masasa_materials', JSON.stringify(uploadedMaterials));
-        renderMaterials();
-    }
 }
