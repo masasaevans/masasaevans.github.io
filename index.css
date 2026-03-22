@@ -1,12 +1,7 @@
 @layer base {
   .hidden { display: none !important; }
   
-  .btn-pop {
-    transition: all 0.15s ease;
-  }
-  .btn-pop:active {
-    transform: scale(0.92);
-  }
+  .btn-pop:active { transform: scale(0.92); }
   
   .tab-button.active {
     border-bottom: 4px solid rgb(79 70 229);
@@ -16,12 +11,12 @@
   
   .password-toggle { transition: color 0.2s; }
   
-  /* Popup animation */
-  #popup-content {
-    animation: popupAnim 0.4s ease;
+  /* Success banner animation */
+  #success-banner {
+    animation: bannerPop 0.4s ease forwards;
   }
-  @keyframes popupAnim {
-    from { transform: scale(0.6); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+  @keyframes bannerPop {
+    from { transform: translate(-50%, -30px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
   }
 }
