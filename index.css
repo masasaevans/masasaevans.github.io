@@ -42,9 +42,14 @@
 .role-btn {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .role-btn:hover {
   transform: scale(1.04);
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.password-toggle {
+  transition: color 0.2s;
 }
 
 @media (max-width: 640px) {
