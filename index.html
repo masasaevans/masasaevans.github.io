@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Masasa Online | CBC & JSS Portal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="index.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masasa Online | CBC & JSS Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
 </head>
 <body class="bg-indigo-50 font-sans antialiased overflow-x-hidden">
 
 <div class="bg-yellow-400 py-3 border-b-2 border-yellow-600 sticky top-0 z-[60] overflow-hidden">
     <div class="marquee-wrapper">
         <span id="marquee-text" class="text-yellow-900 font-black text-lg uppercase tracking-widest">
-            Welcome to Masasa Online! CBC and Junior Secondary (JSS) lessons are now live! 🚀
+            Welcome to Masasa Online! Practice your CBC and JSS skills with our AI Quiz Engine! 🚀
         </span>
     </div>
 </div>
 
 <div id="role-overlay" class="fixed inset-0 bg-indigo-900/95 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-[3rem] p-10 max-w-md w-full text-center shadow-2xl border-8 border-white">
+  <div class="bg-white rounded-[3rem] p-10 max-w-md w-full text-center shadow-2xl border-8 border-white animate-fade-in">
     <div class="mb-6 p-4 bg-indigo-50 rounded-3xl border-2 border-indigo-100">
         <div id="live-time" class="text-4xl font-black text-slate-800 mb-1">00:00:00</div>
         <div id="location-display" class="text-indigo-500 font-bold text-sm uppercase">📍 Detecting...</div>
@@ -34,10 +34,11 @@
 
     <div id="admin-login" class="hidden mt-6 animate-fade-in">
       <div class="bg-red-50 p-4 rounded-2xl text-red-700 font-bold mb-4 text-sm border-2 border-red-100">
-        ⚠️ Are you Evans Masasa?
+        ⚠️ Are you <span class="underline">Evans Masasa</span>?
       </div>
       <input id="admin-pass" type="password" placeholder="Admin Key" class="w-full p-4 border-2 border-indigo-100 rounded-2xl mb-4 text-center font-bold outline-none focus:border-indigo-600">
       <button onclick="validateAdmin()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg">Yes, I am Evans</button>
+      <button onclick="hideAdminLogin()" class="mt-4 text-slate-400 text-sm font-bold uppercase underline block w-full">Go Back</button>
     </div>
   </div>
 </div>
@@ -52,48 +53,55 @@
 <main id="main-content" class="max-w-6xl mx-auto p-6 hidden">
   
   <section id="admin-tools" class="hidden mb-12 p-8 bg-white rounded-[2.5rem] shadow-xl border-4 border-indigo-200">
-      <h3 class="text-2xl font-black text-indigo-700 mb-4 uppercase">Evans Masasa Dashboard</h3>
+      <h3 class="text-2xl font-black text-indigo-700 mb-4 uppercase italic">Mr. Evans Masasa's Control</h3>
       <input id="ann-input" type="text" placeholder="Update Running Announcement..." class="w-full p-4 border rounded-2xl bg-slate-50 font-bold mb-3">
-      <button onclick="updateAnnouncement()" class="w-full bg-yellow-400 text-yellow-900 font-black rounded-2xl py-4 shadow-lg hover:bg-yellow-500">SET ANNOUNCEMENT</button>
+      <button onclick="updateAnnouncement()" class="w-full bg-yellow-400 text-yellow-900 font-black rounded-2xl py-4 shadow-lg hover:bg-yellow-500 active:scale-95 transition-all">APPLY TO MARQUEE</button>
   </section>
 
-  <section class="mb-8 p-8 bg-white rounded-[2.5rem] shadow-xl border-4 border-white text-center">
-    <h2 class="text-3xl font-black text-indigo-700 mb-6">AI Learning Engine 🤖</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-        <select id="subject-select" onchange="showGrades()" class="p-4 rounded-2xl border-2 border-indigo-100 font-black text-indigo-600">
-            <option value="">Choose Subject</option>
-            <option value="literacy">Literacy / English</option>
-            <option value="numeracy">Numeracy / Maths</option>
-        </select>
+  <section class="mb-8 p-6 md:p-10 bg-white rounded-[2.5rem] shadow-xl border-4 border-white text-center">
+    <h2 class="text-2xl md:text-3xl font-black text-indigo-700 mb-6">AI CBC Learning Engine 🤖</h2>
+    
+    <div class="flex flex-col gap-6 max-w-md mx-auto">
+        <div>
+            <label class="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 block text-left ml-2">Step 1: Choose Subject</label>
+            <select id="subject-select" onchange="handleSubjectChange()" class="w-full p-5 rounded-2xl border-4 border-indigo-50 font-black text-indigo-600 focus:border-indigo-400 outline-none appearance-none bg-indigo-50/30">
+                <option value="">Select Subject...</option>
+                <option value="literacy">Literacy / English 📖</option>
+                <option value="numeracy">Numeracy / Maths 🔢</option>
+            </select>
+        </div>
         
-        <select id="grade-select" class="hidden p-4 rounded-2xl border-2 border-indigo-100 font-black text-orange-500">
-            <option value="">Choose Grade</option>
-            <option value="PP1">PP1</option>
-            <option value="PP2">PP2</option>
-            <optgroup label="Primary School">
-                <option value="G1">Grade 1</option><option value="G2">Grade 2</option><option value="G3">Grade 3</option>
-                <option value="G4">Grade 4</option><option value="G5">Grade 5</option><option value="G6">Grade 6</option>
-            </optgroup>
-            <optgroup label="Junior Secondary (JSS)">
-                <option value="G7">Grade 7</option>
-                <option value="G8">Grade 8</option>
-                <option value="G9">Grade 9</option>
-            </optgroup>
-        </select>
+        <div id="grade-container" class="hidden animate-bounce-in">
+            <label class="text-xs font-black text-orange-400 uppercase tracking-widest mb-1 block text-left ml-2">Step 2: Choose Grade</label>
+            <select id="grade-select" onchange="handleGradeChange()" class="w-full p-5 rounded-2xl border-4 border-orange-100 font-black text-orange-500 focus:border-orange-400 outline-none appearance-none bg-orange-50/30">
+                <option value="">Pick Grade...</option>
+                <option value="PP1">PP1</option><option value="PP2">PP2</option>
+                <optgroup label="Primary School">
+                    <option value="G1">Grade 1</option><option value="G2">Grade 2</option><option value="G3">Grade 3</option>
+                    <option value="G4">Grade 4</option><option value="G5">Grade 5</option><option value="G6">Grade 6</option>
+                </optgroup>
+                <optgroup label="Junior Secondary (JSS)">
+                    <option value="G7">Grade 7</option><option value="G8">Grade 8</option><option value="G9">Grade 9</option>
+                </optgroup>
+            </select>
+        </div>
     </div>
-    <button onclick="generateAIQuiz()" id="start-btn" class="hidden mt-6 bg-indigo-600 text-white px-12 py-4 rounded-full font-black text-xl hover:bg-orange-500 transition-all shadow-xl">GENERATE CBC QUESTIONS</button>
+
+    <button onclick="generateAIQuiz()" id="start-btn" class="hidden mt-8 w-full md:w-auto bg-indigo-600 text-white px-16 py-5 rounded-full font-black text-2xl shadow-xl active:scale-95 transition-all">
+      GENERATE QUESTIONS 🚀
+    </button>
   </section>
 
-  <div id="quiz-area" class="hidden space-y-6"></div>
+  <div id="quiz-area" class="hidden space-y-6 pb-20"></div>
 </main>
 
 <div id="score-modal" class="hidden fixed inset-0 bg-indigo-900/95 flex items-center justify-center z-[100] p-4">
     <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center border-8 border-white animate-pop-in">
         <div class="text-8xl mb-4" id="score-emoji">🎉</div>
-        <h2 class="text-3xl font-black text-indigo-700 mb-2">Grade Report</h2>
+        <h2 class="text-3xl font-black text-indigo-700 mb-2">Grade Summary</h2>
         <div id="final-percent" class="text-7xl font-black text-orange-500 mb-4">0%</div>
-        <p id="score-feedback" class="text-lg font-bold text-slate-500 mb-8 italic">Superb Work! 🌟</p>
-        <button onclick="location.reload()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black">Close & Restart</button>
+        <p id="score-feedback" class="text-lg font-bold text-slate-500 mb-8 italic">Congratulations!</p>
+        <button onclick="location.reload()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg">Try Another Grade</button>
     </div>
 </div>
 
