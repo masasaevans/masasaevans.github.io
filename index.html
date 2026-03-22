@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Masasa Online</title>
+  <title>Masasa Online | CBC & JSS Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="index.css">
@@ -12,8 +12,8 @@
 
 <div class="bg-yellow-400 py-3 border-b-2 border-yellow-600 sticky top-0 z-[60] overflow-hidden">
     <div class="marquee-wrapper">
-        <span id="marquee-text" class="text-yellow-900 font-black text-lg uppercase tracking-wide">
-            Welcome to Masasa Online! New lessons are available now! 🚀
+        <span id="marquee-text" class="text-yellow-900 font-black text-lg uppercase tracking-widest">
+            Welcome to Masasa Online! CBC and Junior Secondary (JSS) lessons are now live! 🚀
         </span>
     </div>
 </div>
@@ -22,7 +22,7 @@
   <div class="bg-white rounded-[3rem] p-10 max-w-md w-full text-center shadow-2xl border-8 border-white">
     <div class="mb-6 p-4 bg-indigo-50 rounded-3xl border-2 border-indigo-100">
         <div id="live-time" class="text-4xl font-black text-slate-800 mb-1">00:00:00</div>
-        <div id="location-display" class="text-indigo-500 font-bold text-sm uppercase">📍 Finding City...</div>
+        <div id="location-display" class="text-indigo-500 font-bold text-sm uppercase">📍 Detecting...</div>
     </div>
 
     <h1 class="bubble-text text-5xl font-black text-indigo-600 mb-8 cursor-default">Masasa Online</h1>
@@ -34,73 +34,66 @@
 
     <div id="admin-login" class="hidden mt-6 animate-fade-in">
       <div class="bg-red-50 p-4 rounded-2xl text-red-700 font-bold mb-4 text-sm border-2 border-red-100">
-        ⚠️ Are you sure you are <span class="underline">Evans Masasa</span>?
+        ⚠️ Are you Evans Masasa?
       </div>
       <input id="admin-pass" type="password" placeholder="Admin Key" class="w-full p-4 border-2 border-indigo-100 rounded-2xl mb-4 text-center font-bold outline-none focus:border-indigo-600">
       <button onclick="validateAdmin()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg">Yes, I am Evans</button>
-      <button onclick="hideAdminLogin()" class="mt-4 text-slate-400 text-sm font-bold uppercase underline block w-full">Go Back</button>
     </div>
   </div>
 </div>
 
 <header id="main-header" class="hidden bg-white/90 backdrop-blur-md border-b-2 border-indigo-100 p-4 sticky top-12 z-40">
-  <div class="max-w-6xl mx-auto flex justify-between items-center">
+  <div class="max-w-6xl mx-auto flex justify-between items-center px-4">
     <h1 class="bubble-text text-2xl text-indigo-600">Masasa Portal</h1>
-    <button onclick="location.reload()" class="bg-red-50 text-red-500 px-6 py-2 rounded-full font-black text-xs border-2 border-red-100">LOGOUT</button>
+    <button onclick="location.reload()" class="bg-red-50 text-red-500 px-6 py-2 rounded-full font-black text-xs border-2 border-red-100 hover:bg-red-500 hover:text-white transition-all">LOGOUT</button>
   </div>
 </header>
 
 <main id="main-content" class="max-w-6xl mx-auto p-6 hidden">
   
-  <section id="admin-tools" class="hidden mb-12 space-y-6">
-      <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border-4 border-indigo-200">
-          <h3 class="text-2xl font-black text-indigo-700 mb-6">📢 Evans Masasa's Control Panel</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input id="ann-input" type="text" placeholder="Update Running Text..." class="p-4 border rounded-2xl bg-slate-50 font-bold">
-              <button onclick="updateAnnouncement()" class="bg-yellow-400 text-yellow-900 font-black rounded-2xl py-4">Set Announcement</button>
-              
-              <input id="pdf-title" type="text" placeholder="Lesson Title" class="p-4 border rounded-2xl bg-slate-50 font-bold">
-              <input id="pdf-file" type="file" accept="application/pdf" class="p-3 border rounded-2xl bg-slate-50">
-          </div>
-          <button onclick="uploadPDF()" class="mt-4 w-full bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg">POST LESSON 🚀</button>
-          
-          <hr class="my-8">
-          
-          <h3 class="text-2xl font-black text-indigo-700 mb-4">📝 Add Quiz Question</h3>
-          <input id="quiz-q" type="text" placeholder="Question?" class="w-full p-4 border rounded-2xl mb-2">
-          <div class="grid grid-cols-3 gap-2 mb-4">
-              <input id="opt-0" type="text" placeholder="Option A" class="p-3 border rounded-xl">
-              <input id="opt-1" type="text" placeholder="Option B" class="p-3 border rounded-xl">
-              <input id="opt-2" type="text" placeholder="Option C" class="p-3 border rounded-xl">
-          </div>
-          <select id="correct-opt" class="w-full p-4 border rounded-2xl mb-4 bg-green-50 font-bold text-green-700">
-              <option value="0">Answer is A</option>
-              <option value="1">Answer is B</option>
-              <option value="2">Answer is C</option>
-          </select>
-          <button onclick="saveQuiz()" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black">ADD TO DAILY QUIZ</button>
-      </div>
+  <section id="admin-tools" class="hidden mb-12 p-8 bg-white rounded-[2.5rem] shadow-xl border-4 border-indigo-200">
+      <h3 class="text-2xl font-black text-indigo-700 mb-4 uppercase">Evans Masasa Dashboard</h3>
+      <input id="ann-input" type="text" placeholder="Update Running Announcement..." class="w-full p-4 border rounded-2xl bg-slate-50 font-bold mb-3">
+      <button onclick="updateAnnouncement()" class="w-full bg-yellow-400 text-yellow-900 font-black rounded-2xl py-4 shadow-lg hover:bg-yellow-500">SET ANNOUNCEMENT</button>
   </section>
 
-  <div class="flex gap-4 mb-8 overflow-x-auto pb-2">
-    <button onclick="switchTab('lessons')" id="tab-lessons" class="px-8 py-3 rounded-2xl font-black bg-indigo-600 text-white shadow-lg">Lessons 📚</button>
-    <button onclick="switchTab('quiz')" id="tab-quiz" class="px-8 py-3 rounded-2xl font-black bg-white text-slate-400 shadow-sm">Daily Quiz ✍️</button>
-  </div>
-
-  <section id="lessons-section" class="tab-content grid grid-cols-1 md:grid-cols-3 gap-6"></section>
-
-  <section id="quiz-section" class="tab-content hidden">
-      <div id="quiz-display" class="bg-white p-8 rounded-[3rem] shadow-xl"></div>
+  <section class="mb-8 p-8 bg-white rounded-[2.5rem] shadow-xl border-4 border-white text-center">
+    <h2 class="text-3xl font-black text-indigo-700 mb-6">AI Learning Engine 🤖</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+        <select id="subject-select" onchange="showGrades()" class="p-4 rounded-2xl border-2 border-indigo-100 font-black text-indigo-600">
+            <option value="">Choose Subject</option>
+            <option value="literacy">Literacy / English</option>
+            <option value="numeracy">Numeracy / Maths</option>
+        </select>
+        
+        <select id="grade-select" class="hidden p-4 rounded-2xl border-2 border-indigo-100 font-black text-orange-500">
+            <option value="">Choose Grade</option>
+            <option value="PP1">PP1</option>
+            <option value="PP2">PP2</option>
+            <optgroup label="Primary School">
+                <option value="G1">Grade 1</option><option value="G2">Grade 2</option><option value="G3">Grade 3</option>
+                <option value="G4">Grade 4</option><option value="G5">Grade 5</option><option value="G6">Grade 6</option>
+            </optgroup>
+            <optgroup label="Junior Secondary (JSS)">
+                <option value="G7">Grade 7</option>
+                <option value="G8">Grade 8</option>
+                <option value="G9">Grade 9</option>
+            </optgroup>
+        </select>
+    </div>
+    <button onclick="generateAIQuiz()" id="start-btn" class="hidden mt-6 bg-indigo-600 text-white px-12 py-4 rounded-full font-black text-xl hover:bg-orange-500 transition-all shadow-xl">GENERATE CBC QUESTIONS</button>
   </section>
+
+  <div id="quiz-area" class="hidden space-y-6"></div>
 </main>
 
 <div id="score-modal" class="hidden fixed inset-0 bg-indigo-900/95 flex items-center justify-center z-[100] p-4">
-    <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl border-8 border-white">
-        <div class="text-8xl mb-4">🎉</div>
-        <h2 class="text-3xl font-black text-indigo-700 mb-2">Result</h2>
-        <div id="final-percent" class="text-6xl font-black text-orange-500 mb-4">0%</div>
-        <p class="text-lg font-bold text-slate-500 mb-8 italic">Congratulations! You finished! 🌟</p>
-        <button onclick="closeScore()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black">Close</button>
+    <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center border-8 border-white animate-pop-in">
+        <div class="text-8xl mb-4" id="score-emoji">🎉</div>
+        <h2 class="text-3xl font-black text-indigo-700 mb-2">Grade Report</h2>
+        <div id="final-percent" class="text-7xl font-black text-orange-500 mb-4">0%</div>
+        <p id="score-feedback" class="text-lg font-bold text-slate-500 mb-8 italic">Superb Work! 🌟</p>
+        <button onclick="location.reload()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black">Close & Restart</button>
     </div>
 </div>
 
