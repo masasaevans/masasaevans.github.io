@@ -1,13 +1,14 @@
-// ──────────────────────────────────────────────
-// CONFIG
-// ──────────────────────────────────────────────
+/*
+ * Masasa Online – Educational web app
+ * Copyright (c) 2026 [your name or "young"]
+ * Licensed under MIT (or choose your license)
+ */
+
 const ADMIN_USER = "admin";
 const ADMIN_PASS = "Miritini123";
-const SAMPLE_PDF = "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-pdf-file.pdf";
 
-// Weekly English stories (Sunday filled, others placeholders)
+// Using Sunday story for all days during development
 const WEEKLY_ENGLISH_STORIES = [
-  // 0 Sunday
   {
     title: "The Singing Matatu",
     story: "Every Sunday morning in Eastlands, little Zawadi loved riding the number 19 matatu. One day the radio stopped working, but the passengers started singing old nyatiti songs together. The driver joined in with a deep voice. By the time they reached town, everyone was smiling. Zawadi learned that music can turn any journey into a happy one.",
@@ -24,67 +25,52 @@ const WEEKLY_ENGLISH_STORIES = [
       {q:"Main lesson?", o:["Never ride matatus","Music brings joy","Radios are important","Sundays are boring"], c:1}
     ]
   },
-  // Monday–Saturday placeholders
-  {title:"Monday – Lost Pencil", story:"Aisha forgot her pencil case…", questions:Array(10).fill({q:"Question text…", o:["A","B","C","D"], c:0})},
-  {title:"Tuesday – New Neighbour", story:"Nia was shy…", questions:Array(10).fill({q:"Question text…", o:["A","B","C","D"], c:0})},
-  {title:"Wednesday – Rainy Day", story:"…", questions:Array(10).fill({q:"Question text…", o:["A","B","C","D"], c:0})},
-  {title:"Thursday – Market Adventure", story:"…", questions:Array(10).fill({q:"Question text…", o:["A","B","C","D"], c:0})},
-  {title:"Friday – Football Match", story:"…", questions:Array(10).fill({q:"Question text…", o:["A","B","C","D"], c:0})},
-  {title:"Saturday – Family Picnic", story:"…", questions:Array(10).fill({q:"Question text…", o:["A","B","C","D"], c:0})}
+  // Repeat Sunday story for other days (you can replace later)
+  ...Array(6).fill(null).map(() => WEEKLY_ENGLISH_STORIES[0])
 ];
 
-// ──────────────────────────────────────────────
-// STATE
-// ──────────────────────────────────────────────
 let currentRole = localStorage.getItem("masasaRole") || null;
-let assignments  = JSON.parse(localStorage.getItem("assignments") || "[]");
-let teachers     = JSON.parse(localStorage.getItem("teachers") || "[]");
+let assignments = JSON.parse(localStorage.getItem("assignments") || "[]");
+let teachers   = JSON.parse(localStorage.getItem("teachers")   || "[]");
 let englishAnswers = new Array(10).fill(null);
 let currentQuestions = [];
 
 // ──────────────────────────────────────────────
-// DATE / TIME / WEATHER
+// Date / Time / Weather
 // ──────────────────────────────────────────────
 async function updateDateTimeAndWeather() {
-  const timeEl   = document.getElementById("datetime");
-  const wText    = document.getElementById("weather-text");
-  const wIcon    = document.getElementById("weather-icon");
-
-  timeEl.textContent = new Date().toLocaleString("en-KE", {
-    weekday:"long", year:"numeric", month:"long", day:"numeric",
-    hour:"2-digit", minute:"2-digit", hour12:true
+  document.getElementById("datetime").textContent = new Date().toLocaleString("en-KE", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric",
+    hour: "2-digit", minute: "2-digit", hour12: true
   });
 
   if (!navigator.geolocation) {
-    wText.textContent = "Location not supported";
+    document.getElementById("weather-text").textContent = "Location not supported";
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(async pos => {
-    const {latitude, longitude} = pos.coords;
+  navigator.geolocation.getCurrentPosition(async ({ coords: { latitude, longitude } }) => {
     try {
       const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&timezone=Africa/Nairobi`);
-      const data = await res.json();
-      const temp = Math.round(data.current.temperature_2m);
-      const code = data.current.weather_code;
-
+      const { current } = await res.json();
+      const temp = Math.round(current.temperature_2m);
+      const code = current.weather_code;
       let icon = "☀️";
       if ([51,53,55,61,63,65,80,81,82].includes(code)) icon = "🌧️";
       else if ([71,73,75,77].includes(code)) icon = "❄️";
       else if ([95,96,99].includes(code)) icon = "⛈️";
-
-      wText.textContent = `${temp}°C • ${icon}`;
-      wIcon.textContent = icon;
+      document.getElementById("weather-text").textContent = `${temp}°C • ${icon}`;
+      document.getElementById("weather-icon").textContent = icon;
     } catch {
-      wText.textContent = "Weather unavailable";
+      document.getElementById("weather-text").textContent = "Weather unavailable";
     }
   }, () => {
-    wText.textContent = "Location access denied";
+    document.getElementById("weather-text").textContent = "Location access denied";
   });
 }
 
 // ──────────────────────────────────────────────
-// ROLE & OVERLAY
+// Role / Overlay logic
 // ──────────────────────────────────────────────
 function showWelcomeOverlay() {
   document.getElementById("role-overlay").classList.remove("hidden");
@@ -106,13 +92,8 @@ function selectRole(role) {
   switchTab(0);
 }
 
-function showTeacherLogin() { 
-  document.getElementById("teacher-login").classList.remove("hidden"); 
-}
-
-function hideTeacherLogin() { 
-  document.getElementById("teacher-login").classList.add("hidden"); 
-}
+function showTeacherLogin() { document.getElementById("teacher-login").classList.remove("hidden"); }
+function hideTeacherLogin() { document.getElementById("teacher-login").classList.add("hidden"); }
 
 function validateTeacher() {
   const u = document.getElementById("teacher-username").value.trim();
@@ -125,33 +106,23 @@ function validateTeacher() {
 }
 
 function resetRole() {
-  if (confirm("Change role? All unsaved work will be lost.")) {
+  if (confirm("Change role? Unsaved work will be lost.")) {
     localStorage.removeItem("masasaRole");
     currentRole = null;
     showWelcomeOverlay();
   }
 }
 
-// ──────────────────────────────────────────────
-// PASSWORD VISIBILITY TOGGLE
-// ──────────────────────────────────────────────
 function toggleVisibility(btn) {
   const input = btn.closest('.relative').querySelector('input');
-  if (input.type === "password") {
-    input.type = "text";
-    btn.textContent = "🙈";
-  } else {
-    input.type = "password";
-    btn.textContent = "👁️";
-  }
+  input.type = input.type === "password" ? "text" : "password";
+  btn.textContent = input.type === "password" ? "👁️" : "🙈";
 }
 
 // ──────────────────────────────────────────────
-// ADMIN PANEL
+// Admin panel
 // ──────────────────────────────────────────────
-function showAdminPanel() { 
-  document.getElementById("admin-modal").classList.remove("hidden"); 
-}
+function showAdminPanel() { document.getElementById("admin-modal").classList.remove("hidden"); }
 
 function loginAdmin() {
   const u = document.getElementById("admin-user").value.trim();
@@ -167,7 +138,6 @@ function loginAdmin() {
 function logoutAdmin() {
   document.getElementById("admin-panel").classList.add("hidden");
   document.getElementById("admin-pass").value = "";
-  alert("Logged out successfully");
 }
 
 function renderTeacherList() {
@@ -177,7 +147,8 @@ function renderTeacherList() {
         <div class="flex justify-between bg-white p-3 rounded-xl mb-2 shadow-sm text-sm">
           <span class="font-medium">${t.username}</span>
           <span class="text-emerald-600">Pass: ${t.password}</span>
-        </div>`).join("")
+        </div>
+      `).join("")
     : `<p class="text-gray-400 italic p-3">No teachers yet</p>`;
 }
 
@@ -186,11 +157,11 @@ function addNewTeacher() {
   const p = document.getElementById("new-teacher-pass").value.trim();
   if (!u || !p) return alert("Both fields required");
   if (teachers.some(t => t.username === u)) return alert("Username already exists");
-  
-  teachers.push({username: u, password: p});
+
+  teachers.push({ username: u, password: p });
   localStorage.setItem("teachers", JSON.stringify(teachers));
   renderTeacherList();
-  alert(`Teacher ${u} added!\nPassword: ${p}`);
+  alert(`Teacher ${u} added! Password: ${p}`);
 }
 
 function closeAdminModal() {
@@ -200,80 +171,40 @@ function closeAdminModal() {
 }
 
 // ──────────────────────────────────────────────
-// ASSIGNMENT PDF HELPERS
-// ──────────────────────────────────────────────
-function openAssignmentPdf(id) {
-  const ass = assignments.find(a => a.id === id);
-  if (!ass) return;
-  const url = ass.pdfData || ass.pdfUrl;
-  if (url) window.open(url, "_blank");
-}
-
-function downloadAssignmentPdf(id) {
-  const ass = assignments.find(a => a.id === id);
-  if (!ass) return;
-  const url = ass.pdfData || ass.pdfUrl;
-  const name = (ass.pdfName || ass.title) + (ass.pdfName && !ass.pdfName.endsWith(".pdf") ? ".pdf" : "");
-  if (!url) return;
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = name;
-  a.click();
-}
-
-// ──────────────────────────────────────────────
-// ASSIGNMENTS
+// Assignments
 // ──────────────────────────────────────────────
 function addAssignment() {
   const title = document.getElementById("ass-title").value.trim();
-  const desc  = document.getElementById("ass-desc").value.trim();
-  const nameInput = document.getElementById("ass-pdf-name").value.trim();
-  const fileInput = document.getElementById("ass-pdf-file");
+  if (!title) return alert("Title is required");
 
-  // Clear form
+  const desc = document.getElementById("ass-desc").value.trim();
+  const pdfNameInput = document.getElementById("ass-pdf-name").value.trim();
+  const file = document.getElementById("ass-pdf-file").files[0];
+
+  // Reset form
   document.getElementById("ass-title").value = "";
   document.getElementById("ass-desc").value = "";
   document.getElementById("ass-pdf-name").value = "";
-  fileInput.value = "";
+  document.getElementById("ass-pdf-file").value = "";
 
-  if (!title) {
-    alert("Title is required");
-    return;
-  }
-
-  const file = fileInput.files[0];
+  const entry = { id: Date.now(), title, desc, pdfName: null, pdfData: null };
 
   if (!file) {
-    // No file uploaded
-    assignments.unshift({
-      id: Date.now(),
-      title,
-      desc,
-      pdfName: null,
-      pdfData: null,
-      pdfUrl: null
-    });
+    assignments.unshift(entry);
     localStorage.setItem("assignments", JSON.stringify(assignments));
     renderAssignments();
     return;
   }
 
-  // File uploaded → convert to base64
-  const pdfName = nameInput || file.name;
+  entry.pdfName = pdfNameInput || file.name;
   const reader = new FileReader();
-  reader.onload = function(e) {
-    assignments.unshift({
-      id: Date.now(),
-      title,
-      desc,
-      pdfName,
-      pdfData: e.target.result,  // data:application/pdf;base64,...
-      pdfUrl: null
-    });
+  reader.onload = e => {
+    entry.pdfData = e.target.result;
+    assignments.unshift(entry);
     localStorage.setItem("assignments", JSON.stringify(assignments));
     renderAssignments();
   };
-  reader.onerror = () => alert("Failed to read PDF file");
+  reader.onerror = () => alert("Failed to read file");
   reader.readAsDataURL(file);
 }
 
@@ -281,50 +212,59 @@ function renderAssignments() {
   const container = document.getElementById("assignments-list");
   container.innerHTML = assignments.length
     ? assignments.map(ass => {
-        const hasPdf = ass.pdfData || ass.pdfUrl;
+        const hasPdf = !!ass.pdfData;
         return `
           <div class="bg-white p-5 sm:p-6 rounded-2xl shadow hover:shadow-lg transition">
             <h3 class="font-bold text-lg mb-2">${ass.title}</h3>
             <p class="text-gray-600 mb-4 line-clamp-3">${ass.desc || "No description"}</p>
-            ${hasPdf 
-              ? `
-                <div class="flex flex-col sm:flex-row gap-3">
-                  <button onclick="openAssignmentPdf(${ass.id})" 
-                    class="bg-blue-600 text-white px-5 py-2.5 rounded-lg flex-1 hover:bg-blue-700 transition">
-                    Open PDF
-                  </button>
-                  <button onclick="downloadAssignmentPdf(${ass.id})" 
-                    class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg flex-1 hover:bg-emerald-700 transition">
-                    Download
-                  </button>
-                </div>`
-              : `<p class="text-amber-600 text-sm mt-2">No PDF attached</p>`}
-          </div>`;
+            ${hasPdf ? `
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="openAssignmentPdf(${ass.id})" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg flex-1 hover:bg-blue-700">
+                  Open PDF
+                </button>
+                <button onclick="downloadAssignmentPdf(${ass.id})" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg flex-1 hover:bg-emerald-700">
+                  Download
+                </button>
+              </div>
+            ` : `<p class="text-amber-600 text-sm mt-2">No PDF attached</p>`}
+          </div>
+        `;
       }).join("")
     : `<p class="text-center text-gray-500 py-10">No assignments yet</p>`;
 }
 
+function openAssignmentPdf(id) {
+  const ass = assignments.find(a => a.id === id);
+  if (ass?.pdfData) window.open(ass.pdfData, "_blank");
+}
+
+function downloadAssignmentPdf(id) {
+  const ass = assignments.find(a => a.id === id);
+  if (!ass?.pdfData) return;
+  const a = document.createElement("a");
+  a.href = ass.pdfData;
+  a.download = ass.pdfName || `${ass.title}.pdf`;
+  a.click();
+}
+
 // ──────────────────────────────────────────────
-// DAILY ENGLISH
+// Daily English Quiz
 // ──────────────────────────────────────────────
 function renderDailyEnglish() {
-  const day = new Date().getDay();
-  const storyObj = WEEKLY_ENGLISH_STORIES[day] || WEEKLY_ENGLISH_STORIES[0];
+  const story = WEEKLY_ENGLISH_STORIES[0];
+  document.getElementById("english-title").textContent =
+    `Daily English: ${story.title} (${new Date().toLocaleDateString('en-KE', {weekday:'long'})})`;
 
-  document.getElementById("english-title").textContent = 
-    `Daily English: ${storyObj.title} (${new Date().toLocaleDateString('en-KE', {weekday:'long'})})`;
+  document.getElementById("story-box").innerHTML = `<strong>Story:</strong><br>${story.story}`;
 
-  document.getElementById("story-box").innerHTML = 
-    `<strong>Story:</strong><br>${storyObj.story}`;
-
-  currentQuestions = storyObj.questions;
+  currentQuestions = story.questions;
   englishAnswers.fill(null);
 
-  document.getElementById("english-questions").innerHTML = storyObj.questions.map((q,i) => `
+  document.getElementById("english-questions").innerHTML = story.questions.map((q, i) => `
     <div class="mb-6">
       <p class="font-semibold mb-3">${i+1}. ${q.q}</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        ${q.o.map((opt,idx) => `
+        ${q.o.map((opt, idx) => `
           <label class="flex items-center gap-3 p-3 sm:p-4 border rounded-xl cursor-pointer hover:bg-yellow-50 transition">
             <input type="radio" name="q${i}" value="${idx}" onchange="englishAnswers[${i}]=${idx}" class="w-5 h-5 accent-green-600">
             <span>${opt}</span>
@@ -336,28 +276,26 @@ function renderDailyEnglish() {
 }
 
 function submitEnglishQuiz() {
-  if (englishAnswers.includes(null)) return alert("Answer all 10 questions first");
+  if (englishAnswers.includes(null)) return alert("Please answer all 10 questions");
 
   let correct = 0;
-  englishAnswers.forEach((a,i) => {
-    if (a === currentQuestions[i].c) correct++;
+  englishAnswers.forEach((ans, i) => {
+    if (ans === currentQuestions[i].c) correct++;
   });
 
-  const percent = Math.round(correct / 10 * 100);
-  const emoji    = percent >= 80 ? "🎉🥳🔥✨" : percent >= 50 ? "👏😊👍" : "📚💪";
-  const message  = percent >= 90 ? "Outstanding! You're a star!" :
-                   percent >= 70 ? "Great job! Keep shining!" :
-                   percent >= 50 ? "Good effort! Practice more!" : "Don't give up – try again tomorrow!";
+  const percent = Math.round((correct / 10) * 100);
+  const emoji = percent >= 80 ? "🎉🥳🔥" : percent >= 50 ? "👏😊" : "📚💪";
+  const msg = percent >= 90 ? "Outstanding!" :
+              percent >= 70 ? "Great job!" :
+              percent >= 50 ? "Good effort!" : "Keep practicing!";
 
-  const container = document.getElementById("english-questions");
-  container.innerHTML = `
+  document.getElementById("english-questions").innerHTML = `
     <div class="score-popup">
       <div class="text-6xl mb-4">${emoji}</div>
       <h3 class="text-5xl font-bold mb-3">${percent}%</h3>
       <p class="text-xl mb-2">${correct}/10 correct</p>
-      <p class="text-lg mb-6">${message}</p>
-      <button onclick="renderDailyEnglish()" 
-        class="bg-white text-emerald-800 px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition">
+      <p class="text-lg mb-6">${msg}</p>
+      <button onclick="renderDailyEnglish()" class="bg-white text-emerald-800 px-8 py-3 rounded-xl font-bold hover:bg-gray-100">
         Try Again Tomorrow
       </button>
     </div>
@@ -365,43 +303,35 @@ function submitEnglishQuiz() {
 }
 
 // ──────────────────────────────────────────────
-// TABS & UI
+// Tabs
 // ──────────────────────────────────────────────
 function switchTab(idx) {
-  document.querySelectorAll(".tab-button").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
   document.getElementById(`tab-${idx}`).classList.add("active");
 
-  ["assignments-section","quizzes-section","english-section"].forEach(id => {
-    const section = document.getElementById(id);
-    if (section) section.classList.add("hidden");
-  });
+  document.querySelectorAll("section[id$='-section']").forEach(s => s.classList.add("hidden"));
+  document.getElementById(`${["assignments","quizzes","english"][idx]}-section`).classList.remove("hidden");
 
-  if (idx === 0) document.getElementById("assignments-section").classList.remove("hidden");
-  if (idx === 1) document.getElementById("quizzes-section").classList.remove("hidden");
-  if (idx === 2) {
-    document.getElementById("english-section").classList.remove("hidden");
-    renderDailyEnglish();
-  }
+  if (idx === 2) renderDailyEnglish();
 }
 
 function renderAll() {
   const isTeacher = currentRole === "teacher";
-  document.getElementById("teacher-assignments-form").classList.toggle("hidden", !isTeacher);
+  document.getElementById("teacher-assignments-form")?.classList.toggle("hidden", !isTeacher);
   renderAssignments();
 }
 
 // ──────────────────────────────────────────────
-// INIT
+// Init
 // ──────────────────────────────────────────────
-window.onload = () => {
+window.addEventListener("load", () => {
   if (!currentRole) {
     showWelcomeOverlay();
   } else {
+    hideWelcomeOverlay();
     selectRole(currentRole);
   }
-
   updateDateTimeAndWeather();
-  setInterval(updateDateTimeAndWeather, 600000); // 10 minutes
-
+  setInterval(updateDateTimeAndWeather, 600_000);
   renderAll();
-};
+});
