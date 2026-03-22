@@ -1,9 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masasa Online</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="bg-gray-50 font-sans antialiased">
+
+<div id="role-overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+  <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl mx-4">
+    <div id="welcome-info" class="mb-6 p-4 bg-indigo-50 rounded-2xl">
+        <div id="live-date" class="text-indigo-700 font-bold text-lg"></div>
+        <div id="live-time" class="text-3xl font-black text-gray-800 my-1">00:00:00</div>
+        <div id="weather" class="text-gray-500 font-medium italic">Sunny in Nairobi</div>
+    </div>
+    <h1 class="text-4xl font-extrabold text-indigo-700 mb-6">Masasa Online 🎉</h1>
+    <div id="role-buttons">
+        <button onclick="selectRole('student')" class="w-full bg-orange-500 text-white py-6 rounded-2xl text-2xl font-bold mb-4 shadow-lg active:scale-95 transition-transform">Learner 👩‍🎓</button>
+        <button onclick="showAdminLogin()" class="w-full bg-slate-800 text-white py-6 rounded-2xl text-2xl font-bold shadow-lg active:scale-95 transition-transform">Admin 🔐</button>
+    </div>
+    <div id="admin-login" class="hidden mt-4">
+      <input id="admin-pass" type="password" placeholder="Admin Password" class="w-full p-4 border-2 border-indigo-100 rounded-xl mb-3 outline-none focus:border-indigo-500">
+      <button onclick="validateAdmin()" class="bg-indigo-600 text-white w-full py-4 rounded-2xl font-bold">Login</button>
+      <button onclick="hideAdminLogin()" class="mt-4 text-gray-400 text-sm underline block w-full text-center">Back</button>
+    </div>
+  </div>
+</div>
+
+<header id="main-header" class="hidden bg-indigo-700 text-white p-4 sticky top-0 z-40 shadow-lg">
+  <div class="max-w-6xl mx-auto flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Masasa Online 🇰🇪</h1>
+    <button onclick="location.reload()" class="bg-white/20 px-6 py-2 rounded-lg text-sm font-bold">Logout</button>
+  </div>
+</header>
+
+<main id="main-content" class="max-w-6xl mx-auto p-6 hidden">
+  <div id="admin-tools" class="hidden mb-10 p-6 bg-white rounded-3xl border-2 border-dashed border-indigo-200">
+      <h3 class="font-bold text-indigo-700 mb-4 text-xl">Admin: Upload PDF Lesson</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input id="pdf-title" type="text" placeholder="Lesson Title" class="p-3 border rounded-xl">
+          <input id="pdf-file" type="file" accept="application/pdf" class="p-2 border rounded-xl">
+      </div>
+      <button onclick="uploadPDF()" class="mt-4 bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold">Upload to Portal</button>
+  </div>
+
+  <section id="assignments-section" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></section>
+</main>
+
 <div id="pdf-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex flex-col">
     <div class="p-4 flex justify-between items-center bg-indigo-700 text-white">
-        <h3 id="pdf-modal-title" class="font-bold truncate mr-4">Viewing Document</h3>
-        <button onclick="closePDF()" class="bg-red-500 px-6 py-2 rounded-xl font-bold hover:bg-red-600 transition-colors">Close & Return ✕</button>
+        <h3 id="pdf-modal-title" class="font-bold truncate">Viewing Document</h3>
+        <button onclick="closePDF()" class="bg-red-500 px-6 py-2 rounded-xl font-bold">Close ✕</button>
     </div>
-    <div class="flex-grow">
-        <iframe id="pdf-frame" class="w-full h-full border-none" src=""></iframe>
-    </div>
+    <iframe id="pdf-frame" class="w-full flex-grow border-none" src=""></iframe>
 </div>
+
+<script src="index.js"></script>
+</body>
+</html>
