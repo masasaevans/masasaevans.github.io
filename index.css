@@ -1,22 +1,32 @@
-.tab-button {
-  transition: all 0.3s;
-}
-.tab-button.active {
-  border-color: #4f46e5;
-  color: #4f46e5;
-  font-weight: 600;
+/* Previous styles ... */
+
+.role-btn {
+  transition: all 0.3s ease;
 }
 
-.card {
-  transition: transform 0.2s;
-}
-.card:hover {
-  transform: translateY(-4px);
+.role-btn:hover {
+  transform: scale(1.08) rotate(2deg);
 }
 
-.option-label {
-  transition: all 0.2s;
+/* Learner theme overrides */
+.learner-theme {
+  background: linear-gradient(to bottom right, #fffaf0, #e0f7fa);
 }
-.option-label:hover {
-  background-color: #f3f4f6;
+
+.learner-theme h1, .learner-theme h2, .learner-theme h3 {
+  color: #FF6B6B;
 }
+
+.learner-theme .bg-indigo-600 {
+  background-color: #FF6B6B !important;
+}
+
+.learner-theme .text-indigo-700 {
+  color: #9B59B6 !important;
+}
+
+.learner-theme button.bg-green-600 {
+  background-color: #2ECC71 !important;
+}
+
+/* Add more overrides as needed for buttons, cards etc. */
