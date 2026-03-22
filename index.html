@@ -7,13 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
     <style>
+        html { scroll-behavior: smooth; } /* Makes the auto-jump smooth */
         .marquee-wrapper { display: inline-block; white-space: nowrap; animation: marquee-scroll 25s linear infinite; padding-left: 100%; }
         @keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+        
         .bubble-text { font-family: 'Bubblegum Sans', cursive; transition: 0.3s; cursor: pointer; }
         .bubble-text:hover { color: #f97316 !important; transform: scale(1.05); }
-        .quiz-card { border-left: 8px solid #4f46e5; border-radius: 2.5rem; background: white; margin-bottom: 2rem; transition: all 0.3s; }
-        .quiz-card:nth-child(even) { border-left-color: #f97316; }
-        .quiz-card.answered { border-left-color: #22c55e; opacity: 0.8; transform: scale(0.98); }
+        
+        /* THE FOCUS CSS */
+        .quiz-card { 
+            border-left: 12px solid #e2e8f0; 
+            border-radius: 2.5rem; 
+            background: white; 
+            margin-bottom: 2.5rem; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            opacity: 0.9;
+        }
+        .quiz-card.active-q { border-left-color: #4f46e5; opacity: 1; transform: scale(1.02); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .quiz-card.answered { border-left-color: #22c55e; opacity: 0.7; transform: scale(0.95); }
+        
         select { font-size: 16px !important; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
     </style>
 </head>
@@ -39,7 +51,7 @@
         <button onclick="showAdminLogin()" class="w-full bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold">Admin 🔐</button>
     </div>
     <div id="admin-login" class="hidden mt-6">
-      <input id="admin-pass" type="password" placeholder="Admin Key" class="w-full p-4 border-2 border-indigo-100 rounded-2xl mb-4 text-center font-bold outline-none focus:border-indigo-600">
+      <input id="admin-pass" type="password" placeholder="Admin Key" class="w-full p-4 border-2 border-indigo-100 rounded-2xl mb-4 text-center font-bold outline-none">
       <button onclick="validateAdmin()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg">Login as Evans</button>
       <button onclick="hideAdminLogin()" class="mt-4 text-slate-400 text-xs font-bold uppercase underline block w-full">Back</button>
     </div>
@@ -52,8 +64,7 @@
         <span class="text-xl">⭐</span>
         <span id="star-count" class="font-black text-yellow-700 text-lg">0</span>
     </div>
-    <h1 class="bubble-text text-xl md:text-2xl text-indigo-600 hidden md:block">Masasa Portal</h1>
-    <button onclick="quitPortal()" class="bg-red-50 text-red-500 px-6 py-2 rounded-full font-black text-xs border-2 border-red-100">QUIT</button>
+    <button onclick="quitPortal()" class="bg-red-50 text-red-500 px-6 py-2 rounded-full font-black text-xs border-2 border-red-100 uppercase">Exit School</button>
   </div>
 </header>
 
@@ -61,23 +72,20 @@
   <section id="admin-tools" class="hidden mb-10 p-6 bg-white rounded-[2.5rem] shadow-xl border-4 border-indigo-200">
       <h3 class="text-xl font-black text-indigo-700 mb-4 uppercase">Admin: Evans Masasa</h3>
       <div class="space-y-4">
-          <input id="ann-input" type="text" placeholder="Update Marquee Message" class="w-full p-4 border rounded-2xl bg-slate-50 font-bold outline-none">
-          <button onclick="updateAnnouncement()" class="w-full bg-yellow-400 py-3 rounded-2xl font-black text-yellow-900 shadow-md">Update Banner</button>
+          <input id="ann-input" type="text" placeholder="Change Scrolling Banner" class="w-full p-4 border rounded-2xl bg-slate-50 font-bold">
+          <button onclick="updateAnnouncement()" class="w-full bg-yellow-400 py-3 rounded-2xl font-black text-yellow-900 shadow-md">Apply Update</button>
       </div>
       <div class="mt-6 bg-indigo-50 p-6 rounded-3xl border-2 border-indigo-100">
-          <label class="font-black text-indigo-700 block mb-3">Post PDF Lesson</label>
+          <label class="font-black text-indigo-700 block mb-3">Upload PDF Lesson</label>
           <div class="grid gap-3">
-              <input id="pdf-title" type="text" placeholder="Lesson Name" class="p-4 rounded-xl border">
+              <input id="pdf-title" type="text" placeholder="Lesson Title" class="p-4 rounded-xl border">
               <input id="pdf-file" type="file" accept="application/pdf" onclick="this.value=null" class="p-3 rounded-xl border bg-white">
-              <div class="flex items-center gap-2">
-                  <span class="text-xs font-bold text-slate-400">EXPIRY:</span>
-                  <input id="pdf-expiry" type="date" class="flex-1 p-3 rounded-xl border">
-              </div>
-              <button onclick="uploadPDF()" class="bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg">Publish Lesson</button>
+              <input id="pdf-expiry" type="date" class="p-3 rounded-xl border">
+              <button onclick="uploadPDF()" class="bg-indigo-600 text-white font-black py-4 rounded-xl">Post to Learner Place</button>
           </div>
           <div class="mt-4">
               <div class="flex justify-between text-[10px] font-black uppercase text-slate-500 mb-1">
-                  <span>Cloud Storage</span> <span id="storage-pct">0%</span>
+                  <span>Storage Used</span> <span id="storage-pct">0%</span>
               </div>
               <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                   <div id="storage-bar" class="bg-indigo-500 h-full transition-all" style="width: 0%"></div>
@@ -87,15 +95,15 @@
   </section>
 
   <section id="quiz-selector" class="mb-8 p-6 md:p-10 bg-white rounded-[2.5rem] shadow-xl border-4 border-white text-center">
-    <h2 class="text-3xl font-black text-indigo-700 mb-6 uppercase tracking-tighter">Quick Quiz 🚀</h2>
+    <h2 class="text-3xl font-black text-indigo-700 mb-6 uppercase">Quick Quiz 🚀</h2>
     <div class="flex flex-col gap-4 max-w-md mx-auto">
-        <select id="subject-select" onchange="handleSubjectChange()" class="w-full p-5 rounded-2xl border-4 border-indigo-50 font-black text-indigo-600 outline-none">
+        <select id="subject-select" onchange="handleSubjectChange()" class="w-full p-5 rounded-2xl border-4 border-indigo-50 font-black text-indigo-600">
             <option value="">Select Subject...</option>
-            <option value="literacy">Literacy (Comprehension & Grammar) 📖</option>
-            <option value="numeracy">Numeracy (Khan-style Maths) 🔢</option>
+            <option value="literacy">Literacy 📖</option>
+            <option value="numeracy">Numeracy 🔢</option>
         </select>
         <div id="grade-container" class="hidden">
-            <select id="grade-select" onchange="handleGradeChange()" class="w-full p-5 rounded-2xl border-4 border-orange-100 font-black text-orange-500 outline-none">
+            <select id="grade-select" onchange="handleGradeChange()" class="w-full p-5 rounded-2xl border-4 border-orange-100 font-black text-orange-500">
                 <option value="">Choose Grade...</option>
                 <option value="G1">Grade 1</option><option value="G2">Grade 2</option><option value="G3">Grade 3</option>
                 <option value="G4">Grade 4</option><option value="G5">Grade 5</option><option value="G6">Grade 6</option>
@@ -103,8 +111,8 @@
             </select>
         </div>
     </div>
-    <button onclick="generateAIQuiz()" id="start-btn" class="hidden mt-8 w-full md:w-auto bg-indigo-600 text-white px-12 py-5 rounded-full font-black text-xl shadow-xl active:scale-95 transition-all">
-      GENERATE 10 QUESTIONS ✍️
+    <button onclick="generateAIQuiz()" id="start-btn" class="hidden mt-8 w-full md:w-auto bg-indigo-600 text-white px-12 py-5 rounded-full font-black text-xl shadow-xl">
+      START 10 QUESTIONS ✍️
     </button>
   </section>
 
@@ -117,11 +125,11 @@
 </main>
 
 <div id="score-modal" class="hidden fixed inset-0 bg-indigo-900/95 flex items-center justify-center z-[100] p-4">
-    <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center border-8 border-white animate-bounce-in">
+    <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center border-8 border-white">
         <div class="text-8xl mb-4" id="score-emoji">🎉</div>
         <div id="final-percent" class="text-7xl font-black text-orange-500 mb-2">0%</div>
         <p id="score-feedback" class="text-lg font-bold text-slate-500 mb-8 italic"></p>
-        <button onclick="closeModal()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg">CONTINUE LEARNING</button>
+        <button onclick="closeModal()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg uppercase">Next Lesson</button>
     </div>
 </div>
 
