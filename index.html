@@ -1,62 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Masasa Online</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="min-h-screen bg-gray-50 font-sans antialiased">
+<body class="bg-gray-50 font-sans antialiased">
 
-<!-- Role overlay -->
+<!-- Role selection overlay -->
 <div id="role-overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-  <div class="bg-white rounded-3xl p-6 sm:p-10 w-[90vw] max-w-lg text-center shadow-2xl animate-fade-in">
-    <h2 class="text-4xl sm:text-5xl font-extrabold mb-6 text-indigo-700 animate-bounce">
-      Welcome to Masasa Online 🎉
-    </h2>
+  <div class="bg-white rounded-3xl p-6 sm:p-10 w-[90vw] max-w-lg text-center shadow-2xl">
+    <h2 class="text-4xl sm:text-5xl font-extrabold mb-6 text-indigo-700">Welcome to Masasa Online 🎉</h2>
     <p class="text-lg sm:text-xl mb-8 text-gray-700">Who are you today?</p>
-
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-      <button onclick="selectRole('learner')"
-        class="role-btn bg-gradient-to-br from-red-500 to-orange-500 text-white py-6 sm:py-8 rounded-2xl text-lg sm:text-2xl font-bold shadow-lg hover:scale-105 transition min-h-[100px]">
+      <button onclick="selectRole('student')"
+        class="role-btn bg-gradient-to-br from-red-500 to-orange-500 text-white py-6 sm:py-8 rounded-2xl text-lg sm:text-2xl font-bold shadow-lg transition min-h-[100px]">
         Learner 👩‍🎓
       </button>
       <button onclick="selectRole('parent')"
-        class="role-btn bg-gradient-to-br from-teal-400 to-cyan-500 text-white py-6 sm:py-8 rounded-2xl text-lg sm:text-2xl font-bold shadow-lg hover:scale-105 transition min-h-[100px]">
+        class="role-btn bg-gradient-to-br from-teal-400 to-cyan-500 text-white py-6 sm:py-8 rounded-2xl text-lg sm:text-2xl font-bold shadow-lg transition min-h-[100px]">
         Parent 👨‍👩‍👧
       </button>
       <button onclick="showTeacherLogin()"
-        class="role-btn bg-gradient-to-br from-indigo-600 to-indigo-900 text-white py-6 sm:py-8 rounded-2xl text-lg sm:text-2xl font-bold shadow-lg hover:scale-105 transition min-h-[100px]">
+        class="role-btn bg-gradient-to-br from-indigo-600 to-indigo-900 text-white py-6 sm:py-8 rounded-2xl text-lg sm:text-2xl font-bold shadow-lg transition min-h-[100px]">
         Teacher 👩‍🏫
       </button>
     </div>
 
-    <!-- Teacher login form -->
+    <!-- Teacher login -->
     <div id="teacher-login" class="hidden mt-8">
-      <input id="teacher-username" type="text" placeholder="Username (given by admin)" 
-        class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-base sm:text-lg focus:outline-none focus:border-indigo-500">
-      
-      <div class="relative">
-        <input id="teacher-pass" type="password" placeholder="Password" 
-          class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-base sm:text-lg focus:outline-none focus:border-indigo-500 pr-12">
-        <button type="button" onclick="toggleVisibility(this)" 
+      <input id="teacher-username" type="text" placeholder="Username"
+        class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-base sm:text-lg focus:outline-none focus:border-indigo-500" />
+      <div class="relative mb-4">
+        <input id="teacher-pass" type="password" placeholder="Password"
+          class="w-full p-4 border-2 border-indigo-300 rounded-xl text-base sm:text-lg focus:outline-none focus:border-indigo-500 pr-12" />
+        <button type="button" onclick="toggleVisibility(this)"
           class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-2xl">👁️</button>
       </div>
-
-      <button onclick="validateTeacher()" 
+      <button onclick="validateTeacher()"
         class="bg-green-600 text-white px-8 py-4 rounded-2xl text-base sm:text-lg font-bold w-full hover:bg-green-700 transition">
         Login as Teacher
       </button>
-      <button onclick="hideTeacherLogin()" 
+      <button onclick="hideTeacherLogin()"
         class="text-gray-600 mt-4 underline block mx-auto text-sm sm:text-base">
-        Back to selection
+        Back
       </button>
     </div>
   </div>
 </div>
 
-<!-- Header -->
 <header id="main-header" class="hidden bg-gradient-to-r from-indigo-700 to-indigo-900 text-white shadow-lg sticky top-0 z-40">
   <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
     <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
@@ -64,12 +58,11 @@
       <div id="datetime" class="text-sm sm:text-base opacity-90"></div>
     </div>
     <div class="flex items-center gap-4 sm:gap-6">
-      <div id="weather" class="flex items-center gap-2 text-sm sm:text-base">
+      <div class="flex items-center gap-2 text-sm sm:text-base">
         <span id="weather-icon" class="text-2xl sm:text-3xl"></span>
         <span id="weather-text">--°C • Loading…</span>
       </div>
-      <button onclick="resetRole()" 
-        class="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 text-sm sm:text-base">
+      <button onclick="resetRole()" class="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 text-sm sm:text-base">
         Change Role
       </button>
     </div>
@@ -77,84 +70,60 @@
 </header>
 
 <main id="main-content" class="max-w-6xl mx-auto px-4 py-6 sm:py-8 hidden">
-
-  <!-- Tabs -->
   <div class="flex border-b mb-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
-    <button onclick="switchTab(0)" id="tab-0" 
-      class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap active">
+    <button id="tab-0" onclick="switchTab(0)" class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap active">
       Assignments
     </button>
-    <button onclick="switchTab(1)" id="tab-1" 
-      class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap">
+    <button id="tab-1" onclick="switchTab(1)" class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap">
       Quizzes
     </button>
-    <button onclick="switchTab(2)" id="tab-2" 
-      class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap">
+    <button id="tab-2" onclick="switchTab(2)" class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap">
       Daily English 📖
     </button>
   </div>
 
-  <!-- Assignments -->
   <section id="assignments-section">
     <div id="teacher-assignments-form" class="hidden bg-white p-5 sm:p-6 rounded-2xl shadow mb-6 sm:mb-8">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">Post New Assignment</h2>
-      <input id="ass-title" type="text" placeholder="Title (required)" 
-        class="w-full mb-3 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-      <textarea id="ass-desc" placeholder="Description" 
-        class="w-full mb-3 p-3 border rounded-lg h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-      
-      <!-- PDF Upload -->
+      <input id="ass-title" type="text" placeholder="Title (required)" class="w-full mb-3 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      <textarea id="ass-desc" placeholder="Description" class="w-full mb-3 p-3 border rounded-lg h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
       <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-2">Upload PDF (optional) + Name it</label>
-        <input id="ass-pdf-name" type="text" placeholder="Filename (e.g. Math-Chapter-5.pdf)" 
-          class="w-full p-3 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <input id="ass-pdf-file" type="file" accept="application/pdf" 
-          class="w-full p-3 border rounded-lg file:mr-4 file:py-2 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Upload PDF (optional)</label>
+        <input id="ass-pdf-name" type="text" placeholder="Display name (optional)" class="w-full p-3 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <input id="ass-pdf-file" type="file" accept="application/pdf" class="w-full p-3 border rounded-lg file:mr-4 file:py-2 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
       </div>
-
-      <button onclick="addAssignment()" 
-        class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 w-full sm:w-auto transition">
+      <button onclick="addAssignment()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 w-full sm:w-auto transition">
         Post Assignment
       </button>
     </div>
-
     <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Assignments</h2>
     <div id="assignments-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
   </section>
 
-  <!-- Quizzes -->
   <section id="quizzes-section" class="hidden">
     <div class="bg-white rounded-3xl shadow-xl p-8 text-center">
       <h2 class="text-3xl font-bold text-indigo-600 mb-4">Quizzes 📝</h2>
-      <p class="text-gray-500 text-lg">More interactive quizzes coming soon!<br>Stay tuned for daily challenges.</p>
+      <p class="text-gray-500 text-lg">More quizzes coming soon!</p>
     </div>
   </section>
 
-  <!-- Daily English -->
   <section id="english-section" class="hidden">
     <div class="bg-white rounded-3xl shadow-xl p-5 sm:p-8">
-      <h2 class="text-2xl sm:text-3xl font-bold mb-2 text-red-600" id="english-title">Daily English Comprehension</h2>
-      <p class="text-sm text-gray-500 mb-6">10 questions • New story each weekday</p>
-
-      <div id="story-box" class="bg-amber-50 p-5 sm:p-6 rounded-2xl mb-6 sm:mb-8 text-gray-800 leading-relaxed prose max-w-none">
-      </div>
-
+      <h2 id="english-title" class="text-2xl sm:text-3xl font-bold mb-2 text-red-600">Daily English Comprehension</h2>
+      <p class="text-sm text-gray-500 mb-6">10 questions • New story each day</p>
+      <div id="story-box" class="bg-amber-50 p-5 sm:p-6 rounded-2xl mb-6 sm:mb-8 text-gray-800 leading-relaxed prose max-w-none"></div>
       <div id="english-questions" class="space-y-6 sm:space-y-8"></div>
-
-      <button onclick="submitEnglishQuiz()" 
-        class="mt-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl text-base sm:text-lg font-bold w-full sm:w-auto hover:bg-emerald-700 transition">
+      <button onclick="submitEnglishQuiz()" class="mt-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl text-base sm:text-lg font-bold w-full sm:w-auto hover:bg-emerald-700 transition">
         Submit & See Score
       </button>
     </div>
   </section>
-
 </main>
 
 <footer class="text-center py-6 sm:py-8 text-gray-500 text-sm border-t mt-auto relative">
   Masasa Online • Nairobi • 2026
   <div class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50">
-    <button onclick="showAdminPanel()" 
-      class="bg-gray-300/90 hover:bg-gray-400 text-xs px-4 py-1.5 rounded-full shadow transition">
+    <button onclick="showAdminPanel()" class="bg-gray-300/90 hover:bg-gray-400 text-xs px-4 py-1.5 rounded-full shadow transition">
       👨‍💼 ADMIN
     </button>
   </div>
@@ -164,50 +133,34 @@
 <div id="admin-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
   <div class="bg-white rounded-3xl p-6 sm:p-8 w-[90vw] max-w-sm">
     <h3 class="text-xl sm:text-2xl font-bold mb-6">Admin Login</h3>
-    
-    <input id="admin-user" value="admin" 
-      class="w-full p-4 border rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-    
+    <input id="admin-user" value="admin" class="w-full p-4 border rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
     <div class="relative">
-      <input id="admin-pass" type="password" placeholder="Password" 
-        class="w-full p-4 border rounded-xl mb-6 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-      <button type="button" onclick="toggleVisibility(this)" 
-        class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-2xl">👁️</button>
+      <input id="admin-pass" type="password" placeholder="Password" class="w-full p-4 border rounded-xl mb-6 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      <button type="button" onclick="toggleVisibility(this)" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-2xl">👁️</button>
     </div>
-
-    <button onclick="loginAdmin()" 
-      class="bg-indigo-700 text-white w-full py-4 rounded-2xl text-lg hover:bg-indigo-800 transition">
+    <button onclick="loginAdmin()" class="bg-indigo-700 text-white w-full py-4 rounded-2xl text-lg hover:bg-indigo-800 transition">
       Login
     </button>
 
     <div id="admin-panel" class="hidden mt-8">
       <h4 class="font-semibold mb-4 flex items-center justify-between">
         Teachers
-        <button onclick="logoutAdmin()" 
-          class="text-red-500 text-sm underline hover:text-red-600">Logout</button>
+        <button onclick="logoutAdmin()" class="text-red-500 text-sm underline hover:text-red-600">Logout</button>
       </h4>
       <div id="teacher-list" class="mb-6 max-h-60 overflow-y-auto border rounded-xl p-2 bg-gray-50"></div>
-      
+
       <div class="border-t pt-6">
         <h4 class="font-semibold mb-4">Add New Teacher</h4>
-        <input id="new-teacher-user" placeholder="New username" 
-          class="w-full p-3 border rounded-xl mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        
+        <input id="new-teacher-user" placeholder="New username" class="w-full p-3 border rounded-xl mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
         <div class="relative">
-          <input id="new-teacher-pass" type="password" placeholder="Password" 
-            class="w-full p-3 border rounded-xl mb-4 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <button type="button" onclick="toggleVisibility(this)" 
-            class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-2xl">👁️</button>
+          <input id="new-teacher-pass" type="password" placeholder="Password" class="w-full p-3 border rounded-xl mb-4 pr-12 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <button type="button" onclick="toggleVisibility(this)" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-2xl">👁️</button>
         </div>
-
-        <button onclick="addNewTeacher()" 
-          class="bg-emerald-600 text-white px-6 py-3 rounded-xl w-full hover:bg-emerald-700 transition">
+        <button onclick="addNewTeacher()" class="bg-emerald-600 text-white px-6 py-3 rounded-xl w-full hover:bg-emerald-700 transition">
           Add Teacher
         </button>
       </div>
-
-      <button onclick="closeAdminModal()" 
-        class="mt-6 text-red-500 underline block mx-auto text-sm">Close Window</button>
+      <button onclick="closeAdminModal()" class="mt-6 text-red-500 underline block mx-auto text-sm">Close</button>
     </div>
   </div>
 </div>
