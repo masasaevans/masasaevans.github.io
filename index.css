@@ -42,3 +42,11 @@
 .learner-theme button.bg-indigo-600:hover {
   background-color: #FF4757 !important;
 }
+/* New styles for Daily English & Admin */
+#english-questions label:hover {
+  background-color: #fefce8;
+}
+.admin-pill {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
