@@ -6,21 +6,47 @@ let currentQuestions = [];
 
 const STORY = {
   title: "The Singing Matatu",
-  story: "Every Sunday morning in Eastlands, little Zawadi loved riding the number 19 matatu. One day the radio stopped working, but the passengers started singing old nyatiti songs together. The driver joined in with a deep voice. By the time they reached town, everyone was smiling. Zawadi learned that music can turn any journey into a happy one.",
+  story: "Every Sunday morning in Eastlands, little Zawadi loved riding the number 19 matatu. One day the radio stopped working, but the passengers started singing old nyatiti songs together...",
   questions: [
-    {q:"When does Zawadi usually ride the matatu?", o:["Saturday","Sunday","Monday","Friday"], c:1},
-    {q:"What broke in the matatu?", o:["Engine","Radio","Door","Seats"], c:1},
-    {q:"What did passengers start doing?", o:["Arguing","Singing","Sleeping","Eating"], c:1},
-    {q:"Which instrument is mentioned?", o:["Guitar","Nyatiti","Piano","Drum"], c:1},
-    {q:"Who had a deep voice?", o:["Zawadi","Driver","Child","Old lady"], c:1},
-    {q:"Where did they reach?", o:["Village","Town","School","Market"], c:1},
-    {q:"What did Zawadi learn?", o:["Music is expensive","Music makes journeys happy","Matatus are fast","Singing is bad"], c:1},
-    {q:"What kind of songs?", o:["New pop","Old nyatiti","School","None"], c:1},
-    {q:"How did people feel at the end?", o:["Angry","Sad","Smiling","Tired"], c:2},
-    {q:"Main lesson?", o:["Never ride matatus","Music brings joy","Radios are important","Sundays are boring"], c:1}
+    {q:"When does Zawadi ride?", o:["Sat","Sun","Mon","Fri"], c:1},
+    {q:"What broke?", o:["Engine","Radio","Door","Seats"], c:1},
+    {q:"What did passengers do?", o:["Argue","Sing","Sleep","Eat"], c:1},
+    {q:"Instrument?", o:["Guitar","Nyatiti","Piano","Drum"], c:1},
+    {q:"Deep voice?", o:["Zawadi","Driver","Child","Lady"], c:1},
+    {q:"Reached?", o:["Village","Town","School","Market"], c:1},
+    {q:"Learned?", o:["Music expensive","Music makes happy","Fast","Bad"], c:1},
+    {q:"Songs?", o:["Pop","Nyatiti","School","None"], c:1},
+    {q:"Feeling?", o:["Angry","Sad","Smiling","Tired"], c:2},
+    {q:"Lesson?", o:["Never ride","Music joy","Radio","Boring"], c:1}
   ]
 };
 
+// === POPUP SYSTEM (no more alerts) ===
+function showPopup(message, type = "success") {
+  const popup = document.getElementById("popup");
+  const icon = document.getElementById("popup-icon");
+  const title = document.getElementById("popup-title");
+  const msg = document.getElementById("popup-message");
+
+  if (type === "success") {
+    icon.textContent = "🎉";
+    title.textContent = "Success!";
+    title.className = "text-2xl font-bold mb-2 text-emerald-600";
+  } else {
+    icon.textContent = "⚠️";
+    title.textContent = "Oops!";
+    title.className = "text-2xl font-bold mb-2 text-red-600";
+  }
+
+  msg.textContent = message;
+  popup.classList.remove("hidden");
+}
+
+function closePopup() {
+  document.getElementById("popup").classList.add("hidden");
+}
+
+// === ROLE & LOGIN ===
 function selectRole(role) {
   currentRole = role;
   localStorage.setItem("masasaRole", role);
@@ -35,7 +61,7 @@ function showTeacherLogin() {
 }
 
 function toggleVisibility(btn) {
-  const input = btn.closest('div').querySelector('input');
+  const input = btn.parentElement.querySelector("input");
   input.type = input.type === "password" ? "text" : "password";
   btn.textContent = input.type === "password" ? "👁️" : "🙈";
 }
@@ -46,7 +72,7 @@ function validateTeacher() {
   if (teachers.some(t => t.username === u && t.password === p) || (u === "teacher" && p === "1234")) {
     selectRole("teacher");
   } else {
-    alert("Wrong username or password");
+    showPopup("Wrong username or password", "error");
   }
 }
 
@@ -57,22 +83,28 @@ function resetRole() {
   }
 }
 
+// === ASSIGNMENTS ===
 function addAssignment() {
   const title = document.getElementById("ass-title").value.trim();
-  if (!title) return alert("Title is required");
+  if (!title) {
+    showPopup("Title is required", "error");
+    return;
+  }
   assignments.unshift({ id: Date.now(), title });
   localStorage.setItem("assignments", JSON.stringify(assignments));
   renderAssignments();
+  document.getElementById("ass-title").value = "";
+  document.getElementById("ass-desc").value = "";
 }
 
 function renderAssignments() {
-  const list = document.getElementById("assignments-list");
-  list.innerHTML = assignments.length ? assignments.map(a => `
-    <div class="bg-white p-6 rounded-2xl shadow">
-      <h3 class="font-bold text-lg">${a.title}</h3>
-    </div>`).join("") : "<p class='text-gray-500'>No assignments yet</p>";
+  const container = document.getElementById("assignments-list");
+  container.innerHTML = assignments.length 
+    ? assignments.map(a => `<div class="bg-white p-5 rounded-2xl shadow"><h3 class="font-bold">${a.title}</h3></div>`).join("")
+    : "<p class='text-gray-500 text-center py-8'>No assignments yet</p>";
 }
 
+// === DAILY ENGLISH ===
 function renderDailyEnglish() {
   document.getElementById("english-title").textContent = STORY.title;
   document.getElementById("story-box").innerHTML = `<strong>Story:</strong><br>${STORY.story}`;
@@ -81,20 +113,24 @@ function renderDailyEnglish() {
   document.getElementById("english-questions").innerHTML = STORY.questions.map((q,i) => `
     <div class="mb-6">
       <p class="font-semibold">${i+1}. ${q.q}</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         ${q.o.map((opt,idx) => `<label class="flex items-center gap-3 p-3 border rounded-xl"><input type="radio" name="q${i}" onchange="englishAnswers[${i}]=${idx}"> ${opt}</label>`).join("")}
       </div>
     </div>`).join("");
 }
 
 function submitEnglishQuiz() {
-  if (englishAnswers.includes(null)) return alert("Answer all 10 questions first!");
+  if (englishAnswers.includes(null)) {
+    showPopup("Please answer all 10 questions", "error");
+    return;
+  }
   let correct = 0;
   englishAnswers.forEach((a,i) => { if (a === currentQuestions[i].c) correct++; });
   const percent = Math.round(correct / 10 * 100);
-  alert(`🎉 You scored ${percent}% !\n${correct}/10 correct`);
+  showPopup(`You scored ${percent}% ! 🎉`, "success");
 }
 
+// === TABS ===
 function switchTab(n) {
   document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
   document.getElementById("tab-" + n).classList.add("active");
@@ -109,6 +145,7 @@ function renderAll() {
   renderAssignments();
 }
 
+// === INIT ===
 window.onload = () => {
   if (!currentRole) {
     document.getElementById("role-overlay").classList.remove("hidden");
