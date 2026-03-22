@@ -23,7 +23,7 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-/* Learner-friendly bright theme overrides */
+/* Learner-friendly bright theme */
 .learner-theme {
   background: linear-gradient(to bottom right, #fffaf0, #e0f7fa, #f0fdfa);
 }
@@ -42,11 +42,12 @@
 .learner-theme button.bg-indigo-600:hover {
   background-color: #FF4757 !important;
 }
-/* New styles for Daily English & Admin */
+
+/* Daily English extras */
 #english-questions label:hover {
   background-color: #fefce8;
 }
-.admin-pill {
-  font-size: 10px;
-  letter-spacing: 0.5px;
+.prose p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
