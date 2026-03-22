@@ -1,13 +1,12 @@
 const ADMIN_PASS = "admin123";
 let activeQuestions = [], userAnswers = {}, materials = [], totalStars = 0;
 
-// INITIALIZATION & SESSION PERSISTENCE
+// RECOVERY & SESSION
 document.addEventListener('DOMContentLoaded', () => {
     const savedRole = localStorage.getItem('masasa_role');
     materials = JSON.parse(localStorage.getItem('masasa_lessons')) || [];
     totalStars = parseInt(localStorage.getItem('masasa_stars')) || 0;
     
-    // If refreshed, keep them on the page they were on
     if(savedRole) restoreSession(savedRole);
     
     updateStarDisplay();
@@ -34,7 +33,7 @@ function selectRole(role) {
 }
 
 function quitPortal() {
-    if(confirm("Are you sure you want to exit the school portal?")) {
+    if(confirm("Exit school portal? Your stars will be saved.")) {
         localStorage.removeItem('masasa_role');
         location.reload();
     }
@@ -48,11 +47,11 @@ async function fetchLocation() {
     } catch (e) { document.getElementById('location-display').textContent = "📍 Nairobi, Kenya"; }
 }
 
-// ADMIN PDF ENGINE
+// PDF ENGINE
 function uploadPDF() {
     const title = document.getElementById('pdf-title').value, file = document.getElementById('pdf-file').files[0], expiry = document.getElementById('pdf-expiry').value;
-    if(!title || !file) return alert("Missing Title or File!");
-    if(file.size > 2.2 * 1024 * 1024) return alert("File too large! Max 2.2MB for local storage.");
+    if(!title || !file) return alert("Missing info!");
+    if(file.size > 2 * 1024 * 1024) return alert("PDF too big! Keep under 2MB.");
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -60,8 +59,8 @@ function uploadPDF() {
             materials.unshift({ title, data: e.target.result, expiry, id: Date.now() });
             localStorage.setItem('masasa_lessons', JSON.stringify(materials));
             renderPDFs(); updateStorageMeter();
-            alert("Lesson Published to Learner Place!");
-        } catch (err) { alert("Browser Storage Full! Delete old lessons first."); }
+            alert("Published!");
+        } catch (err) { alert("Storage Full!"); }
     };
     reader.readAsDataURL(file);
 }
@@ -71,11 +70,11 @@ function renderPDFs() {
     container.innerHTML = materials.length ? materials.map(m => `
         <div class="bg-white p-6 rounded-[2.5rem] shadow-lg border-4 border-indigo-50 text-center">
             <h4 class="font-black text-indigo-700 truncate mb-1">${m.title}</h4>
-            <p class="text-[9px] font-black text-slate-400 mb-4 uppercase tracking-widest">${m.expiry ? 'EXP: '+m.expiry : 'OPEN ACCESS'}</p>
-            <a href="${m.data}" download="${m.title}.pdf" class="block w-full bg-orange-500 text-white py-3 rounded-2xl font-black hover:bg-indigo-600 transition-all">DOWNLOAD</a>
-            ${isAdmin ? `<button onclick="deletePDF(${m.id})" class="text-red-400 text-[10px] mt-4 font-black uppercase tracking-widest hover:underline">Delete</button>` : ''}
+            <p class="text-[9px] font-black text-slate-400 mb-4 uppercase tracking-widest">${m.expiry ? 'EXP: '+m.expiry : 'OPEN'}</p>
+            <a href="${m.data}" download="${m.title}.pdf" class="block w-full bg-orange-500 text-white py-3 rounded-2xl font-black">GET PDF</a>
+            ${isAdmin ? `<button onclick="deletePDF(${m.id})" class="text-red-400 text-[10px] mt-4 font-black uppercase">Delete</button>` : ''}
         </div>
-    `).join('') : `<p class="col-span-full text-center text-slate-400 py-10 italic">Checking for new lessons...</p>`;
+    `).join('') : `<p class="col-span-full text-center text-slate-400 py-10 italic">No lessons today.</p>`;
 }
 
 function deletePDF(id) {
@@ -97,10 +96,10 @@ function updateStorageMeter() {
     document.getElementById('storage-pct').textContent = pct + "%";
 }
 
-// FOCUS MODE QUIZ ENGINE (AUTO-SCROLL)
+// FOCUS MODE ENGINE
 function generateAIQuiz() {
     const sub = document.getElementById('subject-select').value, grd = document.getElementById('grade-select').value, btn = document.getElementById('start-btn');
-    btn.innerHTML = "PLEASE BE PATIENT, LEARNER... 🤖";
+    btn.innerHTML = "BE PATIENT, LEARNER... 🤖";
     btn.disabled = true;
 
     setTimeout(() => {
@@ -109,40 +108,38 @@ function generateAIQuiz() {
             for(let i=0; i<10; i++) activeQuestions.push(genMath(grd));
         } else {
             const passage = { 
-                text: "The sun was hot in Nairobi. Juma went to the river to find cool water. He saw a big green frog jumping. Juma laughed and sat under a leafy tree.",
+                text: "The sun is hot today. Juma is at the river. He saw a green frog jumping. Juma is happy.",
                 qs: [
-                    {q: "Where did Juma go?", a: "River", o: ["River", "School", "Market"]},
-                    {q: "What color was the frog?", a: "Green", o: ["Blue", "Green", "Red"]},
-                    {q: "What was the frog doing?", a: "Jumping", o: ["Singing", "Jumping", "Sleeping"]},
-                    {q: "How was the sun?", a: "Hot", o: ["Cold", "Hot", "Cloudy"]},
-                    {q: "Where did Juma sit?", a: "Under a tree", o: ["On a rock", "In the car", "Under a tree"]}
+                    {q: "Where is Juma?", a: "River", o: ["River", "Market", "Home"]},
+                    {q: "What color was the frog?", a: "Green", o: ["Green", "Blue", "Red"]},
+                    {q: "Is Juma happy?", a: "Yes", o: ["Yes", "No", "Maybe"]}
                 ]
             };
             activeQuestions.push({ type: 'passage', text: passage.text });
-            passage.qs.forEach(q => activeQuestions.push({type:'q', q:q.q, opts:shuffle(q.o), correct:shuffle(q.o).indexOf(q.a), hint:"Read the passage again!"}));
-            for(let i=0; i<5; i++) activeQuestions.push(genGrammar(grd));
+            passage.qs.forEach(q => activeQuestions.push({type:'q', q:q.q, opts:shuffle(q.o), correct:shuffle(q.o).indexOf(q.a)}));
+            for(let i=0; i<7; i++) activeQuestions.push(genGrammar(grd)); // Total 10 Qs
         }
         renderQuiz();
-        btn.innerHTML = "GENERATE 10 QUESTIONS ✍️"; btn.disabled = false;
+        btn.innerHTML = "START 10 QUESTIONS ✍️"; btn.disabled = false;
         document.getElementById('quiz-area').classList.remove('hidden');
-        document.getElementById('quiz-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 1500);
+        document.getElementById('q-block-1')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 1200);
 }
 
 function genMath(grade) {
     const g = parseInt(grade.substring(1)) || 1;
-    const n1 = Math.floor(Math.random() * (g * 10)) + 10, n2 = Math.floor(Math.random() * (g * 5)) + 2;
+    const n1 = Math.floor(Math.random() * (g * 10)) + 5, n2 = Math.floor(Math.random() * (g * 5)) + 1;
     const isPlus = Math.random() > 0.5;
     const ans = isPlus ? n1 + n2 : n1 - n2;
-    const opts = shuffle([ans, ans + 2, ans - 3]);
-    return { type: 'q', q: `Juma has ${n1} coins. He ${isPlus ? 'finds' : 'loses'} ${n2} coins. How many does he have now?`, opts, correct: opts.indexOf(ans), hint: isPlus ? "Plus (+) means more." : "Minus (-) means less." };
+    const opts = shuffle([ans, ans + 2, ans - 1]);
+    return { type: 'q', q: `Juma has ${n1} coins. He ${isPlus ? 'gets' : 'gives away'} ${n2} coins. Total?`, opts, correct: opts.indexOf(ans) };
 }
 
 function genGrammar(grade) {
-    const pool = [{q: "Choose the Verb (Doing Word):", a: "Running", o: ["Running", "Red", "Table"]}, {q: "Choose the Noun (Naming Word):", a: "Kenya", o: ["Sing", "Kenya", "Quickly"]}];
-    const p = pool[Math.floor(Math.random()*pool.length)];
-    const opts = shuffle(p.o);
-    return { type: 'q', q: p.q, opts, correct: opts.indexOf(p.a), hint: "Think of an action or a place." };
+    const p = [{q: "Choose Verb:", a: "Run", o: ["Run", "Blue", "Cup"]}, {q: "Plural of Book:", a: "Books", o: ["Books", "Bookes", "Bookish"]}];
+    const item = p[Math.floor(Math.random()*p.length)];
+    const opts = shuffle(item.o);
+    return { type: 'q', q: item.q, opts, correct: opts.indexOf(item.a) };
 }
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
@@ -151,35 +148,54 @@ function renderQuiz() {
     const area = document.getElementById('quiz-area');
     let qc = 1;
     area.innerHTML = activeQuestions.map((item, idx) => {
-        if(item.type === 'passage') return `<div class="bg-indigo-900 text-white p-8 rounded-3xl italic shadow-xl border-l-8 border-orange-500 text-lg mb-8">"${item.text}"</div>`;
+        if(item.type === 'passage') return `<div class="bg-indigo-900 text-white p-8 rounded-3xl italic shadow-xl border-l-8 border-orange-500 mb-8">"${item.text}"</div>`;
         return `
-            <div id="q-block-${idx}" class="quiz-card p-8 shadow-lg border-4 border-white">
-                <p class="font-black text-xl mb-4 text-slate-700">${qc++}. ${item.q}</p>
+            <div id="q-block-${qc}" class="quiz-card p-8 shadow-lg border-4 ${qc===1?'active-q':''}">
+                <p class="font-black text-xl mb-4 text-slate-700">${qc}. ${item.q}</p>
                 <div class="grid gap-3">
-                    ${item.opts.map((opt, oIdx) => `<button onclick="pickAnswer(${idx}, ${oIdx}, this)" class="q-opt p-5 rounded-2xl border-4 border-indigo-50 font-bold text-left bg-white transition-all active:scale-95">${opt}</button>`).join('')}
+                    ${item.opts.map((opt, oIdx) => `<button onclick="pickAnswer(${qc}, ${idx}, ${oIdx}, this)" class="q-opt p-5 rounded-2xl border-4 border-indigo-50 font-bold text-left bg-white transition-all active:scale-95">${opt}</button>`).join('')}
                 </div>
-                <details class="mt-4"><summary class="text-xs font-black text-indigo-400 cursor-pointer uppercase">Hint</summary><p class="mt-2 text-sm text-slate-500 italic bg-indigo-50 p-3 rounded-xl">${item.hint || "Try your best!"}</p></details>
             </div>`;
-    }).join('') + `<button id="submit-quiz-btn" onclick="gradeQuiz()" class="w-full bg-indigo-600 text-white py-6 rounded-full font-black text-2xl shadow-xl hover:bg-green-500 transition-all">FINISH & SUBMIT 🤖</button>`;
+        qc++;
+        return html; // Placeholder for logic
+    }).join('') + `<button id="submit-quiz-btn" onclick="gradeQuiz()" class="w-full bg-indigo-600 text-white py-6 rounded-full font-black text-2xl shadow-xl">SUBMIT 🤖</button>`;
+    
+    // Manual adjustment for QC counter logic in map
+    let finalHtml = "";
+    let qNum = 1;
+    activeQuestions.forEach((item, idx) => {
+        if(item.type === 'passage') {
+            finalHtml += `<div class="bg-indigo-900 text-white p-8 rounded-3xl italic shadow-xl border-l-8 border-orange-500 mb-8">"${item.text}"</div>`;
+        } else {
+            finalHtml += `
+                <div id="q-block-${qNum}" class="quiz-card p-8 shadow-lg border-4 ${qNum===1?'active-q':''}">
+                    <p class="font-black text-xl mb-4 text-slate-700">${qNum}. ${item.q}</p>
+                    <div class="grid gap-3">
+                        ${item.opts.map((opt, oIdx) => `<button onclick="pickAnswer(${qNum}, ${idx}, ${oIdx}, this)" class="q-opt p-5 rounded-2xl border-4 border-indigo-50 font-bold text-left bg-white transition-all">${opt}</button>`).join('')}
+                    </div>
+                </div>`;
+            qNum++;
+        }
+    });
+    area.innerHTML = finalHtml + `<button id="submit-quiz-btn" onclick="gradeQuiz()" class="w-full bg-indigo-600 text-white py-6 rounded-full font-black text-2xl shadow-xl">FINISH & SUBMIT 🤖</button>`;
 }
 
-// AUTO-SCROLL LOGIC
-function pickAnswer(qIdx, oIdx, btn) {
-    const parent = btn.parentElement.parentElement;
-    parent.querySelectorAll('.q-opt').forEach(b => { b.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600'); b.classList.add('bg-white', 'border-indigo-50'); });
-    btn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
+function pickAnswer(qNum, qIdx, oIdx, btn) {
+    const parent = document.getElementById(`q-block-${qNum}`);
+    parent.querySelectorAll('.q-opt').forEach(b => { b.className = "q-opt p-5 rounded-2xl border-4 border-indigo-50 font-bold text-left bg-white"; });
+    btn.className = "q-opt p-5 rounded-2xl border-4 border-indigo-600 font-bold text-left bg-indigo-600 text-white";
     userAnswers[qIdx] = oIdx;
+    
+    parent.classList.remove('active-q');
     parent.classList.add('answered');
 
-    // Smooth scroll to next question
-    const nextQ = document.getElementById(`q-block-${qIdx + 1}`);
-    const submitBtn = document.getElementById('submit-quiz-btn');
-    
+    const nextQ = document.getElementById(`q-block-${qNum + 1}`);
     setTimeout(() => {
         if(nextQ) {
+            nextQ.classList.add('active-q');
             nextQ.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else if(submitBtn) {
-            submitBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            document.getElementById('submit-quiz-btn').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }, 400);
 }
@@ -192,21 +208,15 @@ function gradeQuiz() {
     localStorage.setItem('masasa_stars', totalStars);
     updateStarDisplay();
     document.getElementById('final-percent').textContent = pct + "%";
-    document.getElementById('score-feedback').textContent = `Learner, you earned ${stars} Stars! ⭐`;
-    document.getElementById('score-emoji').textContent = pct >= 80 ? "🏆" : "🥈";
+    document.getElementById('score-feedback').textContent = `You earned ${stars} Stars! ⭐`;
     document.getElementById('score-modal').classList.remove('hidden');
 }
 
-function closeModal() {
-    document.getElementById('score-modal').classList.add('hidden');
-    document.getElementById('quiz-area').classList.add('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
+function closeModal() { document.getElementById('score-modal').classList.add('hidden'); document.getElementById('quiz-area').classList.add('hidden'); window.scrollTo(0,0); }
 function updateStarDisplay() { document.getElementById('star-count').textContent = totalStars; }
 function showAdminLogin() { document.getElementById('role-buttons').classList.add('hidden'); document.getElementById('admin-login').classList.remove('hidden'); }
 function hideAdminLogin() { document.getElementById('role-buttons').classList.remove('hidden'); document.getElementById('admin-login').classList.add('hidden'); }
-function validateAdmin() { if(document.getElementById('admin-pass').value === ADMIN_PASS) { selectRole('admin'); } else { alert("Incorrect Key!"); } }
-function updateAnnouncement() { if(document.getElementById('ann-input').value) { document.getElementById('marquee-text').textContent = document.getElementById('ann-input').value; alert("Banner Updated!"); } }
-function handleSubjectChange() { document.getElementById('grade-container').classList.remove('hidden'); document.getElementById('grade-container').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-function handleGradeChange() { document.getElementById('start-btn').classList.remove('hidden'); document.getElementById('start-btn').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+function validateAdmin() { if(document.getElementById('admin-pass').value === ADMIN_PASS) { selectRole('admin'); } else { alert("Wrong Key!"); } }
+function updateAnnouncement() { document.getElementById('marquee-text').textContent = document.getElementById('ann-input').value; alert("Updated!"); }
+function handleSubjectChange() { document.getElementById('grade-container').classList.remove('hidden'); }
+function handleGradeChange() { document.getElementById('start-btn').classList.remove('hidden'); }
