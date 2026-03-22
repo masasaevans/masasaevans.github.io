@@ -1,85 +1,28 @@
-/* 1. CORE LAYOUT & SCROLLING */
-html { 
-    scroll-behavior: smooth; 
-}
+html { scroll-behavior: smooth; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.marquee-wrapper { display: inline-block; white-space: nowrap; animation: marquee-scroll 25s linear infinite; padding-left: 100%; }
+@keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
 
-body {
-    -webkit-tap-highlight-color: transparent;
-}
+.bubble-text { font-family: 'Bubblegum Sans', cursive; transition: 0.3s; cursor: pointer; }
 
-/* 2. THE MARQUEE BANNER */
-.marquee-wrapper { 
-    display: inline-block; 
-    white-space: nowrap; 
-    animation: marquee-scroll 25s linear infinite; 
-    padding-left: 100%; 
-}
-
-@keyframes marquee-scroll { 
-    from { transform: translateX(0); } 
-    to { transform: translateX(-100%); } 
-}
-
-/* 3. TYPOGRAPHY & BUTTONS */
-.bubble-text { 
-    font-family: 'Bubblegum Sans', cursive; 
-    transition: 0.3s; 
-    cursor: pointer; 
-}
-
-.bubble-text:hover { 
-    color: #f97316 !important; 
-    transform: scale(1.05); 
-}
-
-/* 4. FOCUS MODE: QUIZ CARDS */
+/* AUTO-FOCUS CARDS */
 .quiz-card { 
     border-left: 12px solid #e2e8f0; 
     border-radius: 2.5rem; 
     background: white; 
     margin-bottom: 2.5rem; 
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
-    opacity: 0.6; /* Unfocused questions are slightly faded */
+    opacity: 0.6;
     transform: scale(0.95);
 }
+.quiz-card.active-q { border-left-color: #4f46e5; opacity: 1; transform: scale(1.02); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+.quiz-card.answered { border-left-color: #22c55e; opacity: 0.5; transform: scale(0.9); }
 
-/* The question the learner is currently reading */
-.quiz-card.active-q { 
-    border-left-color: #4f46e5; 
-    opacity: 1; 
-    transform: scale(1.02); 
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); 
-}
+select { font-size: 16px !important; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.2em; }
 
-/* The question after they click an answer */
-.quiz-card.answered { 
-    border-left-color: #22c55e; 
-    opacity: 0.5; 
-    transform: scale(0.9); 
-}
-
-/* 5. INPUTS & SELECTS (Mobile Optimization) */
-select { 
-    font-size: 16px !important; 
-    appearance: none; 
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); 
-    background-repeat: no-repeat; 
-    background-position: right 1rem center; 
-    background-size: 1.2em; 
-}
-
-/* 6. ANIMATIONS */
 @keyframes bounce-in {
     0% { transform: scale(0.5); opacity: 0; }
     70% { transform: scale(1.1); }
     100% { transform: scale(1); opacity: 1; }
 }
-
-.animate-bounce-in {
-    animation: bounce-in 0.6s ease-out forwards;
-}
-
-/* Hide scrollbar for cleaner look on tablets */
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
+.animate-bounce-in { animation: bounce-in 0.6s ease-out forwards; }
