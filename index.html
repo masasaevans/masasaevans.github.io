@@ -17,7 +17,7 @@
         Welcome to Masasa Online 🎉✨
       </h2>
       <p class="text-xl md:text-2xl mb-10 text-gray-700 font-medium">
-        Hello, you are a ?
+        Who are you today?
       </p>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
@@ -37,7 +37,7 @@
 
       <!-- Teacher Login Form -->
       <div id="teacher-login" class="hidden mt-10">
-        <input id="teacher-email" type="email" placeholder="Admin email (must end with @masasaadmin.ke)" 
+        <input id="teacher-username" type="text" placeholder="Username (given by admin)" 
           class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-lg focus:outline-none focus:border-indigo-500"/>
         <input id="teacher-pass" type="password" placeholder="Password" 
           class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-lg focus:outline-none focus:border-indigo-500"/>
@@ -52,13 +52,13 @@
     </div>
   </div>
 
-  <!-- Main Content (hidden until role selected) -->
+  <!-- Main Header -->
   <header id="main-header" class="hidden bg-gradient-to-r from-indigo-700 to-indigo-900 text-white shadow-lg sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
       <h1 class="text-2xl md:text-3xl font-bold">Masasa Online 🇰🇪</h1>
       <button onclick="resetRole()" 
         class="bg-white/20 px-5 py-2 rounded-lg hover:bg-white/30 transition text-sm md:text-base">
-        Home
+        Change Role
       </button>
     </div>
   </header>
@@ -68,7 +68,7 @@
     <!-- Tabs -->
     <div class="flex border-b mb-8 overflow-x-auto">
       <button onclick="switchTab(0)" id="tab-0" 
-        class="tab-button px-6 py-3 font-medium border-b-4 border-transparent text-gray-500 hover:text-indigo-600 whitespace-nowrap">
+        class="tab-button px-6 py-3 font-medium border-b-4 border-transparent text-gray-500 hover:text-indigo-600 whitespace-nowrap active">
         Assignments
       </button>
       <button onclick="switchTab(1)" id="tab-1" 
@@ -76,9 +76,9 @@
         Quizzes
       </button>
       <button onclick="switchTab(2)" id="tab-2" 
-  class="tab-button px-6 py-3 font-medium border-b-4 border-transparent text-gray-500 hover:text-indigo-600 whitespace-nowrap">
-  Daily English 📖
-</button>
+        class="tab-button px-6 py-3 font-medium border-b-4 border-transparent text-gray-500 hover:text-indigo-600 whitespace-nowrap">
+        Daily English 📖
+      </button>
     </div>
 
     <!-- Assignments Section -->
@@ -87,7 +87,7 @@
         <h2 class="text-xl font-semibold mb-4 text-gray-800">Post New Assignment</h2>
         <input id="ass-title" type="text" placeholder="Assignment Title" class="w-full mb-3 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
         <textarea id="ass-desc" placeholder="Description / instructions" class="w-full mb-3 p-3 border rounded-lg h-28 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-        <input id="ass-pdf" type="text" placeholder="PDF direct link (or use sample)" class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        <input id="ass-pdf" type="text" placeholder="Direct PDF link (or leave blank for sample)" class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
         <button onclick="addAssignment()" 
           class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-indigo-700 transition w-full md:w-auto">
           Post Assignment
@@ -97,23 +97,6 @@
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Assignments</h2>
       <div id="assignments-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
-    <!-- Daily English Comprehension -->
-<section id="english-section" class="hidden">
-  <div class="bg-white rounded-3xl shadow-xl p-8">
-    <h2 class="text-3xl font-bold mb-2 text-[#FF6B6B]">Daily English Comprehension</h2>
-    <p class="text-sm text-gray-500 mb-6">10 questions • Short story: The Magic Matatu in Nairobi</p>
-    
-    <div class="bg-amber-50 p-6 rounded-2xl mb-8 text-gray-800 leading-relaxed">
-      <strong>Story:</strong> Every morning in Nairobi, little Kiano waited for the magic matatu. One day the matatu driver, Baba Juma, said, “Today we go on an adventure!” They drove past the tall buildings, the busy market, and the green park. Suddenly the matatu started singing Kenyan songs! All the passengers laughed and danced. At the end, Baba Juma gave Kiano a big mango and said, “Kindness makes every journey magical.” Kiano smiled and ran home to tell his mother the best story ever.
-    </div>
-
-    <div id="english-questions" class="space-y-8"></div>
-    <button onclick="submitEnglishQuiz()" 
-      class="mt-8 bg-[#2ECC71] text-white px-10 py-4 rounded-2xl text-lg font-bold w-full md:w-auto">
-      Submit Answers & Get Score
-    </button>
-  </div>
-</section>
 
     <!-- Quizzes Section -->
     <section id="quizzes-section" class="hidden">
@@ -145,6 +128,24 @@
       <div id="mcq-list" class="mt-6 space-y-6"></div>
     </section>
 
+    <!-- Daily English Comprehension -->
+    <section id="english-section" class="hidden">
+      <div class="bg-white rounded-3xl shadow-xl p-8">
+        <h2 class="text-3xl font-bold mb-2 text-[#FF6B6B]">Daily English Comprehension</h2>
+        <p class="text-sm text-gray-500 mb-6">10 questions • New story every day</p>
+        
+        <div class="bg-amber-50 p-6 rounded-2xl mb-8 text-gray-800 leading-relaxed prose max-w-none">
+          <!-- Story will be inserted here -->
+        </div>
+
+        <div id="english-questions" class="space-y-8"></div>
+        <button onclick="submitEnglishQuiz()" 
+          class="mt-8 bg-[#2ECC71] text-white px-10 py-4 rounded-2xl text-lg font-bold w-full md:w-auto">
+          Submit Answers & Get Score
+        </button>
+      </div>
+    </section>
+
     <!-- Quiz Taking Interface -->
     <div id="quiz-taking" class="hidden">
       <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-10 max-w-4xl mx-auto">
@@ -164,45 +165,35 @@
     </div>
 
   </main>
-  <!-- Daily English Comprehension -->
-<section id="english-section" class="hidden">
-  <div class="bg-white rounded-3xl shadow-xl p-8">
-    <h2 class="text-3xl font-bold mb-2 text-[#FF6B6B]">Daily English Comprehension</h2>
-    <p class="text-sm text-gray-500 mb-6">10 questions • Short story: The Magic Matatu in Nairobi</p>
-    
-    <div class="bg-amber-50 p-6 rounded-2xl mb-8 text-gray-800 leading-relaxed">
-      <strong>Story:</strong> Every morning in Nairobi, little Kiano waited for the magic matatu. One day the matatu driver, Baba Juma, said, “Today we go on an adventure!” They drove past the tall buildings, the busy market, and the green park. Suddenly the matatu started singing Kenyan songs! All the passengers laughed and danced. At the end, Baba Juma gave Kiano a big mango and said, “Kindness makes every journey magical.” Kiano smiled and ran home to tell his mother the best story ever.
+
+  <footer class="text-center py-8 text-gray-500 text-sm border-t mt-auto relative">
+    Masasa Online • Static website • Made in Nairobi • 2026
+    <!-- Admin pill -->
+    <div class="fixed bottom-6 right-6 z-50">
+      <button onclick="showAdminPanel()" 
+        class="bg-gray-300 hover:bg-gray-400 text-[10px] px-5 py-1.5 rounded-full shadow-md transition text-gray-700 flex items-center gap-1 admin-pill">
+        👨‍💼 ADMIN ONLY
+      </button>
     </div>
-
-    <div id="english-questions" class="space-y-8"></div>
-    <button onclick="submitEnglishQuiz()" 
-      class="mt-8 bg-[#2ECC71] text-white px-10 py-4 rounded-2xl text-lg font-bold w-full md:w-auto">
-      Submit Answers & Get Score
-    </button>
-  </div>
-</section>
-
-  <footer class="text-center py-8 text-gray-500 text-sm border-t mt-auto">
-    Masasa Online • Mombasa • To God be the Glory • 2026
   </footer>
 
   <!-- Admin Login Modal -->
-<div id="admin-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
-  <div class="bg-white rounded-3xl p-8 max-w-sm w-full mx-4">
-    <h3 class="text-2xl font-bold mb-6">Admin Login</h3>
-    <input id="admin-user" value="admin" class="w-full p-4 border rounded-xl mb-4" placeholder="Username">
-    <input id="admin-pass" type="password" class="w-full p-4 border rounded-xl mb-6" placeholder="Password">
-    <button onclick="loginAdmin()" class="bg-indigo-700 text-white w-full py-4 rounded-2xl text-lg">Login as Admin</button>
-    <div id="admin-panel" class="hidden mt-8">
-      <h4 class="font-semibold mb-4">Manage Teachers</h4>
-      <div id="teacher-list" class="mb-6"></div>
-      <input id="new-teacher-user" placeholder="New teacher username" class="w-full p-3 border rounded-xl mb-3">
-      <input id="new-teacher-pass" placeholder="Password for teacher" class="w-full p-3 border rounded-xl mb-4">
-      <button onclick="addNewTeacher()" class="bg-emerald-600 text-white px-8 py-3 rounded-xl w-full">Add Teacher</button>
-      <button onclick="closeAdminModal()" class="mt-4 text-red-500 underline">Close</button>
+  <div id="admin-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full mx-4">
+      <h3 class="text-2xl font-bold mb-6">Admin Login</h3>
+      <input id="admin-user" value="admin" class="w-full p-4 border rounded-xl mb-4" placeholder="Username">
+      <input id="admin-pass" type="password" class="w-full p-4 border rounded-xl mb-6" placeholder="Password">
+      <button onclick="loginAdmin()" class="bg-indigo-700 text-white w-full py-4 rounded-2xl text-lg">Login as Admin</button>
+      <div id="admin-panel" class="hidden mt-8">
+        <h4 class="font-semibold mb-4">Manage Teachers</h4>
+        <div id="teacher-list" class="mb-6 max-h-60 overflow-y-auto"></div>
+        <input id="new-teacher-user" placeholder="New teacher username" class="w-full p-3 border rounded-xl mb-3">
+        <input id="new-teacher-pass" placeholder="Password for teacher" class="w-full p-3 border rounded-xl mb-4">
+        <button onclick="addNewTeacher()" class="bg-emerald-600 text-white px-8 py-3 rounded-xl w-full">Add Teacher</button>
+        <button onclick="closeAdminModal()" class="mt-4 text-red-500 underline block mx-auto">Close</button>
+      </div>
     </div>
   </div>
-</div>
 
 </body>
 </html>
