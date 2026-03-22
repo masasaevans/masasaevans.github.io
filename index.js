@@ -1,63 +1,60 @@
-const ADMIN_PASS = "admin123";
-let activeQuestions = [], userAnswers = {}, totalStars = 0;
-let pdfData = [], manualQuizzes = [];
+let currentQs = [], userAnswers = {}, stars = 0, pdfs = [], tQuizzes = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Session Recovery
-    const savedRole = localStorage.getItem('masasa_role');
-    pdfData = JSON.parse(localStorage.getItem('masasa_pdfs')) || [];
-    manualQuizzes = JSON.parse(localStorage.getItem('masasa_teacher_qs')) || [];
-    totalStars = parseInt(localStorage.getItem('masasa_stars')) || 0;
+    const role = localStorage.getItem('masasa_role');
+    stars = parseInt(localStorage.getItem('masasa_stars')) || 0;
+    pdfs = JSON.parse(localStorage.getItem('masasa_pdfs')) || [];
+    tQuizzes = JSON.parse(localStorage.getItem('masasa_tq')) || [];
 
-    if(savedRole) restoreSession(savedRole);
-    updateStarDisplay();
+    if(role) activateUI(role);
+    updateStarUI();
     renderLearnerPlace();
     
-    setInterval(() => {
-        document.getElementById('live-time').textContent = new Date().toLocaleTimeString('en-GB');
+    // Live Time
+    setInterval(() => { 
+        document.getElementById('live-time').innerText = new Date().toLocaleTimeString('en-GB'); 
     }, 1000);
-    fetchLocation();
+
+    // Location API
+    fetch('https://ipapi.co/json/')
+        .then(r => r.json())
+        .then(d => document.getElementById('location-display').innerText = `📍 ${d.city}, ${d.country_name}`)
+        .catch(() => document.getElementById('location-display').innerText = "📍 Nairobi, Kenya");
 });
 
-function restoreSession(role) {
+function activateUI(role) {
     document.getElementById('role-overlay').style.display = 'none';
     document.getElementById('main-header').classList.remove('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     if(role === 'admin') document.getElementById('admin-tools').classList.remove('hidden');
 }
 
-function selectRole(role) {
-    localStorage.setItem('masasa_role', role);
-    restoreSession(role);
+function selectRole(r) { localStorage.setItem('masasa_role', r); activateUI(r); }
+function logout() { localStorage.removeItem('masasa_role'); location.reload(); }
+function showAdminLogin() { 
+    document.getElementById('role-buttons').classList.add('hidden'); 
+    document.getElementById('admin-login').classList.remove('hidden'); 
+}
+function hideAdminLogin() { 
+    document.getElementById('role-buttons').classList.remove('hidden'); 
+    document.getElementById('admin-login').classList.add('hidden'); 
+}
+function validateAdmin() { 
+    if(document.getElementById('admin-pass').value === 'admin123') selectRole('admin'); 
+    else alert('Wrong Key!'); 
 }
 
-function quitPortal() {
-    if(confirm("Exit school? Stars are saved!")) {
-        localStorage.removeItem('masasa_role');
-        location.reload();
-    }
-}
-
-// FETCH LOCATION
-async function fetchLocation() {
-    try {
-        const res = await fetch('https://ipapi.co/json/');
-        const data = await res.json();
-        document.getElementById('location-display').textContent = `📍 ${data.city}, ${data.country_name}`;
-    } catch (e) { document.getElementById('location-display').textContent = "📍 Nairobi, Kenya"; }
-}
-
-// ADMIN FUNCTIONS
+// Admin Logic
 function uploadPDF() {
     const title = document.getElementById('pdf-title').value;
     const file = document.getElementById('pdf-file').files[0];
-    if(!title || !file) return alert("Fill all fields");
-
+    if(!title || !file) return;
     const reader = new FileReader();
     reader.onload = (e) => {
-        pdfData.unshift({ title, data: e.target.result, id: Date.now(), type: 'pdf' });
-        localStorage.setItem('masasa_pdfs', JSON.stringify(pdfData));
+        pdfs.unshift({ title, data: e.target.result, id: Date.now(), type: 'pdf' });
+        localStorage.setItem('masasa_pdfs', JSON.stringify(pdfs));
         renderLearnerPlace();
+        alert("PDF Published!");
     };
     reader.readAsDataURL(file);
 }
@@ -65,147 +62,116 @@ function uploadPDF() {
 function publishTeacherQuiz() {
     const title = document.getElementById('mq-title').value;
     const q = document.getElementById('mq-q').value;
-    const correct = document.getElementById('mq-a').value;
-    const opts = shuffle([correct, document.getElementById('mq-b').value, document.getElementById('mq-c').value, document.getElementById('mq-d').value]);
-    
-    if(!title || !q || !correct) return alert("Fill quiz fields");
-
-    manualQuizzes.unshift({ 
-        title, 
-        id: Date.now(), 
-        type: 'quiz', 
-        questions: [{ q, opts, correct: opts.indexOf(correct) }] 
-    });
-    localStorage.setItem('masasa_teacher_qs', JSON.stringify(manualQuizzes));
+    const a = document.getElementById('mq-a').value;
+    const b = document.getElementById('mq-b').value;
+    if(!title || !q || !a) return;
+    const opts = [a, b, "None", "Both"].sort(() => Math.random() - 0.5);
+    tQuizzes.unshift({ title, id: Date.now(), type: 'quiz', q, opts, correct: opts.indexOf(a) });
+    localStorage.setItem('masasa_tq', JSON.stringify(tQuizzes));
     renderLearnerPlace();
     alert("Quiz Published!");
 }
 
-// RENDER LEARNER PLACE (PDFs + QUIZZES)
 function renderLearnerPlace() {
     const container = document.getElementById('material-list');
     const isAdmin = !document.getElementById('admin-tools').classList.contains('hidden');
-    
-    const allMaterials = [...manualQuizzes, ...pdfData];
-    container.innerHTML = allMaterials.map(m => `
-        <div class="${m.type==='quiz'?'bg-indigo-600':'bg-white'} p-6 rounded-[2.5rem] shadow-xl border-4 border-white text-center">
-            <h4 class="font-black ${m.type==='quiz'?'text-white':'text-indigo-700'} truncate mb-3">${m.title}</h4>
-            ${m.type==='quiz' ? 
-                `<button onclick="startManualQuiz(${m.id})" class="w-full bg-white text-indigo-600 py-3 rounded-2xl font-black">START QUIZ</button>` :
-                `<a href="${m.data}" download="${m.title}.pdf" class="block w-full bg-orange-500 text-white py-3 rounded-2xl font-black">GET PDF</a>`
+    const combined = [...tQuizzes, ...pdfs];
+    container.innerHTML = combined.map(i => `
+        <div class="${i.type==='quiz'?'bg-indigo-600 text-white':'bg-white'} p-6 rounded-[2.5rem] shadow-xl border-4 border-white text-center">
+            <h4 class="font-black mb-3 truncate uppercase text-sm">${i.title}</h4>
+            ${i.type==='quiz' ? 
+                `<button onclick="startTQuiz(${i.id})" class="w-full bg-white text-indigo-600 py-3 rounded-2xl font-black shadow-md">START QUIZ</button>` :
+                `<a href="${i.data}" download class="block w-full bg-orange-500 text-white py-3 rounded-2xl font-black shadow-md">GET PDF</a>`
             }
-            ${isAdmin ? `<button onclick="deleteItem(${m.id}, '${m.type}')" class="text-[10px] mt-4 opacity-50 block w-full text-center uppercase text-red-300">Delete</button>` : ''}
+            ${isAdmin ? `<button onclick="deleteItem(${i.id}, '${i.type}')" class="text-[10px] mt-4 opacity-50 block w-full uppercase underline">Delete</button>` : ''}
         </div>
     `).join('');
 }
 
 function deleteItem(id, type) {
-    if(type === 'quiz') manualQuizzes = manualQuizzes.filter(q => q.id !== id);
-    else pdfData = pdfData.filter(p => p.id !== id);
-    localStorage.setItem('masasa_teacher_qs', JSON.stringify(manualQuizzes));
-    localStorage.setItem('masasa_pdfs', JSON.stringify(pdfData));
+    if(type==='quiz') tQuizzes = tQuizzes.filter(q=>q.id!==id); 
+    else pdfs = pdfs.filter(p=>p.id!==id);
+    localStorage.setItem('masasa_tq', JSON.stringify(tQuizzes)); 
+    localStorage.setItem('masasa_pdfs', JSON.stringify(pdfs));
     renderLearnerPlace();
 }
 
-// CLOUD QUIZ ENGINE
-async function generateCloudQuiz() {
+// Cloud Logic
+async function fetchCloudQuiz() {
     const sub = document.getElementById('subject-select').value;
-    const diff = document.getElementById('grade-select').value;
-    const btn = document.getElementById('start-btn');
-    btn.innerHTML = "FETCHING QUESTIONS... ☁️";
-    
-    const cat = sub === 'literacy' ? 9 : 17; // 9: General, 17: Science/Math
-    const url = `https://opentdb.com/api.php?amount=10&category=${cat}&difficulty=${diff}&type=multiple`;
-
+    const lvl = document.getElementById('level-select').value;
+    const btn = document.getElementById('start-cloud-btn');
+    btn.innerText = "FETCHING... ☁️";
     try {
-        const res = await fetch(url);
+        const res = await fetch(`https://opentdb.com/api.php?amount=10&category=${sub}&difficulty=${lvl}&type=multiple`);
         const data = await res.json();
-        activeQuestions = data.results.map(item => {
-            const opts = shuffle([...item.incorrect_answers, item.correct_answer]);
-            return {
-                type: 'q',
-                q: decodeHtml(item.question),
-                opts: opts.map(o => decodeHtml(o)),
-                correct: opts.indexOf(item.correct_answer)
-            };
+        currentQs = data.results.map(item => {
+            const opts = [...item.incorrect_answers, item.correct_answer].sort(() => Math.random() - 0.5);
+            return { q: decode(item.question), opts: opts.map(o=>decode(o)), correct: opts.indexOf(item.correct_answer) };
         });
         renderQuiz();
-        btn.innerHTML = "FETCH 10 QUESTIONS ✍️";
-        document.getElementById('quiz-area').classList.remove('hidden');
-        document.getElementById('q-block-1').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } catch (e) { alert("Offline? Check your internet."); btn.innerHTML = "RETRY 🔄"; }
+    } catch(e) { alert("API Offline!"); }
+    btn.innerText = "START 10 Qs";
 }
 
-function startManualQuiz(id) {
-    const quiz = manualQuizzes.find(q => q.id === id);
-    activeQuestions = quiz.questions.map(q => ({...q, type: 'q'}));
+function startTQuiz(id) {
+    const quiz = tQuizzes.find(q=>q.id===id);
+    currentQs = [{ q: quiz.q, opts: quiz.opts, correct: quiz.correct }];
     renderQuiz();
-    document.getElementById('quiz-area').classList.remove('hidden');
-    document.getElementById('q-block-1').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function renderQuiz() {
     const area = document.getElementById('quiz-area');
-    let qNum = 1;
-    let html = activeQuestions.map((item, idx) => `
-        <div id="q-block-${qNum}" class="quiz-card p-8 shadow-lg border-4 ${qNum===1?'active-q':''}">
-            <p class="font-black text-xl mb-4 text-slate-700">${qNum++}. ${item.q}</p>
+    area.classList.remove('hidden');
+    area.innerHTML = currentQs.map((q, i) => `
+        <div id="q-block-${i+1}" class="quiz-card p-8 shadow-lg border-4 ${i===0?'active-q':''}">
+            <p class="font-black text-xl mb-4 text-slate-700">${i+1}. ${q.q}</p>
             <div class="grid gap-3">
-                ${item.opts.map((opt, oIdx) => `<button onclick="pickAnswer(${qNum-1}, ${idx}, ${oIdx}, this)" class="q-opt p-5 rounded-2xl border-4 border-indigo-50 font-bold text-left bg-white transition-all">${opt}</button>`).join('')}
+                ${q.opts.map((o, oi) => `<button onclick="handlePick(${i+1}, ${i}, ${oi}, this)" class="q-opt p-5 rounded-2xl border-4 border-indigo-50 font-bold text-left bg-white w-full shadow-sm">${o}</button>`).join('')}
             </div>
         </div>
-    `).join('');
-    area.innerHTML = html + `<button id="submit-quiz-btn" onclick="gradeQuiz()" class="w-full bg-indigo-600 text-white py-6 rounded-full font-black text-2xl shadow-xl">FINISH QUIZ</button>`;
+    `).join('') + `<button onclick="gradeQuiz()" class="w-full bg-indigo-600 text-white py-6 rounded-full font-black text-2xl shadow-xl mt-10">FINISH & SUBMIT</button>`;
+    area.scrollIntoView({ behavior: 'smooth' });
 }
 
-function pickAnswer(qNum, qIdx, oIdx, btn) {
-    const parent = document.getElementById(`q-block-${qNum}`);
-    parent.querySelectorAll('.q-opt').forEach(b => { 
-        b.className = "q-opt p-5 rounded-2xl border-4 border-indigo-50 font-bold text-left bg-white w-full transition-all"; 
-    });
-    btn.className = "q-opt p-5 rounded-2xl border-4 border-indigo-600 font-bold text-left bg-indigo-600 text-white w-full";
+function handlePick(qNum, qIdx, oIdx, btn) {
+    const card = document.getElementById(`q-block-${qNum}`);
+    card.querySelectorAll('.q-opt').forEach(b => b.className = "q-opt p-5 rounded-2xl border-4 border-indigo-50 font-bold text-left bg-white w-full shadow-sm");
+    btn.className = "q-opt p-5 rounded-2xl border-4 border-indigo-600 font-bold text-left bg-indigo-600 text-white w-full shadow-md";
     userAnswers[qIdx] = oIdx;
-    
-    parent.classList.remove('active-q');
-    parent.classList.add('answered');
 
-    const nextQ = document.getElementById(`q-block-${qNum + 1}`);
-    setTimeout(() => {
-        if(nextQ) {
-            nextQ.classList.add('active-q');
-            nextQ.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-            document.getElementById('submit-quiz-btn').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }, 500);
+    card.classList.remove('active-q');
+    card.classList.add('answered');
+
+    const next = document.getElementById(`q-block-${qNum+1}`);
+    if(next) {
+        next.classList.add('active-q');
+        setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+    }
 }
 
 function gradeQuiz() {
     let score = 0;
-    activeQuestions.forEach((q, i) => { if(userAnswers[i] === q.correct) score++; });
-    const pct = Math.round((score / activeQuestions.length) * 100);
-    const stars = Math.floor(pct / 10);
-    totalStars += stars;
-    localStorage.setItem('masasa_stars', totalStars);
-    updateStarDisplay();
-    
-    document.getElementById('final-percent').textContent = pct + "%";
-    document.getElementById('score-feedback').textContent = `You earned ${stars} Stars! ⭐`;
+    currentQs.forEach((q, i) => { if(userAnswers[i] === q.correct) score++; });
+    const p = Math.round((score/currentQs.length)*100);
+    const s = Math.floor(p/10);
+    stars += s; localStorage.setItem('masasa_stars', stars);
+    updateStarUI();
+    document.getElementById('final-percent').innerText = p + "%";
+    document.getElementById('score-feedback').innerText = `Learner, you earned ${s} Stars!`;
+    document.getElementById('score-emoji').innerText = p >= 80 ? "🏆" : "🥈";
     document.getElementById('score-modal').classList.remove('hidden');
 }
 
-function closeModal() {
-    document.getElementById('score-modal').classList.add('hidden');
-    document.getElementById('quiz-area').classList.add('hidden');
+function closeQuiz() { 
+    document.getElementById('score-modal').classList.add('hidden'); 
+    document.getElementById('quiz-area').classList.add('hidden'); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// UTILS
-function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
-function decodeHtml(html) { const t = document.createElement("textarea"); t.innerHTML = html; return t.value; }
-function updateStarDisplay() { document.getElementById('star-count').textContent = totalStars; }
-function showAdminLogin() { document.getElementById('role-buttons').classList.add('hidden'); document.getElementById('admin-login').classList.remove('hidden'); }
-function hideAdminLogin() { document.getElementById('role-buttons').classList.remove('hidden'); document.getElementById('admin-login').classList.add('hidden'); }
-function validateAdmin() { if(document.getElementById('admin-pass').value === ADMIN_PASS) selectRole('admin'); else alert("Wrong Key!"); }
-function handleSubjectChange() { document.getElementById('grade-container').classList.remove('hidden'); }
-function handleGradeChange() { document.getElementById('start-btn').classList.remove('hidden'); }
+function updateStarUI() { document.getElementById('star-count').innerText = stars; }
+function showLevel() { 
+    document.getElementById('level-select').classList.remove('hidden'); 
+    document.getElementById('start-cloud-btn').classList.remove('hidden'); 
+}
+function decode(h) { const t = document.createElement("textarea"); t.innerHTML = h; return t.value; }
