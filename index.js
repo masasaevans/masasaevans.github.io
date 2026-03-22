@@ -1,9 +1,3 @@
-/*
- * Masasa Online – Educational web app
- * Copyright (c) 2026 [your name or "young"]
- * Licensed under MIT (or choose your license)
- */
-
 const ADMIN_USER = "admin";
 const ADMIN_PASS = "Miritini123";
 
@@ -310,7 +304,8 @@ function switchTab(idx) {
   document.getElementById(`tab-${idx}`).classList.add("active");
 
   document.querySelectorAll("section[id$='-section']").forEach(s => s.classList.add("hidden"));
-  document.getElementById(`${["assignments","quizzes","english"][idx]}-section`).classList.remove("hidden");
+  const sectionNames = ["assignments", "quizzes", "english"];
+  document.getElementById(`${sectionNames[idx]}-section`).classList.remove("hidden");
 
   if (idx === 2) renderDailyEnglish();
 }
