@@ -1,26 +1,40 @@
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
+/* Bubbling Text Font & Animation */
+.bubble-text {
+    font-family: 'Bubblegum Sans', cursive;
+    display: inline-block;
+}
+
+.bubble-text:hover {
+    animation: bubble 0.5s ease infinite alternate;
+    color: #f97316; /* Font turns orange on hover */
+}
+
+@keyframes bubble {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+}
+
+/* Announcement Marquee Animation */
+.animate-marquee {
+    display: inline-block;
+    animation: marquee 20s linear infinite;
+}
+
+@keyframes marquee {
+    from { transform: translateX(100%); }
+    to { transform: translateX(-100%); }
+}
+
+/* Button & Hover States */
+.btn-pop:hover {
+    transform: translateY(-5px) scale(1.02);
 }
 
 .animate-fade-in {
-    animation: fadeIn 0.3s ease forwards;
+    animation: fadeIn 0.4s ease-out;
 }
 
-/* Learner Button Hover Effect */
-.btn-learner:hover {
-    background-color: #4f46e5; /* Changes from Orange to Indigo on hover */
-    color: #ffffff;
-    box-shadow: 0 12px 20px rgba(79, 70, 229, 0.4);
-}
-
-/* Custom transitions for all buttons */
-button, a {
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* Card Hover Animation */
-.group:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
