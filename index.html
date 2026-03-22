@@ -1,199 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Masasa Online - Nairobi</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Masasa Online</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="index.css">
   <script src="index.js" defer></script>
 </head>
-<body class="min-h-screen font-sans bg-gray-50">
+<body class="min-h-screen bg-gray-50 font-sans antialiased">
 
-  <!-- Role Selection Overlay -->
-  <div id="role-overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-    <div class="bg-white rounded-3xl p-8 max-w-lg w-full mx-4 text-center shadow-2xl animate-fade-in">
-      <h2 class="text-4xl md:text-5xl font-extrabold mb-6 text-indigo-700 animate-bounce">
-        Welcome to Masasa Online 🎉✨
-      </h2>
-      <p class="text-xl md:text-2xl mb-10 text-gray-700 font-medium">
-        Who are you today?
-      </p>
+<!-- Role overlay -->
+<div id="role-overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+  <div class="bg-white rounded-3xl p-6 sm:p-10 w-[90vw] max-w-lg text-center shadow-2xl animate-fade-in">
+    <h2 class="text-4xl sm:text-5xl font-extrabold mb-6 text-indigo-700 animate-bounce">
+      Welcome to Masasa Online 🎉
+    </h2>
+    <p class="text-lg sm:text-xl mb-8 text-gray-700">Who are you today?</p>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <button onclick="selectRole('learner')" 
-          class="role-btn bg-gradient-to-br from-[#FF6B6B] to-[#FF8E53] text-white py-8 rounded-2xl text-xl md:text-2xl font-bold shadow-xl hover:scale-105 transition">
-          Learner 👩‍🎓
-        </button>
-        <button onclick="selectRole('parent')" 
-          class="role-btn bg-gradient-to-br from-[#4ECDC4] to-[#45B7A7] text-white py-8 rounded-2xl text-xl md:text-2xl font-bold shadow-xl hover:scale-105 transition">
-          Parent 👨‍👩‍👧
-        </button>
-        <button onclick="showTeacherLogin()" 
-          class="role-btn bg-gradient-to-br from-indigo-600 to-indigo-900 text-white py-8 rounded-2xl text-xl md:text-2xl font-bold shadow-xl hover:scale-105 transition">
-          Teacher 👩‍🏫
-        </button>
-      </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+      <button onclick="selectRole('learner')"
+        class="role-btn bg-gradient-to-br from-red-500 to-orange-500 text-white py-6 sm:py-8 rounded-2xl text-lg sm:text-2xl font-bold shadow-lg hover:scale-105 transition min-h-[100px]">
+        Learner 👩‍🎓
+      </button>
+      <button onclick="selectRole('parent')"
+        class="role-btn bg-gradient-to-br from-teal-400 to-cyan-500 text-white py-6 sm:py-8 rounded-2xl text-lg sm:text-2xl font-bold shadow-lg hover:scale-105 transition min-h-[100px]">
+        Parent 👨‍👩‍👧
+      </button>
+      <button onclick="showTeacherLogin()"
+        class="role-btn bg-gradient-to-br from-indigo-600 to-indigo-900 text-white py-6 sm:py-8 rounded-2xl text-lg sm:text-2xl font-bold shadow-lg hover:scale-105 transition min-h-[100px]">
+        Teacher 👩‍🏫
+      </button>
+    </div>
 
-      <!-- Teacher Login Form -->
-      <div id="teacher-login" class="hidden mt-10">
-        <input id="teacher-username" type="text" placeholder="Username (given by admin)" 
-          class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-lg focus:outline-none focus:border-indigo-500"/>
-        <input id="teacher-pass" type="password" placeholder="Password" 
-          class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-lg focus:outline-none focus:border-indigo-500"/>
-        <button onclick="validateTeacher()" 
-          class="bg-green-600 text-white px-10 py-4 rounded-2xl text-lg font-bold w-full hover:bg-green-700 transition">
-          Login as Teacher
-        </button>
-        <button onclick="hideTeacherLogin()" class="text-gray-600 mt-4 underline block mx-auto">
-          Back to selection
-        </button>
-      </div>
+    <!-- Teacher login form -->
+    <div id="teacher-login" class="hidden mt-8">
+      <input id="teacher-username" type="text" placeholder="Username (given by admin)" class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-base sm:text-lg focus:outline-none focus:border-indigo-500">
+      <input id="teacher-pass" type="password" placeholder="Password" class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-base sm:text-lg focus:outline-none focus:border-indigo-500">
+      <button onclick="validateTeacher()" class="bg-green-600 text-white px-8 py-4 rounded-2xl text-base sm:text-lg font-bold w-full hover:bg-green-700 transition">
+        Login as Teacher
+      </button>
+      <button onclick="hideTeacherLogin()" class="text-gray-600 mt-4 underline block mx-auto text-sm sm:text-base">
+        Back to selection
+      </button>
     </div>
   </div>
+</div>
 
-  <!-- Main Header -->
-  <header id="main-header" class="hidden bg-gradient-to-r from-indigo-700 to-indigo-900 text-white shadow-lg sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-      <h1 class="text-2xl md:text-3xl font-bold">Masasa Online 🇰🇪</h1>
-      <button onclick="resetRole()" 
-        class="bg-white/20 px-5 py-2 rounded-lg hover:bg-white/30 transition text-sm md:text-base">
+<!-- Header with date/time + weather -->
+<header id="main-header" class="hidden bg-gradient-to-r from-indigo-700 to-indigo-900 text-white shadow-lg sticky top-0 z-40">
+  <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+    <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+      <h1 class="text-xl sm:text-3xl font-bold">Masasa Online 🇰🇪</h1>
+      <div id="datetime" class="text-sm sm:text-base opacity-90"></div>
+    </div>
+    <div class="flex items-center gap-4 sm:gap-6">
+      <div id="weather" class="flex items-center gap-2 text-sm sm:text-base">
+        <span id="weather-icon" class="text-2xl sm:text-3xl"></span>
+        <span id="weather-text">--°C • Loading…</span>
+      </div>
+      <button onclick="resetRole()" class="bg-white/20 px-4 py-2 rounded-lg hover:bg-white/30 text-sm sm:text-base">
         Change Role
       </button>
     </div>
-  </header>
+  </div>
+</header>
 
-  <main id="main-content" class="max-w-6xl mx-auto px-4 py-8 hidden">
+<main id="main-content" class="max-w-6xl mx-auto px-4 py-6 sm:py-8 hidden">
 
-    <!-- Tabs -->
-    <div class="flex border-b mb-8 overflow-x-auto">
-      <button onclick="switchTab(0)" id="tab-0" 
-        class="tab-button px-6 py-3 font-medium border-b-4 border-transparent text-gray-500 hover:text-indigo-600 whitespace-nowrap active">
-        Assignments
-      </button>
-      <button onclick="switchTab(1)" id="tab-1" 
-        class="tab-button px-6 py-3 font-medium border-b-4 border-transparent text-gray-500 hover:text-indigo-600 whitespace-nowrap">
-        Quizzes
-      </button>
-      <button onclick="switchTab(2)" id="tab-2" 
-        class="tab-button px-6 py-3 font-medium border-b-4 border-transparent text-gray-500 hover:text-indigo-600 whitespace-nowrap">
-        Daily English 📖
-      </button>
-    </div>
+  <!-- Tabs -->
+  <div class="flex border-b mb-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+    <button onclick="switchTab(0)" id="tab-0" class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap active">
+      Assignments
+    </button>
+    <button onclick="switchTab(1)" id="tab-1" class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap">
+      Quizzes
+    </button>
+    <button onclick="switchTab(2)" id="tab-2" class="tab-button px-5 sm:px-8 py-3 font-medium border-b-4 border-transparent text-gray-600 hover:text-indigo-600 whitespace-nowrap">
+      Daily English 📖
+    </button>
+  </div>
 
-    <!-- Assignments Section -->
-    <section id="assignments-section">
-      <div id="teacher-assignments-form" class="hidden bg-white p-6 rounded-2xl shadow-lg mb-8">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Post New Assignment</h2>
-        <input id="ass-title" type="text" placeholder="Assignment Title" class="w-full mb-3 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
-        <textarea id="ass-desc" placeholder="Description / instructions" class="w-full mb-3 p-3 border rounded-lg h-28 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-        <input id="ass-pdf" type="text" placeholder="Direct PDF link (or leave blank for sample)" class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
-        <button onclick="addAssignment()" 
-          class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-indigo-700 transition w-full md:w-auto">
-          Post Assignment
-        </button>
-      </div>
-
-      <h2 class="text-2xl font-bold mb-6 text-gray-800">Assignments</h2>
-      <div id="assignments-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </section>
-
-    <!-- Quizzes Section -->
-    <section id="quizzes-section" class="hidden">
-      <div id="teacher-quiz-form" class="hidden bg-white p-6 rounded-2xl shadow-lg mb-8">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Create Multiple Choice Question</h2>
-        <input id="q-text" type="text" placeholder="Question text" class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <input id="opt0" placeholder="Option A" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
-          <input id="opt1" placeholder="Option B" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
-          <input id="opt2" placeholder="Option C" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
-          <input id="opt3" placeholder="Option D" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
-        </div>
-        <select id="correct-index" class="w-full mt-5 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <option value="0">A is correct</option>
-          <option value="1">B is correct</option>
-          <option value="2">C is correct</option>
-          <option value="3">D is correct</option>
-        </select>
-        <button onclick="addMCQ()" class="mt-6 bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-indigo-700 transition w-full md:w-auto">
-          Add Question
-        </button>
-      </div>
-
-      <h2 class="text-2xl font-bold mb-6 text-gray-800">Practice Quizzes</h2>
-      <button id="start-quiz-btn" onclick="startQuiz()" 
-        class="hidden bg-green-600 text-white px-10 py-4 rounded-2xl text-lg font-bold hover:bg-green-700 transition">
-        🚀 Start Quiz (Auto-Graded)
-      </button>
-      <div id="mcq-list" class="mt-6 space-y-6"></div>
-    </section>
-
-    <!-- Daily English Comprehension -->
-    <section id="english-section" class="hidden">
-      <div class="bg-white rounded-3xl shadow-xl p-8">
-        <h2 class="text-3xl font-bold mb-2 text-[#FF6B6B]">Daily English Comprehension</h2>
-        <p class="text-sm text-gray-500 mb-6">10 questions • New story every day</p>
-        
-        <div class="bg-amber-50 p-6 rounded-2xl mb-8 text-gray-800 leading-relaxed prose max-w-none">
-          <!-- Story will be inserted here -->
-        </div>
-
-        <div id="english-questions" class="space-y-8"></div>
-        <button onclick="submitEnglishQuiz()" 
-          class="mt-8 bg-[#2ECC71] text-white px-10 py-4 rounded-2xl text-lg font-bold w-full md:w-auto">
-          Submit Answers & Get Score
-        </button>
-      </div>
-    </section>
-
-    <!-- Quiz Taking Interface -->
-    <div id="quiz-taking" class="hidden">
-      <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-10 max-w-4xl mx-auto">
-        <h2 class="text-3xl font-bold mb-10 text-center text-gray-800">Quiz - Instant Grading</h2>
-        <div id="quiz-questions" class="space-y-10"></div>
-        <div class="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-          <button onclick="submitQuiz()" 
-            class="bg-green-600 text-white px-12 py-4 rounded-2xl text-lg font-bold hover:bg-green-700 transition">
-            Submit & See Results
-          </button>
-          <button onclick="cancelQuiz()" 
-            class="bg-gray-300 px-10 py-4 rounded-2xl text-lg font-medium hover:bg-gray-400 transition">
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-
-  </main>
-
-  <footer class="text-center py-8 text-gray-500 text-sm border-t mt-auto relative">
-    Masasa Online • Static website • Made in Nairobi • 2026
-    <!-- Admin pill -->
-    <div class="fixed bottom-6 right-6 z-50">
-      <button onclick="showAdminPanel()" 
-        class="bg-gray-300 hover:bg-gray-400 text-[10px] px-5 py-1.5 rounded-full shadow-md transition text-gray-700 flex items-center gap-1 admin-pill">
-        👨‍💼 ADMIN ONLY
+  <!-- Assignments -->
+  <section id="assignments-section">
+    <div id="teacher-assignments-form" class="hidden bg-white p-5 sm:p-6 rounded-2xl shadow mb-6 sm:mb-8">
+      <h2 class="text-lg sm:text-xl font-semibold mb-4">Post Assignment</h2>
+      <input id="ass-title" type="text" placeholder="Title" class="w-full mb-3 p-3 border rounded-lg">
+      <textarea id="ass-desc" placeholder="Description" class="w-full mb-3 p-3 border rounded-lg h-24"></textarea>
+      <input id="ass-pdf" type="text" placeholder="PDF link (optional)" class="w-full mb-4 p-3 border rounded-lg">
+      <button onclick="addAssignment()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 w-full sm:w-auto">
+        Post
       </button>
     </div>
-  </footer>
 
-  <!-- Admin Login Modal -->
-  <div id="admin-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
-    <div class="bg-white rounded-3xl p-8 max-w-sm w-full mx-4">
-      <h3 class="text-2xl font-bold mb-6">Admin Login</h3>
-      <input id="admin-user" value="admin" class="w-full p-4 border rounded-xl mb-4" placeholder="Username">
-      <input id="admin-pass" type="password" class="w-full p-4 border rounded-xl mb-6" placeholder="Password">
-      <button onclick="loginAdmin()" class="bg-indigo-700 text-white w-full py-4 rounded-2xl text-lg">Login as Admin</button>
-      <div id="admin-panel" class="hidden mt-8">
-        <h4 class="font-semibold mb-4">Manage Teachers</h4>
-        <div id="teacher-list" class="mb-6 max-h-60 overflow-y-auto"></div>
-        <input id="new-teacher-user" placeholder="New teacher username" class="w-full p-3 border rounded-xl mb-3">
-        <input id="new-teacher-pass" placeholder="Password for teacher" class="w-full p-3 border rounded-xl mb-4">
-        <button onclick="addNewTeacher()" class="bg-emerald-600 text-white px-8 py-3 rounded-xl w-full">Add Teacher</button>
-        <button onclick="closeAdminModal()" class="mt-4 text-red-500 underline block mx-auto">Close</button>
+    <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Assignments</h2>
+    <div id="assignments-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
+  </section>
+
+  <!-- Daily English -->
+  <section id="english-section" class="hidden">
+    <div class="bg-white rounded-3xl shadow-xl p-5 sm:p-8">
+      <h2 class="text-2xl sm:text-3xl font-bold mb-2 text-red-600">Daily English Comprehension</h2>
+      <p class="text-sm text-gray-500 mb-6">10 questions • New story each weekday</p>
+
+      <div class="bg-amber-50 p-5 sm:p-6 rounded-2xl mb-6 sm:mb-8 text-gray-800 leading-relaxed prose max-w-none">
+        <!-- story inserted here -->
       </div>
+
+      <div id="english-questions" class="space-y-6 sm:space-y-8"></div>
+
+      <button onclick="submitEnglishQuiz()" 
+        class="mt-6 bg-emerald-600 text-white px-8 py-4 rounded-2xl text-base sm:text-lg font-bold w-full sm:w-auto hover:bg-emerald-700 transition">
+        Submit & See Score
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="text-center py-6 sm:py-8 text-gray-500 text-sm border-t mt-auto relative">
+  Masasa Online • Nairobi • 2026
+  <div class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50">
+    <button onclick="showAdminPanel()" 
+      class="bg-gray-300/90 hover:bg-gray-400 text-xs px-4 py-1.5 rounded-full shadow transition">
+      👨‍💼 ADMIN
+    </button>
+  </div>
+</footer>
+
+<!-- Admin modal -->
+<div id="admin-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
+  <div class="bg-white rounded-3xl p-6 sm:p-8 w-[90vw] max-w-sm">
+    <h3 class="text-xl sm:text-2xl font-bold mb-6">Admin Login</h3>
+    <input id="admin-user" value="admin" class="w-full p-4 border rounded-xl mb-4">
+    <input id="admin-pass" type="password" class="w-full p-4 border rounded-xl mb-6">
+    <button onclick="loginAdmin()" class="bg-indigo-700 text-white w-full py-4 rounded-2xl text-lg">Login</button>
+
+    <div id="admin-panel" class="hidden mt-8">
+      <h4 class="font-semibold mb-4">Teachers</h4>
+      <div id="teacher-list" class="mb-6 max-h-60 overflow-y-auto"></div>
+      <input id="new-teacher-user" placeholder="New username" class="w-full p-3 border rounded-xl mb-3">
+      <input id="new-teacher-pass" placeholder="Password" class="w-full p-3 border rounded-xl mb-4">
+      <button onclick="addNewTeacher()" class="bg-emerald-600 text-white px-6 py-3 rounded-xl w-full">Add Teacher</button>
+      <button onclick="closeAdminModal()" class="mt-4 text-red-500 underline block mx-auto">Close</button>
     </div>
   </div>
+</div>
 
 </body>
 </html>
