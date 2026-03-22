@@ -1,8 +1,8 @@
-/* SMOOTH CONTINUOUS MARQUEE */
+/* SMOOTH RUNNING MARQUEE */
 .marquee-wrapper {
     display: inline-block;
     white-space: nowrap;
-    animation: marquee-scroll 20s linear infinite;
+    animation: marquee-scroll 22s linear infinite;
     padding-left: 100%;
 }
 
@@ -18,24 +18,35 @@
 }
 
 .bubble-text:hover {
-    color: #f97316 !important; /* Font color changes on hover */
+    color: #f97316 !important; /* Turns Orange on hover */
     animation: bubble-jump 0.4s ease infinite alternate;
 }
 
 @keyframes bubble-jump {
     from { transform: translateY(0); }
-    to { transform: translateY(-8px); }
+    to { transform: translateY(-10px); }
 }
 
 /* LEARNER BUTTON HOVER */
 .learner-btn:hover {
-    background-color: #4f46e5 !important; /* Changes to Indigo */
+    background-color: #4f46e5 !important; /* Turns Indigo */
     transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(79, 70, 229, 0.4);
 }
 
-.animate-pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-@keyframes popIn { 
-    0% { transform: scale(0.5); opacity: 0; }
+/* ANIMATIONS */
+.animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.animate-bounce-in { animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes bounceIn { 
+    0% { transform: scale(0.8); opacity: 0; }
+    70% { transform: scale(1.05); }
     100% { transform: scale(1); opacity: 1; }
 }
+
+.animate-pop-in { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* Fix iOS select zoom */
+select { font-size: 16px !important; }
