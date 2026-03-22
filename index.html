@@ -1,67 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Masasa Online - Welcome!</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Masasa Online - Nairobi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="index.css">
   <script src="index.js" defer></script>
 </head>
-<body class="min-h-screen font-sans">
+<body class="min-h-screen font-sans bg-gray-50">
 
-  <!-- Role Selection Overlay (shows on first load) -->
-  <div id="role-overlay" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-2xl transform scale-100 transition-all">
-      <h2 id="welcome-title" class="text-4xl font-extrabold mb-6 text-indigo-700 animate-bounce">Welcome to Masasa Online 🎉</h2>
-      <p class="text-xl mb-8 text-gray-700">Who are you today?</p>
-      
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <button onclick="selectRole('learner')" class="role-btn bg-gradient-to-br from-[#FF6B6B] to-[#FF8E53] text-white py-6 rounded-2xl text-xl font-bold shadow-lg hover:scale-105 transition">
+  <!-- Role Selection Overlay -->
+  <div id="role-overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-8 max-w-lg w-full mx-4 text-center shadow-2xl animate-fade-in">
+      <h2 class="text-4xl md:text-5xl font-extrabold mb-6 text-indigo-700 animate-bounce">
+        Welcome to Masasa Online 🎉✨
+      </h2>
+      <p class="text-xl md:text-2xl mb-10 text-gray-700 font-medium">
+        Who are you today?
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <button onclick="selectRole('learner')" 
+          class="role-btn bg-gradient-to-br from-[#FF6B6B] to-[#FF8E53] text-white py-8 rounded-2xl text-xl md:text-2xl font-bold shadow-xl hover:scale-105 transition">
           Learner 👩‍🎓
         </button>
-        <button onclick="selectRole('parent')" class="role-btn bg-gradient-to-br from-[#4ECDC4] to-[#556270] text-white py-6 rounded-2xl text-xl font-bold shadow-lg hover:scale-105 transition">
+        <button onclick="selectRole('parent')" 
+          class="role-btn bg-gradient-to-br from-[#4ECDC4] to-[#45B7A7] text-white py-8 rounded-2xl text-xl md:text-2xl font-bold shadow-xl hover:scale-105 transition">
           Parent 👨‍👩‍👧
         </button>
-        <button onclick="showTeacherLogin()" class="role-btn bg-gradient-to-br from-indigo-600 to-indigo-800 text-white py-6 rounded-2xl text-xl font-bold shadow-lg hover:scale-105 transition">
+        <button onclick="showTeacherLogin()" 
+          class="role-btn bg-gradient-to-br from-indigo-600 to-indigo-900 text-white py-8 rounded-2xl text-xl md:text-2xl font-bold shadow-xl hover:scale-105 transition">
           Teacher 👩‍🏫
         </button>
       </div>
 
-      <!-- Hidden Teacher Login Form -->
-      <div id="teacher-login" class="hidden mt-8">
-        <input id="teacher-email" type="email" placeholder="Admin email (@masasaadmin.ke)" class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-lg">
-        <input id="teacher-pass" type="password" placeholder="Password" class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-lg">
-        <button onclick="validateTeacher()" class="bg-green-600 text-white px-10 py-4 rounded-2xl text-lg font-bold w-full mt-2 hover:bg-green-700">
+      <!-- Teacher Login Form -->
+      <div id="teacher-login" class="hidden mt-10">
+        <input id="teacher-email" type="email" placeholder="Admin email (must end with @masasaadmin.ke)" 
+          class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-lg focus:outline-none focus:border-indigo-500"/>
+        <input id="teacher-pass" type="password" placeholder="Password" 
+          class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-lg focus:outline-none focus:border-indigo-500"/>
+        <button onclick="validateTeacher()" 
+          class="bg-green-600 text-white px-10 py-4 rounded-2xl text-lg font-bold w-full hover:bg-green-700 transition">
           Login as Teacher
         </button>
-        <button onclick="hideTeacherLogin()" class="text-gray-600 mt-4 underline">Back</button>
+        <button onclick="hideTeacherLogin()" class="text-gray-600 mt-4 underline block mx-auto">
+          Back to selection
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <header id="main-header" class="hidden bg-gradient-to-r from-indigo-700 to-indigo-900 text-white shadow-lg">
+  <!-- Main Content (hidden until role selected) -->
+  <header id="main-header" class="hidden bg-gradient-to-r from-indigo-700 to-indigo-900 text-white shadow-lg sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-      <h1 class="text-3xl font-bold">Masasa Online 🇰🇪</h1>
-      <button onclick="resetRole()" class="bg-white/20 px-6 py-2 rounded-lg hover:bg-white/30">
+      <h1 class="text-2xl md:text-3xl font-bold">Masasa Online 🇰🇪</h1>
+      <button onclick="resetRole()" 
+        class="bg-white/20 px-5 py-2 rounded-lg hover:bg-white/30 transition text-sm md:text-base">
         Change Role
       </button>
     </div>
   </header>
 
-  <div id="main-content" class="max-w-6xl mx-auto px-4 py-6 hidden">
-    <!-- Tabs and rest of your previous content here -->
-    <!-- ... paste your previous tabs, assignments, quizzes sections here ... -->
-    <!-- For brevity I'm not repeating the full 300+ lines, just keep your existing sections inside this div -->
-    <!-- Make sure to add class="learner-theme" or similar where needed for colors -->
+  <main id="main-content" class="max-w-6xl mx-auto px-4 py-8 hidden">
 
-    <!-- Example: override some colors for learner mode -->
-    <style id="dynamic-styles"></style>
-  </div>
+    <!-- Tabs -->
+    <div class="flex border-b mb-8 overflow-x-auto">
+      <button onclick="switchTab(0)" id="tab-0" 
+        class="tab-button px-6 py-3 font-medium border-b-4 border-transparent text-gray-500 hover:text-indigo-600 whitespace-nowrap">
+        Assignments
+      </button>
+      <button onclick="switchTab(1)" id="tab-1" 
+        class="tab-button px-6 py-3 font-medium border-b-4 border-transparent text-gray-500 hover:text-indigo-600 whitespace-nowrap">
+        Quizzes
+      </button>
+    </div>
 
-  <footer class="text-center py-8 text-gray-500 text-sm mt-auto">
-    Masasa Online • Static • Made with ❤️ in Nairobi
+    <!-- Assignments Section -->
+    <section id="assignments-section">
+      <div id="teacher-assignments-form" class="hidden bg-white p-6 rounded-2xl shadow-lg mb-8">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Post New Assignment</h2>
+        <input id="ass-title" type="text" placeholder="Assignment Title" class="w-full mb-3 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        <textarea id="ass-desc" placeholder="Description / instructions" class="w-full mb-3 p-3 border rounded-lg h-28 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        <input id="ass-pdf" type="text" placeholder="PDF direct link (or use sample)" class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        <button onclick="addAssignment()" 
+          class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-indigo-700 transition w-full md:w-auto">
+          Post Assignment
+        </button>
+      </div>
+
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Assignments</h2>
+      <div id="assignments-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- Quizzes Section -->
+    <section id="quizzes-section" class="hidden">
+      <div id="teacher-quiz-form" class="hidden bg-white p-6 rounded-2xl shadow-lg mb-8">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Create Multiple Choice Question</h2>
+        <input id="q-text" type="text" placeholder="Question text" class="w-full mb-4 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <input id="opt0" placeholder="Option A" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          <input id="opt1" placeholder="Option B" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          <input id="opt2" placeholder="Option C" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          <input id="opt3" placeholder="Option D" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+        </div>
+        <select id="correct-index" class="w-full mt-5 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="0">A is correct</option>
+          <option value="1">B is correct</option>
+          <option value="2">C is correct</option>
+          <option value="3">D is correct</option>
+        </select>
+        <button onclick="addMCQ()" class="mt-6 bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-indigo-700 transition w-full md:w-auto">
+          Add Question
+        </button>
+      </div>
+
+      <h2 class="text-2xl font-bold mb-6 text-gray-800">Practice Quizzes</h2>
+      <button id="start-quiz-btn" onclick="startQuiz()" 
+        class="hidden bg-green-600 text-white px-10 py-4 rounded-2xl text-lg font-bold hover:bg-green-700 transition">
+        🚀 Start Quiz (Auto-Graded)
+      </button>
+      <div id="mcq-list" class="mt-6 space-y-6"></div>
+    </section>
+
+    <!-- Quiz Taking Interface -->
+    <div id="quiz-taking" class="hidden">
+      <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-10 max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold mb-10 text-center text-gray-800">Quiz - Instant Grading</h2>
+        <div id="quiz-questions" class="space-y-10"></div>
+        <div class="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
+          <button onclick="submitQuiz()" 
+            class="bg-green-600 text-white px-12 py-4 rounded-2xl text-lg font-bold hover:bg-green-700 transition">
+            Submit & See Results
+          </button>
+          <button onclick="cancelQuiz()" 
+            class="bg-gray-300 px-10 py-4 rounded-2xl text-lg font-medium hover:bg-gray-400 transition">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="text-center py-8 text-gray-500 text-sm border-t mt-auto">
+    Masasa Online • Static website • Made in Nairobi • 2026
   </footer>
+
 </body>
 </html>
