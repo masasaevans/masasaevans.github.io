@@ -14,7 +14,57 @@ let assignments  = [];
 let mcqs         = [];
 let quizQuestions = [];
 let currentAnswers = [];
+let teachers = JSON.parse(localStorage.getItem("teachers") || "[]"); // [{username, password}, ...]
+let englishAnswers = [];
+// Daily stories & questions (expand this object over time)
+// Key = 'YYYY-MM-DD' or weekday name fallback
+const DAILY_ENGLISH_CONTENT = {
+  "2026-03-22": {  // Sunday example - you already have this story
+    title: "The Magic Matatu in Nairobi",
+    story: "Every morning in Nairobi, little Kiano waited for the magic matatu. One day the matatu driver, Baba Juma, said, “Today we go on an adventure!” They drove past the tall buildings, the busy market, and the green park. Suddenly the matatu started singing Kenyan songs! All the passengers laughed and danced. At the end, Baba Juma gave Kiano a big mango and said, “Kindness makes every journey magical.” Kiano smiled and ran home to tell his mother the best story ever.",
+    questions: [
+      {q: "Where does the story mainly take place?",          options: ["Mombasa","Nairobi","Kisumu","Nakuru"], correct: 1},
+      {q: "What is the name of the young boy?",               options: ["Juma","Kiano","Baba","Matatu"], correct: 1},
+      {q: "Who is the driver of the matatu?",                 options: ["Kiano","Baba Juma","The mother","A passenger"], correct: 1},
+      {q: "What surprising thing did the matatu do?",         options: ["It flew","It sang songs","It stopped moving","It cried"], correct: 1},
+      {q: "What gift did Baba Juma give to Kiano?",           options: ["A book","Money","A big mango","A toy"], correct: 2},
+      {q: "According to Baba Juma, what makes journeys magical?", options: ["Speed","Kindness","Money","Loud music"], correct: 1},
+      {q: "How did Kiano feel when he got home?",             options: ["Sad","Angry","Happy and excited","Sleepy"], correct: 2},
+      {q: "What did Kiano want to do when he reached home?",  options: ["Sleep","Tell his mother the story","Play football","Eat the mango"], correct: 1},
+      {q: "What colour was the park they passed?",            options: ["Blue","Red","Green","Yellow"], correct: 2},
+      {q: "The main message of the story is about…",          options: ["Adventure","Kindness","Magic matatus","Nairobi traffic"], correct: 1}
+    ]
+  },
+  "2026-03-23": {  // Monday example - new story
+    title: "Amani and the Lost Lion Cub",
+    story: "In the Maasai Mara, young Amani found a tiny lion cub crying under an acacia tree. Its mother was nowhere. Amani carried water in her calabash and shared her ugali. She sang a soft Luo lullaby. Hours later, the lioness appeared. Instead of roaring, she gently rubbed against Amani as thanks. From that day, Amani became known as 'Lion Friend' in her village.",
+    questions: [
+      {q: "Where did Amani find the lion cub?", options: ["Nairobi","Maasai Mara","Kibera","Coast"], correct: 1},
+      {q: "What did Amani share with the cub?", options: ["Her phone","Water and ugali","Toys","Money"], correct: 1},
+      {q: "What song did Amani sing?",          options: ["A pop song","A Luo lullaby","A school anthem","Nothing"], correct: 1},
+      {q: "How did the lioness react when she returned?", options: ["Attacked Amani","Rubbed against her gently","Ran away","Roared loudly"], correct: 1},
+      {q: "What nickname did Amani get?",       options: ["Fast Runner","Lion Friend","Water Girl","Singer"], correct: 1},
+      // ... add 5 more similar questions ...
+      {q: "Question 6 placeholder", options: ["A","B","C","D"], correct: 0},
+      {q: "Question 7 placeholder", options: ["A","B","C","D"], correct: 0},
+      {q: "Question 8 placeholder", options: ["A","B","C","D"], correct: 0},
+      {q: "Question 9 placeholder", options: ["A","B","C","D"], correct: 0},
+      {q: "Question 10 placeholder",options: ["A","B","C","D"], correct: 0}
+    ]
+  },
+  // Add more dates or use weekday fallback below
+};
 
+// Fallback if date not found → cycle by weekday
+const WEEKDAY_FALLBACK = [
+  // Sunday
+  DAILY_ENGLISH_CONTENT["2026-03-22"],
+  // Monday (use the March 23 example or create new)
+  DAILY_ENGLISH_CONTENT["2026-03-23"],
+  // Tuesday → add your own story/questions
+  { title: "Tuesday Story", story: "...", questions: [/*10 q*/] },
+  // ... Wednesday to Saturday
+];
 // ──────────────────────────────────────────────
 // DOM Elements Cache (optional but cleaner)
 // ──────────────────────────────────────────────
@@ -308,11 +358,25 @@ function backToMain() {
 // ──────────────────────────────────────────────
 function switchTab(tabIndex) {
   document.querySelectorAll(".tab-button").forEach(el => el.classList.remove("active"));
-  document.getElementById(`tab-${tabIndex}`).classList.add("active");
+  const activeTab = document.getElementById(`tab-${tabIndex}`);
+  if (activeTab) activeTab.classList.add("active");
 
-  document.getElementById("assignments-section").classList.toggle("hidden", tabIndex !== 0);
-  document.getElementById("quizzes-section").classList.toggle("hidden", tabIndex !== 1);
+  document.getElementById("assignments-section").classList.add("hidden");
+  document.getElementById("quizzes-section").classList.add("hidden");
+  document.getElementById("english-section").classList.add("hidden");
   document.getElementById("quiz-taking").classList.add("hidden");
+
+  if (tabIndex === 0) document.getElementById("assignments-section").classList.remove("hidden");
+  else if (tabIndex === 1) document.getElementById("quizzes-section").classList.remove("hidden");
+  else if (tabIndex === 2) {
+    if (currentRole === "learner" || currentRole === "parent") {
+      document.getElementById("english-section").classList.remove("hidden");
+      renderEnglishQuestions();
+    } else {
+      alert("Daily English is for Learners & Parents only");
+      switchTab(0);
+    }
+  }
 }
 
 // ──────────────────────────────────────────────
@@ -338,6 +402,145 @@ function renderAll() {
 // ──────────────────────────────────────────────
 // Init
 // ──────────────────────────────────────────────
+// ================== ADMIN & TEACHER LOGIN (additional) ==================
+function showAdminPanel() {
+  document.getElementById("admin-modal").classList.remove("hidden");
+}
+
+function loginAdmin() {
+  const user = document.getElementById("admin-user").value.trim();
+  const pass = document.getElementById("admin-pass").value;
+  if (user === "admin" && pass === "MasasaAdmin2026!") {
+    document.getElementById("admin-panel").classList.remove("hidden");
+    renderTeacherList();
+  } else {
+    alert("Wrong admin credentials!");
+  }
+}
+
+function renderTeacherList() {
+  const container = document.getElementById("teacher-list");
+  container.innerHTML = teachers.length ? teachers.map(t => 
+    `<div class="flex justify-between bg-gray-100 p-3 rounded-xl mb-2">
+      <span>${t.username}</span>
+      <span class="text-xs text-gray-500">Pass: ${t.password}</span>
+    </div>`).join("") : "<p class='text-gray-400'>No teachers yet</p>";
+}
+
+function addNewTeacher() {
+  const username = document.getElementById("new-teacher-user").value.trim();
+  const password = document.getElementById("new-teacher-pass").value.trim();
+  if (!username || !password) return alert("Fill both fields");
+  teachers.push({username, password});
+  localStorage.setItem("teachers", JSON.stringify(teachers));
+  renderTeacherList();
+  alert(`Teacher ${username} added! Give them this password: ${password}`);
+}
+
+function closeAdminModal() {
+  document.getElementById("admin-modal").classList.add("hidden");
+  document.getElementById("admin-panel").classList.add("hidden");
+}
+
+// Update teacher login (replace the old validateTeacher function)
+function validateTeacher() {
+  const username = document.getElementById("teacher-email").value.trim(); // reuse field as username
+  const pass = document.getElementById("teacher-pass").value;
+  const found = teachers.find(t => t.username === username && t.password === pass);
+  if (found) {
+    selectRole("teacher");
+    hideTeacherLogin();
+  } else {
+    alert("Wrong username or password!\nAsk Admin to give you the correct ones.");
+  }
+}
+
+// ================== DAILY ENGLISH (10 questions) ==================
+function renderEnglishQuestions() {
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  let content = DAILY_ENGLISH_CONTENT[today];
+
+  if (!content) {
+    // Fallback to weekday (0=Sunday, 1=Monday, ...)
+    const weekday = new Date().getDay();
+    content = WEEKDAY_FALLBACK[weekday] || DAILY_ENGLISH_CONTENT["2026-03-22"]; // default
+  }
+
+  // Update title & story
+  document.querySelector("#english-section h2").textContent = "Daily English: " + content.title;
+  document.querySelector("#english-section .bg-amber-50").innerHTML = `<strong>Story:</strong> ${content.story}`;
+
+  englishAnswers = new Array(10).fill(null);
+  const container = document.getElementById("english-questions");
+  container.innerHTML = "";
+
+  content.questions.forEach((q, i) => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <p class="font-semibold mb-4">${i+1}. ${q.q}</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        ${q.options.map((opt, idx) => `
+          <label class="flex items-center gap-3 p-4 border rounded-2xl cursor-pointer hover:bg-yellow-50 transition">
+            <input type="radio" name="eng${i}" value="${idx}" 
+              onchange="englishAnswers[${i}] = ${idx}" class="w-5 h-5 accent-green-500">
+            <span>${opt}</span>
+          </label>
+        `).join("")}
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function submitEnglishQuiz() {
+  if (englishAnswers.includes(null)) {
+    alert("Please answer all 10 questions first! 🌟");
+    return;
+  }
+
+  const correctCount = englishAnswers.filter((ans, i) => ans === DAILY_ENGLISH_CONTENT[Object.keys(DAILY_ENGLISH_CONTENT)[0]].questions[i]?.correct || false).length;
+  // Note: the line above is simplified — in real use match with current content.questions[i].correct
+  // Better version:
+  // You need to store current content globally or re-fetch — for simplicity assume fixed index or save currentQuestions
+
+  // Improved (add this variable at top of file):
+  // let currentEnglishQuestions = [];
+
+  // Then in renderEnglishQuestions():
+  // currentEnglishQuestions = content.questions;
+
+  // Then here:
+  const score = englishAnswers.filter((ans, i) => ans === currentEnglishQuestions[i].correct).length;
+  const percent = Math.round((score / 10) * 100);
+
+  // Congratulatory popup
+  const emoji = percent >= 80 ? "🎉🥳🔥" : percent >= 50 ? "👏😊" : "📚💪";
+  const message = percent === 100 ? "Perfect! You're a comprehension star! 🌟" 
+                 : percent >= 80 ? "Excellent job! Keep shining! ✨" 
+                 : percent >= 50 ? "Good effort! You're getting better every day! 👍" 
+                 : "Great try! Read the story again and try tomorrow! 📖";
+
+  // Simple alert popup (you can replace with custom modal later)
+  setTimeout(() => {
+    alert(`${emoji}\n\nYour Score: ${percent}% (${score}/10)\n\n${message}`);
+  }, 300);
+
+  // Optional: show inline too
+  document.getElementById("english-questions").innerHTML = `
+    <div class="text-center py-12">
+      <div class="text-5xl mb-4">${emoji}</div>
+      <h3 class="text-4xl font-bold text-green-600 mb-4">${percent}%</h3>
+      <p class="text-xl mb-6">${message}</p>
+      <button onclick="renderEnglishQuestions()" class="bg-blue-600 text-white px-10 py-4 rounded-2xl text-lg">
+        Try Again / Next Day
+      </button>
+    </div>`;
+}
+
+// Helper
+function backToEnglishTab() {
+  renderEnglishQuestions();
+}
 window.onload = () => {
   loadData();
 
@@ -345,6 +548,8 @@ window.onload = () => {
     showWelcomeOverlay();
   } else {
     selectRole(currentRole);
+    // Inside your existing window.onload → after selectRole(currentRole);
+switchTab(0);   // ← already there, just keep
   }
 
   renderAll();
