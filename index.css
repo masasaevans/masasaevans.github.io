@@ -1,53 +1,54 @@
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
-}
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
+@layer base {
+  :root {
+    --fs-base: clamp(15px, 3.2vw + 0.4rem, 17px);
+    --fs-h1:   clamp(1.9rem, 6vw + 0.5rem, 3.2rem);
+    --fs-h2:   clamp(1.6rem, 5vw + 0.4rem, 2.5rem);
+    --spacing: clamp(1rem, 4vw, 1.6rem);
+  }
+
+  html { font-size: var(--fs-base); scroll-behavior: smooth; }
+  body { min-height: 100dvh; line-height: 1.6; overflow-x: hidden; }
+  h1 { font-size: var(--fs-h1); }
+  h2 { font-size: var(--fs-h2); }
+
+  button, [role="button"] { min-height: 44px; min-width: 44px; touch-action: manipulation; }
 }
 
-/* Tabs */
-.tab-button.active {
-  border-color: #4f46e5;
-  color: #4f46e5;
-  font-weight: 600;
+.max-w-6xl { max-width: 80rem; margin-inline: auto; padding-inline: var(--spacing); }
+
+.snap-mandatory::-webkit-scrollbar { display: none; }
+.scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+
+.prose { font-size: 1.05rem; line-height: 1.75; }
+.prose p { margin: 0.75em 0; }
+
+.score-popup {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 2rem 1.5rem;
+  border-radius: 1.5rem;
+  text-align: center;
+  margin: 2rem auto;
+  max-width: 90vw;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+  animation: pop 0.5s ease-out;
 }
 
-/* Cards hover effect */
-.card {
-  transition: all 0.25s ease;
-}
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+@keyframes pop {
+  0% { transform: scale(0.65) translateY(40px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
-/* Learner-friendly bright theme */
-.learner-theme {
-  background: linear-gradient(to bottom right, #fffaf0, #e0f7fa, #f0fdfa);
+.role-btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.learner-theme h1, .learner-theme h2, .learner-theme h3 {
-  color: #FF6B6B;
-}
-.learner-theme .bg-indigo-600 {
-  background-color: #FF6B6B !important;
-}
-.learner-theme .bg-indigo-700 {
-  background-color: #FF4757 !important;
-}
-.learner-theme .bg-green-600 {
-  background-color: #2ECC71 !important;
-}
-.learner-theme button.bg-indigo-600:hover {
-  background-color: #FF4757 !important;
+.role-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
-/* Daily English extras */
-#english-questions label:hover {
-  background-color: #fefce8;
-}
-.prose p {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+@media (max-width: 640px) {
+  .p-8 { padding: 1.5rem; }
+  .text-3xl { font-size: 1.75rem; }
+  .grid-cols-2, .grid-cols-3 { grid-template-columns: 1fr; }
 }
