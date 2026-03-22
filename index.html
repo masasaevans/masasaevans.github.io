@@ -9,37 +9,36 @@
 </head>
 <body class="bg-gray-50 font-sans antialiased">
 
-<!-- Role Overlay -->
+<!-- ROLE OVERLAY -->
 <div id="role-overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
   <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl">
     <h1 class="text-4xl font-extrabold text-indigo-700 mb-6">Masasa Online 🎉</h1>
-    <p class="text-lg mb-8 text-gray-700">Who are you today?</p>
+    <p class="text-lg mb-8">Who are you today?</p>
     
-    <button onclick="selectRole('student')" class="role-btn w-full bg-gradient-to-br from-red-500 to-orange-500 text-white py-6 rounded-2xl text-2xl font-bold mb-4">Learner 👩‍🎓</button>
-    <button onclick="selectRole('parent')" class="role-btn w-full bg-gradient-to-br from-teal-400 to-cyan-500 text-white py-6 rounded-2xl text-2xl font-bold mb-4">Parent 👨‍👩‍👧</button>
-    <button onclick="showTeacherLogin()" class="role-btn w-full bg-gradient-to-br from-indigo-600 to-indigo-900 text-white py-6 rounded-2xl text-2xl font-bold">Teacher 👩‍🏫</button>
+    <button onclick="selectRole('student')" class="btn-pop w-full bg-gradient-to-br from-red-500 to-orange-500 text-white py-6 rounded-2xl text-2xl font-bold mb-4">Learner 👩‍🎓</button>
+    <button onclick="selectRole('parent')" class="btn-pop w-full bg-gradient-to-br from-teal-400 to-cyan-500 text-white py-6 rounded-2xl text-2xl font-bold mb-4">Parent 👨‍👩‍👧</button>
+    <button onclick="showTeacherLogin()" class="btn-pop w-full bg-gradient-to-br from-indigo-600 to-indigo-900 text-white py-6 rounded-2xl text-2xl font-bold">Teacher 👩‍🏫</button>
 
-    <!-- Teacher Login -->
     <div id="teacher-login" class="hidden mt-8">
-      <input id="teacher-username" type="text" placeholder="Username" class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl text-lg">
+      <input id="teacher-username" type="text" placeholder="Username" class="w-full p-4 mb-4 border-2 border-indigo-300 rounded-xl">
       <div class="relative mb-4">
-        <input id="teacher-pass" type="password" placeholder="Password" class="w-full p-4 border-2 border-indigo-300 rounded-xl text-lg pr-12">
+        <input id="teacher-pass" type="password" placeholder="Password" class="w-full p-4 border-2 border-indigo-300 rounded-xl pr-12">
         <button onclick="toggleVisibility(this)" class="password-toggle absolute right-4 top-1/2 -translate-y-1/2 text-2xl">👁️</button>
       </div>
-      <button onclick="validateTeacher()" class="bg-green-600 text-white w-full py-4 rounded-2xl text-lg font-bold">Login as Teacher</button>
+      <button onclick="validateTeacher()" class="btn-pop bg-green-600 text-white w-full py-4 rounded-2xl text-lg font-bold">Login as Teacher</button>
     </div>
   </div>
 </div>
 
+<!-- MAIN HEADER -->
 <header id="main-header" class="hidden bg-indigo-700 text-white p-4 sticky top-0 z-40 shadow">
   <div class="max-w-6xl mx-auto flex justify-between items-center">
     <h1 class="text-2xl font-bold">Masasa Online 🇰🇪</h1>
-    <button onclick="resetRole()" class="bg-white/20 px-5 py-2 rounded-lg hover:bg-white/30">Change Role</button>
+    <button onclick="resetRole()" class="btn-pop bg-white/20 px-6 py-2 rounded-lg">Exit / Change Role</button>
   </div>
 </header>
 
 <main id="main-content" class="max-w-6xl mx-auto p-6 hidden">
-  <!-- Tabs -->
   <div class="flex border-b mb-6">
     <button onclick="switchTab(0)" id="tab-0" class="tab-button active px-8 py-3 font-medium">Assignments</button>
     <button onclick="switchTab(2)" id="tab-2" class="tab-button px-8 py-3 font-medium">Daily English 📖</button>
@@ -48,9 +47,9 @@
   <!-- Assignments -->
   <section id="assignments-section">
     <div id="teacher-form" class="hidden bg-white p-6 rounded-2xl shadow mb-8">
-      <input id="ass-title" placeholder="Assignment Title" class="w-full p-3 border rounded mb-3">
+      <input id="ass-title" placeholder="Title" class="w-full p-3 border rounded mb-3">
       <textarea id="ass-desc" placeholder="Description" class="w-full p-3 border rounded h-24"></textarea>
-      <button onclick="addAssignment()" class="mt-4 bg-indigo-600 text-white px-8 py-3 rounded-xl">Post Assignment</button>
+      <button onclick="addAssignment()" class="btn-pop mt-4 bg-indigo-600 text-white px-8 py-3 rounded-xl">Post Assignment</button>
     </div>
     <div id="assignments-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
   </section>
@@ -58,11 +57,21 @@
   <!-- Daily English -->
   <section id="english-section" class="hidden bg-white rounded-3xl p-8 shadow">
     <h2 id="english-title" class="text-3xl font-bold mb-2 text-red-600"></h2>
-    <div id="story-box" class="bg-amber-50 p-6 rounded-2xl mb-8 leading-relaxed"></div>
+    <div id="story-box" class="bg-amber-50 p-6 rounded-2xl mb-8"></div>
     <div id="english-questions" class="space-y-6"></div>
-    <button onclick="submitEnglishQuiz()" class="mt-8 bg-emerald-600 text-white w-full py-4 rounded-2xl text-lg font-bold">Submit & See Score</button>
+    <button onclick="submitEnglishQuiz()" class="btn-pop mt-8 bg-emerald-600 text-white w-full py-4 rounded-2xl text-lg font-bold">Submit & See Score</button>
   </section>
 </main>
+
+<!-- CUSTOM POPUP -->
+<div id="popup" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[80]">
+  <div id="popup-content" class="bg-white rounded-3xl shadow-2xl max-w-xs w-full p-8 text-center scale-95 transition-transform">
+    <div id="popup-icon" class="text-6xl mb-4"></div>
+    <h3 id="popup-title" class="text-2xl font-bold mb-2"></h3>
+    <p id="popup-message" class="text-gray-600 mb-6"></p>
+    <button onclick="closePopup()" class="btn-pop bg-indigo-600 text-white px-10 py-3 rounded-2xl font-medium">OK</button>
+  </div>
+</div>
 
 <script src="index.js"></script>
 </body>
