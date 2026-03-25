@@ -71,12 +71,41 @@
 
       <hr class="my-8">
 
-      <!-- Quiz System -->
-      <h3 class="font-bold mb-2">Create Quiz</h3>
-      <input id="quiz-title" type="text" placeholder="Quiz Title" class="w-full p-3 border rounded-xl mb-3">
-      <button id="add-question-btn" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold mb-3">Add Sample Question</button>
-      <button id="publish-quiz-btn" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold">Publish Quiz</button>
+      <!-- Quiz System changed to form-->
+      <h3 class="font-bold text-lg mb-4 text-indigo-700">Create New Quiz</h3>
+<input id="quiz-title" type="text" placeholder="Enter Quiz Title (e.g., Biology 101)" class="w-full p-3 border rounded-xl mb-6 shadow-sm">
 
+<div class="bg-orange-50 p-6 rounded-2xl border-2 border-orange-100 mb-6">
+  <h4 class="font-bold mb-3">Add a Question</h4>
+  <input id="q-text" type="text" placeholder="Question Text" class="w-full p-3 border rounded-xl mb-3">
+  
+  <div class="grid grid-cols-2 gap-3 mb-3">
+    <input id="opt-0" type="text" placeholder="Option 1" class="p-3 border rounded-xl">
+    <input id="opt-1" type="text" placeholder="Option 2" class="p-3 border rounded-xl">
+    <input id="opt-2" type="text" placeholder="Option 3" class="p-3 border rounded-xl">
+    <input id="opt-3" type="text" placeholder="Option 4" class="p-3 border rounded-xl">
+  </div>
+
+  <select id="q-correct" class="w-full p-3 border rounded-xl mb-4">
+    <option value="">-- Select Correct Option --</option>
+    <option value="0">Option 1</option>
+    <option value="1">Option 2</option>
+    <option value="2">Option 3</option>
+    <option value="3">Option 4</option>
+  </select>
+
+  <button onclick="addQuestionToList()" class="w-full bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition">
+    ➕ Add Question to Quiz
+  </button>
+</div>
+
+<div id="temp-questions-list" class="mb-6 italic text-sm text-gray-600">
+  No questions added to this quiz yet.
+</div>
+
+<button id="publish-quiz-btn" class="w-full bg-indigo-600 text-white px-6 py-4 rounded-xl font-black text-lg shadow-lg hover:bg-indigo-700 transition">
+  🚀 Publish Full Quiz to Database
+</button>
     </div>
 
     <!-- STUDENT CONTENT -->
