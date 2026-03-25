@@ -304,8 +304,18 @@ window.submitQuiz = () => {
   alert("✅ Quiz submitted! (Scoring will be added later)");
 };
 
+
+
+
 // ===== LIVE TIME =====
 setInterval(() => {
   const el = document.getElementById("live-time");
   if (el) el.textContent = new Date().toLocaleString("en-GB");
 }, 1000);
+
+
+// Attach functions to window so HTML buttons can "see" them
+window.uploadPDF = uploadPDF;
+window.addQuestionToList = addQuestionToList;
+window.publishQuiz = publishQuiz;
+
