@@ -1,5 +1,6 @@
-// ===== FIREBASE CONFIG =====
+// ===== FIREBASE IMPORTS =====
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+
 import {
   getFirestore, collection, addDoc, getDocs, query, orderBy
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
@@ -14,27 +15,40 @@ import {
   signInWithRedirect, getRedirectResult
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
-// 🔴 YOUR CONFIG
+
+// 🔥 YOUR REAL CONFIG
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_ID",
-  storageBucket: "YOUR_BUCKET",
-  messagingSenderId: "X",
-  appId: "X"
+  apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
+  authDomain: "masasa-online.firebaseapp.com",
+  projectId: "masasa-online",
+  storageBucket: "masasa-online.firebasestorage.app",
+  messagingSenderId: "975253887376",
+  appId: "1:975253887376:web:c1d6e59922a7d3ac2cbb15",
+  measurementId: "G-LLPYLLVV8V"
 };
 
+
+// ===== INIT =====
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
+
+// ===== ELEMENTS =====
+const roleOverlay = document.getElementById("role-overlay");
+const mainHeader = document.getElementById("main-header");
+const mainContent = document.getElementById("main-content");
+const adminTools = document.getElementById("admin-tools");
+
+
 // ===== UTILITIES =====
 function showMain() {
-  role-overlay.classList.add("hidden");
-  main-header.classList.remove("hidden");
-  main-content.classList.remove("hidden");
+  roleOverlay.classList.add("hidden");
+  mainHeader.classList.remove("hidden");
+  mainContent.classList.remove("hidden");
 }
+
 
 // ===== STUDENT ROLE =====
 window.selectRole = () => {
@@ -43,6 +57,15 @@ window.selectRole = () => {
   loadQuizzes();
 };
 
+
+// ===== ADMIN LOGIN PANEL =====
+window.showAdminLogin = () =>
+  document.getElementById("admin-login").classList.remove("hidden");
+
+window.hideAdminLogin = () =>
+  document.getElementById("admin-login").classList.add("hidden");
+
+
 // ===== GOOGLE LOGIN =====
 window.signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
@@ -50,27 +73,41 @@ window.signInWithGoogle = async () => {
 };
 
 getRedirectResult(auth).then(res => {
-  if (res?.user) showMain();
+  if (res?.user) {
+    showMain();
+    loadMaterials();
+    loadQuizzes();
+  }
 });
+
 
 // ===== ADMIN LOGIN =====
 window.validateAdmin = async () => {
-  const pass = admin-pass.value;
-  await signInWithEmailAndPassword(auth,
-    "realmasasa@gmail.com", pass);
+  const pass = document.getElementById("admin-pass").value;
+
+  await signInWithEmailAndPassword(
+    auth,
+    "realmasasa@gmail.com",
+    pass
+  );
 
   showMain();
-  admin-tools.classList.remove("hidden");
+  adminTools.classList.remove("hidden");
+  loadMaterials();
+  loadQuizzes();
 };
 
+
 // ===== LOGOUT =====
-window.logout = () => signOut(auth).then(() => location.reload());
+window.logout = () =>
+  signOut(auth).then(() => location.reload());
+
 
 // ===== UPLOAD PDF =====
 window.uploadPDF = async () => {
 
-  const title = pdf-title.value;
-  const file = pdf-file.files[0];
+  const title = document.getElementById("pdf-title").value;
+  const file = document.getElementById("pdf-file").files[0];
 
   if (!file) return alert("Select a PDF");
 
@@ -85,29 +122,35 @@ window.uploadPDF = async () => {
     created: Date.now()
   });
 
-  alert("Uploaded!");
+  alert("Uploaded successfully ✅");
   loadMaterials();
 };
+
 
 // ===== LOAD MATERIALS =====
 async function loadMaterials() {
 
-  material-list.innerHTML = "";
+  const list = document.getElementById("material-list");
+  list.innerHTML = "";
 
-  const q = query(collection(db, "materials"), orderBy("created", "desc"));
+  const q = query(
+    collection(db, "materials"),
+    orderBy("created", "desc")
+  );
+
   const snap = await getDocs(q);
 
   snap.forEach(doc => {
     const m = doc.data();
 
-    material-list.innerHTML += `
-      <div class="bg-white p-4 rounded-xl shadow mb-3">
+    list.innerHTML += `
+      <div class="card">
         📄 ${m.title}
-        <a href="${m.url}" target="_blank"
-          class="text-blue-600 ml-3">Download</a>
+        <a href="${m.url}" target="_blank">Download</a>
       </div>`;
   });
 }
+
 
 // ===== QUIZ SYSTEM =====
 let questions = [];
@@ -115,28 +158,34 @@ let questions = [];
 window.addQuestion = () => {
   questions.push({
     q: "Sample question?",
-    options: ["A","B","C","D"],
+    options: ["A", "B", "C", "D"],
     correct: 0
   });
+
   alert("Sample question added");
 };
 
+
 window.publishQuiz = async () => {
 
+  const title = document.getElementById("quiz-title").value;
+
   await addDoc(collection(db, "quizzes"), {
-    title: quiz-title.value,
+    title,
     questions
   });
 
   questions = [];
-  alert("Quiz published");
+  alert("Quiz published 🎉");
   loadQuizzes();
 };
+
 
 // ===== LOAD QUIZZES =====
 async function loadQuizzes() {
 
-  quiz-list.innerHTML = "";
+  const list = document.getElementById("quiz-list");
+  list.innerHTML = "";
 
   const snap = await getDocs(collection(db, "quizzes"));
 
@@ -144,16 +193,14 @@ async function loadQuizzes() {
 
     const quiz = doc.data();
 
-    quiz-list.innerHTML += `
-      <div class="bg-white p-4 rounded-xl shadow mb-3">
+    list.innerHTML += `
+      <div class="card">
         🧠 ${quiz.title}
-        <button onclick="startQuiz('${doc.id}')"
-          class="ml-3 bg-orange-500 text-white px-3 py-1 rounded">
-          Start
-        </button>
+        <button onclick="startQuiz('${doc.id}')">Start</button>
       </div>`;
   });
 }
+
 
 // ===== START QUIZ =====
 window.startQuiz = async (id) => {
@@ -161,12 +208,15 @@ window.startQuiz = async (id) => {
   const snap = await getDocs(collection(db, "quizzes"));
   const quiz = snap.docs.find(d => d.id === id).data();
 
-  quiz-area.classList.remove("hidden");
+  const area = document.getElementById("quiz-area");
+  area.classList.remove("hidden");
 
-  let html = `<h2 class="text-xl font-bold mb-4">${quiz.title}</h2>`;
+  let html = `<h2>${quiz.title}</h2>`;
 
   quiz.questions.forEach((q, i) => {
-    html += `<p>${i+1}. ${q.q}</p>`;
+
+    html += `<p>${i + 1}. ${q.q}</p>`;
+
     q.options.forEach((opt, j) => {
       html += `
         <label>
@@ -176,16 +226,20 @@ window.startQuiz = async (id) => {
     });
   });
 
-  html += `
-    <button onclick="submitQuiz()" 
-      class="bg-green-600 text-white px-6 py-3 rounded mt-4">
-      Submit
-    </button>`;
+  html += `<button onclick="submitQuiz()">Submit</button>`;
 
-  quiz-area.innerHTML = html;
+  area.innerHTML = html;
 };
+
 
 // ===== SUBMIT QUIZ =====
 window.submitQuiz = () => {
-  alert("Quiz submitted!");
+  alert("Quiz submitted ✅");
 };
+
+
+// ===== LIVE TIME =====
+setInterval(() => {
+  const el = document.getElementById("live-time");
+  if (el) el.textContent = new Date().toLocaleString();
+}, 1000);
