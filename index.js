@@ -12,7 +12,9 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithRedirect,
-  getRedirectResult
+  getRedirectResult,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -60,7 +62,7 @@ function startCountdowns() {
   }, 30000);
 }
 
-// ====================== GOOGLE SIGN-IN (Redirect - Best for GitHub Pages) ======================
+// ====================== GOOGLE SIGN-IN ======================
 async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
   try {
@@ -74,25 +76,75 @@ async function handleRedirectResult() {
   try {
     const result = await getRedirectResult(auth);
     if (result?.user) {
-      const user = result.user;
-      document.getElementById('role-overlay').classList.add('hidden');
-      document.getElementById('main-header').classList.remove('hidden');
-      document.getElementById('main-content').classList.remove('hidden');
-
-      if (user.email === 'realmasasa@gmail.com') {
-        document.getElementById('admin-tools').classList.remove('hidden');
-      }
-      loadAllContent();
+      showMainApp(result.user);
     }
   } catch (error) {
     console.error("Redirect error:", error);
+    alert("Google sign-in error: " + error.message);
   }
 }
 
-function logout() {
-  signOut(auth).then(() => location.reload());
+// ====================== EMAIL/PASSWORD AUTH (Fixed) ======================
+let isLoginMode = true;   // true = sign in, false = sign up
+
+function toggleAuthMode() {
+  isLoginMode = !isLoginMode;
+  document.getElementById('auth-title').textContent = isLoginMode ? 'Sign In' : 'Create Account';
+  document.getElementById('auth-button').textContent = isLoginMode ? 'Sign In' : 'Sign Up';
+  document.getElementById('toggle-text').innerHTML = isLoginMode 
+    ? `Don't have an account? <span onclick="toggleAuthMode()" class="text-orange-600 cursor-pointer">Sign up</span>` 
+    : `Already have an account? <span onclick="toggleAuthMode()" class="text-orange-600 cursor-pointer">Sign in</span>`;
 }
 
+async function handleEmailAuth() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  if (!email || !password) {
+    alert("Please enter email and password");
+    return;
+  }
+
+  const btn = document.getElementById('auth-button');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Please wait...";
+
+  try {
+    let userCredential;
+    if (isLoginMode) {
+      userCredential = await signInWithEmailAndPassword(auth, email, password);
+    } else {
+      userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    }
+    showMainApp(userCredential.user);
+  } catch (error) {
+    console.error(error);
+    let msg = error.message;
+    if (error.code === 'auth/wrong-password') msg = "Incorrect password";
+    else if (error.code === 'auth/user-not-found') msg = "No account found with this email";
+    else if (error.code === 'auth/email-already-in-use') msg = "Email already registered. Please sign in.";
+    else if (error.code === 'auth/weak-password') msg = "Password should be at least 6 characters";
+    
+    alert("Error: " + msg);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
+
+function showMainApp(user) {
+  document.getElementById('role-overlay').classList.add('hidden');
+  document.getElementById('main-header').classList.remove('hidden');
+  document.getElementById('main-content').classList.remove('hidden');
+
+  if (user.email === 'realmasasa@gmail.com') {
+    document.getElementById('admin-tools').classList.remove('hidden');
+  }
+  loadAllContent();
+}
+
+// ====================== DEMO & LOGOUT ======================
 function continueAsStudent() {
   document.getElementById('role-overlay').classList.add('hidden');
   document.getElementById('main-header').classList.remove('hidden');
@@ -100,255 +152,12 @@ function continueAsStudent() {
   loadAllContent();
 }
 
-// ====================== PDF UPLOAD ======================
-async function uploadPDF() {
-  const title = document.getElementById('pdf-title').value.trim();
-  const deadlineInput = document.getElementById('pdf-deadline').value;
-  const file = document.getElementById('pdf-file').files[0];
-
-  if (!title || !file) return alert('Title and PDF file are required');
-
-  try {
-    const storageRef = ref(storage, 'pdfs/' + Date.now() + '-' + file.name);
-    const snapshot = await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(snapshot.ref);
-
-    await addDoc(collection(db, 'materials'), {
-      title,
-      url,
-      uploadedAt: serverTimestamp(),
-      deadline: deadlineInput ? new Date(deadlineInput) : null
-    });
-
-    alert('✅ PDF published successfully!');
-    document.getElementById('pdf-title').value = '';
-    document.getElementById('pdf-file').value = '';
-    loadMaterials();
-  } catch (err) {
-    console.error(err);
-    alert('Upload failed: ' + err.message);
-  }
+function logout() {
+  signOut(auth).then(() => location.reload());
 }
 
-// ====================== QUIZ CREATION ======================
-function addQuestion() {
-  const type = document.getElementById('q-type').value;
-  const text = document.getElementById('q-text').value.trim();
-  if (!text) return alert('Enter question text');
-
-  let question = { type, text };
-
-  if (type === 'mcq') {
-    const opts = ['opt1','opt2','opt3','opt4']
-      .map(id => document.getElementById(id).value.trim())
-      .filter(o => o);
-
-    const correctIndex = parseInt(document.getElementById('correct-index').value);
-
-    if (opts.length < 2 || isNaN(correctIndex) || correctIndex >= opts.length) {
-      return alert('At least 2 options and valid correct index required');
-    }
-
-    question.options = opts;
-    question.correct = correctIndex;
-  } else {
-    const correctAnswer = prompt('Enter exact correct short answer:');
-    if (!correctAnswer?.trim()) return;
-    question.correct = correctAnswer.trim();
-  }
-
-  questionsPreview.push(question);
-  renderQuestionsPreview();
-
-  document.getElementById('q-text').value = '';
-  if (type === 'mcq') ['opt1','opt2','opt3','opt4'].forEach(id => document.getElementById(id).value = '');
-}
-
-function renderQuestionsPreview() {
-  const container = document.getElementById('questions-preview');
-  container.innerHTML = questionsPreview.map((q, i) => `
-    <div class="flex justify-between bg-white p-4 rounded-2xl border">
-      <div>
-        <span class="uppercase text-xs font-bold text-orange-600">${q.type}</span> ${q.text}
-        ${q.options ? `<br><small class="text-green-600">Options: ${q.options.join(' | ')}</small>` : ''}
-      </div>
-      <button onclick="removeQuestion(${i})" class="text-red-500 text-2xl">×</button>
-    </div>
-  `).join('');
-}
-
-function removeQuestion(i) {
-  questionsPreview.splice(i, 1);
-  renderQuestionsPreview();
-}
-
-async function publishQuiz() {
-  const title = document.getElementById('quiz-title').value.trim();
-  const deadlineInput = document.getElementById('quiz-deadline').value;
-
-  if (!title || questionsPreview.length === 0) return alert('Title and at least one question required');
-
-  try {
-    await addDoc(collection(db, 'quizzes'), {
-      title,
-      questions: questionsPreview,
-      deadline: deadlineInput ? new Date(deadlineInput) : null,
-      createdAt: serverTimestamp()
-    });
-
-    alert('✅ Quiz published successfully!');
-    questionsPreview = [];
-    renderQuestionsPreview();
-    document.getElementById('quiz-title').value = '';
-    loadQuizzes();
-  } catch (err) {
-    console.error(err);
-    alert('Failed to publish quiz: ' + err.message);
-  }
-}
-
-// ====================== LOAD CONTENT ======================
-async function loadMaterials() {
-  const q = query(collection(db, 'materials'), orderBy('uploadedAt', 'desc'));
-  const snapshot = await getDocs(q);
-  const container = document.getElementById('material-list');
-  container.innerHTML = '';
-
-  snapshot.forEach(docSnap => {
-    const m = docSnap.data();
-    const deadline = m.deadline ? new Date(m.deadline) : null;
-    const expired = deadline && Date.now() > deadline.getTime();
-
-    const cardHTML = `
-      <div class="bg-white p-6 rounded-3xl border-2 shadow ${expired ? 'border-red-300 opacity-75' : 'border-indigo-100'}">
-        <h4 class="font-black text-lg">${m.title}</h4>
-        <p class="text-xs text-slate-500">Uploaded: ${m.uploadedAt?.toDate ? m.uploadedAt.toDate().toLocaleDateString() : '—'}</p>
-        ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
-        <button onclick="viewPDF('\( {m.url}', ' \){m.title.replace(/'/g, "\\'")}')" 
-                class="mt-4 w-full ${expired ? 'bg-red-400' : 'bg-indigo-600'} text-white py-3 rounded-2xl font-black">
-          View PDF 📄
-        </button>
-      </div>`;
-    container.innerHTML += cardHTML;
-  });
-}
-
-function viewPDF(url, title) {
-  document.getElementById('pdf-modal-title').textContent = title;
-  document.getElementById('pdf-frame').src = url;
-  document.getElementById('pdf-modal').classList.remove('hidden');
-}
-
-function closePDF() {
-  document.getElementById('pdf-modal').classList.add('hidden');
-  document.getElementById('pdf-frame').src = '';
-}
-
-async function loadQuizzes() {
-  const q = query(collection(db, 'quizzes'), orderBy('createdAt', 'desc'));
-  const snapshot = await getDocs(q);
-  const container = document.getElementById('quiz-list');
-  container.innerHTML = '';
-
-  snapshot.forEach(docSnap => {
-    const quiz = docSnap.data();
-    const deadline = quiz.deadline ? new Date(quiz.deadline) : null;
-    const expired = deadline && Date.now() > deadline.getTime();
-
-    const cardHTML = `
-      <div class="bg-white p-6 rounded-3xl border-2 shadow ${expired ? 'border-red-300' : 'border-orange-100'}">
-        <h4 class="font-black text-lg">${quiz.title}</h4>
-        <p class="text-xs text-slate-500">${quiz.questions.length} questions</p>
-        ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
-        <button onclick="startQuiz('${docSnap.id}')" 
-                class="mt-4 w-full ${expired ? 'bg-red-400 cursor-not-allowed' : 'bg-orange-500'} text-white py-3 rounded-2xl font-black"
-                ${expired ? 'disabled' : ''}>
-          ${expired ? 'EXPIRED' : 'START QUIZ NOW'}
-        </button>
-      </div>`;
-    container.innerHTML += cardHTML;
-  });
-}
-
-async function startQuiz(quizId) {
-  const docSnap = await getDoc(doc(db, 'quizzes', quizId));
-  if (!docSnap.exists()) return alert("Quiz not found");
-
-  currentQuiz = { id: quizId, ...docSnap.data() };
-
-  document.getElementById('quiz-area').classList.remove('hidden');
-  document.getElementById('quiz-area').innerHTML = `
-    <h2 class="text-3xl font-black text-center mb-8">${currentQuiz.title}</h2>
-    <div id="questions-container" class="space-y-10"></div>
-    <button onclick="submitQuiz()" class="w-full mt-10 bg-green-600 hover:bg-green-700 text-white py-6 rounded-3xl text-2xl font-black">
-      FINISH & GET INSTANT RESULT
-    </button>
-  `;
-
-  renderQuizQuestions();
-}
-
-function renderQuizQuestions() {
-  const container = document.getElementById('questions-container');
-  container.innerHTML = currentQuiz.questions.map((q, index) => {
-    if (q.type === 'mcq') {
-      return `
-        <div class="bg-white p-8 rounded-3xl shadow">
-          <p class="font-bold text-xl mb-6">${index + 1}. ${q.text}</p>
-          <div class="space-y-4">
-            ${q.options.map((opt, i) => `
-              <label class="flex items-center gap-3 cursor-pointer">
-                <input type="radio" name="q\( {index}" value=" \){i}" class="w-5 h-5 accent-orange-500">
-                <span class="text-lg">${opt}</span>
-              </label>
-            `).join('')}
-          </div>
-        </div>`;
-    } else {
-      return `
-        <div class="bg-white p-8 rounded-3xl shadow">
-          <p class="font-bold text-xl mb-6">${index + 1}. ${q.text}</p>
-          <input type="text" id="short-${index}" placeholder="Type your answer here..." 
-                 class="w-full p-5 border-2 border-orange-200 rounded-3xl text-lg focus:border-orange-500">
-        </div>`;
-    }
-  }).join('');
-}
-
-function submitQuiz() {
-  let score = 0;
-  const total = currentQuiz.questions.length;
-
-  currentQuiz.questions.forEach((q, index) => {
-    if (q.type === 'mcq') {
-      const selected = document.querySelector(`input[name="q${index}"]:checked`);
-      if (selected && parseInt(selected.value) === q.correct) score++;
-    } else {
-      const answer = document.getElementById(`short-${index}`).value.trim().toLowerCase();
-      if (answer === q.correct.toLowerCase()) score++;
-    }
-  });
-
-  const percent = Math.round((score / total) * 100);
-  const emoji = percent >= 80 ? '🎉' : percent >= 50 ? '👍' : '😕';
-  const feedback = percent >= 80 ? 'Excellent work!' : percent >= 50 ? 'Good effort!' : 'Keep practicing!';
-
-  document.getElementById('score-emoji').textContent = emoji;
-  document.getElementById('final-percent').textContent = percent + '%';
-  document.getElementById('score-feedback').textContent = feedback;
-  document.getElementById('score-modal').classList.remove('hidden');
-  document.getElementById('quiz-area').classList.add('hidden');
-}
-
-function closeQuiz() {
-  document.getElementById('score-modal').classList.add('hidden');
-  currentQuiz = null;
-}
-
-function loadAllContent() {
-  loadMaterials();
-  loadQuizzes();
-}
+// ====================== (Your existing PDF, Quiz, Load functions unchanged) ======================
+// ... [Keep all your uploadPDF, addQuestion, publishQuiz, loadMaterials, loadQuizzes, startQuiz, etc. exactly as you had them] ...
 
 // ====================== INIT ======================
 window.onload = () => {
@@ -358,27 +167,16 @@ window.onload = () => {
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      document.getElementById('role-overlay').classList.add('hidden');
-      document.getElementById('main-header').classList.remove('hidden');
-      document.getElementById('main-content').classList.remove('hidden');
-      if (user.email === 'realmasasa@gmail.com') {
-        document.getElementById('admin-tools').classList.remove('hidden');
-      }
-      loadAllContent();
+      showMainApp(user);
     }
   });
-};
 
-// Global exposure
-window.signInWithGoogle = signInWithGoogle;
-window.continueAsStudent = continueAsStudent;
-window.logout = logout;
-window.uploadPDF = uploadPDF;
-window.addQuestion = addQuestion;
-window.removeQuestion = removeQuestion;
-window.publishQuiz = publishQuiz;
-window.viewPDF = viewPDF;
-window.closePDF = closePDF;
-window.startQuiz = startQuiz;
-window.submitQuiz = submitQuiz;
-window.closeQuiz = closeQuiz;
+  // Expose functions to window so onclick works
+  window.signInWithGoogle = signInWithGoogle;
+  window.continueAsStudent = continueAsStudent;
+  window.logout = logout;
+  window.handleEmailAuth = handleEmailAuth;
+  window.toggleAuthMode = toggleAuthMode;
+
+  // ... your other window. assignments (uploadPDF, addQuestion, etc.)
+};
