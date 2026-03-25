@@ -2,38 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-.marquee-container {
-    overflow: hidden;
-    white-space: nowrap;
-    background: linear-gradient(90deg, #4f46e5, #ec4899);
-    color: white;
-    padding: 8px 0;
+body {
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-.marquee-text {
-    display: inline-block;
-    animation: marquee 25s linear infinite;
-    font-weight: 900;
+.rounded-3xl {
+  border-radius: 1.5rem;
 }
 
-@keyframes marquee {
-    from { transform: translateX(100%); }
-    to   { transform: translateX(-100%); }
+input:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
 }
 
-.animate-pop {
-    animation: pop 0.4s ease forwards;
-}
-
-@keyframes pop {
-    0%   { transform: scale(0.7); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.bubble-text {
-    font-family: 'Bubblegum Sans', cursive;
-}
-
-#live-time {
-    font-variant-numeric: tabular-nums;
+/* Countdown style */
+.countdown {
+  font-weight: 600;
 }
