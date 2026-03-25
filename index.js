@@ -314,27 +314,4 @@ setInterval(() => {
 }, 1000);
 
 
-// // ... All your logic functions are up here ...
-
-async function uploadPDF() { 
-  /* code */ 
-}
-
-async function publishQuiz() { 
-  /* code */ 
-}
-
-// ... All functions defined ...
-
-// NOW attach them to window at the very bottom
-window.selectRole = selectRole;
-window.showAdminLogin = () => document.getElementById("admin-login").classList.remove("hidden");
-window.hideAdminLogin = () => document.getElementById("admin-login").classList.add("hidden");
-window.validateAdmin = validateAdmin;
-window.signInWithGoogle = signInWithGoogle;
-window.logout = logout;
-window.uploadPDF = uploadPDF; // Only if you didn't use an EventListener
-window.addQuestionToList = addQuestionToList;
-window.publishQuiz = publishQuiz;
-window.startQuiz = startQuiz;
-window.submitQuiz = submitQuiz;
+// // ... All 
