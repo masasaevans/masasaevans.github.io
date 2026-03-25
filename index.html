@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Masasa Online - Learn Smarter</title>
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="index.css">
 </head>
@@ -17,11 +16,17 @@
     <div class="bg-white rounded-3xl p-10 max-w-md w-full text-center shadow-2xl">
       <h1 class="text-4xl font-black mb-8 text-orange-600">Masasa Online 🚀</h1>
 
-      <button onclick="selectRole()" class="w-full bg-orange-500 text-white font-black py-5 rounded-3xl mb-4">👨‍🎓 Continue as Student</button>
+      <button onclick="selectRole()" class="w-full bg-orange-500 text-white font-black py-5 rounded-3xl mb-4">
+        👨‍🎓 Continue as Student
+      </button>
 
-      <button onclick="showAdminLogin()" class="w-full bg-indigo-600 text-white font-black py-5 rounded-3xl mb-4">👨‍💼 Admin Login</button>
+      <button onclick="showAdminLogin()" class="w-full bg-indigo-600 text-white font-black py-5 rounded-3xl mb-4">
+        👨‍💼 Admin Login
+      </button>
 
-      <button onclick="signInWithGoogle()" class="w-full border-2 py-5 rounded-3xl font-bold">Sign in with Google</button>
+      <button onclick="signInWithGoogle()" class="w-full border-2 py-5 rounded-3xl font-bold">
+        Sign in with Google
+      </button>
     </div>
   </div>
 
@@ -57,7 +62,6 @@
 
       <h2 class="text-2xl font-black mb-6">Admin Dashboard</h2>
 
-      <!-- Upload PDF -->
       <h3 class="font-bold mb-2">Upload Material</h3>
       <input id="pdf-title" type="text" placeholder="Material Title" class="w-full p-3 border rounded-xl mb-3">
       <input id="pdf-file" type="file" accept="application/pdf" class="mb-3">
@@ -65,7 +69,6 @@
 
       <hr class="my-8">
 
-      <!-- CREATE QUIZ -->
       <h3 class="font-bold mb-2">Create Quiz</h3>
       <input id="quiz-title" type="text" placeholder="Quiz Title" class="w-full p-3 border rounded-xl mb-3">
       <button onclick="addQuestion()" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold mb-3">Add Sample Question</button>
@@ -74,7 +77,6 @@
 
     <!-- STUDENT CONTENT -->
     <div class="grid md:grid-cols-2 gap-10">
-
       <div>
         <h2 class="text-2xl font-black mb-4">📄 Materials</h2>
         <div id="material-list"></div>
@@ -84,7 +86,6 @@
         <h2 class="text-2xl font-black mb-4">🧠 Quizzes</h2>
         <div id="quiz-list"></div>
       </div>
-
     </div>
 
     <div id="quiz-area" class="hidden mt-10"></div>
