@@ -5,74 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Masasa Online - Learn Smarter</title>
 
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="index.css">
 </head>
 
-<body>
+<body class="bg-gradient-to-br from-orange-50 to-indigo-50 min-h-screen">
 
   <!-- ROLE OVERLAY -->
-  <div id="role-overlay" class="overlay">
-    <div class="panel">
-      <h1>Masasa Online 🚀</h1>
+  <div id="role-overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-10 max-w-md w-full text-center shadow-2xl">
+      <h1 class="text-4xl font-black mb-8 text-orange-600">Masasa Online 🚀</h1>
 
-      <button onclick="selectRole()">👨‍🎓 Student</button>
-      <button onclick="showAdminLogin()">👨‍💼 Admin</button>
-      <button onclick="signInWithGoogle()">Google Login</button>
+      <button onclick="selectRole()" class="w-full bg-orange-500 text-white font-black py-5 rounded-3xl mb-4">👨‍🎓 Continue as Student</button>
+
+      <button onclick="showAdminLogin()" class="w-full bg-indigo-600 text-white font-black py-5 rounded-3xl mb-4">👨‍💼 Admin Login</button>
+
+      <button onclick="signInWithGoogle()" class="w-full border-2 py-5 rounded-3xl font-bold">Sign in with Google</button>
     </div>
   </div>
 
   <!-- ADMIN LOGIN -->
-  <div id="admin-login" class="overlay hidden">
-    <div class="panel">
-      <h2>Admin Login</h2>
-      <input id="admin-pass" type="password" placeholder="Password">
-      <button onclick="validateAdmin()">Login</button>
-      <button onclick="hideAdminLogin()">Cancel</button>
+  <div id="admin-login" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-8 max-w-sm w-full">
+      <h2 class="text-2xl font-black mb-6">Admin Login</h2>
+
+      <input id="admin-pass" type="password" placeholder="Enter admin password" class="w-full p-4 border rounded-xl mb-6">
+
+      <div class="flex gap-4">
+        <button onclick="validateAdmin()" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold">Login</button>
+        <button onclick="hideAdminLogin()" class="flex-1 bg-gray-200 py-3 rounded-xl font-bold">Cancel</button>
+      </div>
     </div>
   </div>
 
   <!-- HEADER -->
-  <header id="main-header" class="hidden">
-    <h1>📚 Masasa Online</h1>
-    <div>
-      <span id="live-time"></span>
-      <button onclick="logout()">Logout</button>
+  <header id="main-header" class="hidden bg-white shadow sticky top-0">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-black text-orange-600">📚 Masasa Online</h1>
+      <div class="flex gap-6 items-center">
+        <div id="live-time" class="font-bold"></div>
+        <button onclick="logout()" class="bg-red-500 text-white px-6 py-2 rounded-xl">Logout</button>
+      </div>
     </div>
   </header>
 
-  <!-- MAIN CONTENT -->
-  <div id="main-content" class="hidden container">
+  <main id="main-content" class="hidden max-w-6xl mx-auto px-6 py-10">
 
     <!-- ADMIN TOOLS -->
-    <div id="admin-tools" class="hidden admin-box">
+    <div id="admin-tools" class="hidden mb-12 bg-white p-8 rounded-3xl shadow">
 
-      <h2>Admin Dashboard</h2>
+      <h2 class="text-2xl font-black mb-6">Admin Dashboard</h2>
 
-      <input id="pdf-title" placeholder="Material Title">
-      <input id="pdf-file" type="file" accept="application/pdf">
-      <button onclick="uploadPDF()">Upload PDF</button>
+      <!-- Upload PDF -->
+      <h3 class="font-bold mb-2">Upload Material</h3>
+      <input id="pdf-title" type="text" placeholder="Material Title" class="w-full p-3 border rounded-xl mb-3">
+      <input id="pdf-file" type="file" accept="application/pdf" class="mb-3">
+      <button onclick="uploadPDF()" class="bg-green-600 text-white px-6 py-3 rounded-xl font-bold mb-6">Publish PDF</button>
 
-      <hr>
+      <hr class="my-8">
 
-      <input id="quiz-title" placeholder="Quiz Title">
-      <button onclick="addQuestion()">Add Sample Question</button>
-      <button onclick="publishQuiz()">Publish Quiz</button>
-
+      <!-- CREATE QUIZ -->
+      <h3 class="font-bold mb-2">Create Quiz</h3>
+      <input id="quiz-title" type="text" placeholder="Quiz Title" class="w-full p-3 border rounded-xl mb-3">
+      <button onclick="addQuestion()" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold mb-3">Add Sample Question</button>
+      <button onclick="publishQuiz()" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold">Publish Quiz</button>
     </div>
 
     <!-- STUDENT CONTENT -->
-    <h2>📄 Materials</h2>
-    <div id="material-list"></div>
+    <div class="grid md:grid-cols-2 gap-10">
 
-    <h2>🧠 Quizzes</h2>
-    <div id="quiz-list"></div>
+      <div>
+        <h2 class="text-2xl font-black mb-4">📄 Materials</h2>
+        <div id="material-list"></div>
+      </div>
 
-    <div id="quiz-area" class="hidden"></div>
+      <div>
+        <h2 class="text-2xl font-black mb-4">🧠 Quizzes</h2>
+        <div id="quiz-list"></div>
+      </div>
 
-  </div>
+    </div>
+
+    <div id="quiz-area" class="hidden mt-10"></div>
+
+  </main>
 
   <script type="module" src="index.js"></script>
-
 </body>
 </html>
