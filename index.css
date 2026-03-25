@@ -1,69 +1,39 @@
-/* Standard Reset */
-html { scroll-behavior: smooth; }
-body { -webkit-tap-highlight-color: transparent; }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Custom Fonts */
-.bubble-text { font-family: 'Bubblegum Sans', cursive; }
-
-/* GitHub Marquee */
-.marquee-container { 
-    background: #facc15; 
-    padding: 14px 0; 
-    border-bottom: 4px solid #ca8a04; 
-    position: sticky; 
-    top: 0; 
-    z-index: 60; 
-    overflow: hidden; 
-}
-.marquee-text { 
-    display: inline-block; 
-    white-space: nowrap; 
-    animation: marquee-scroll 35s linear infinite; 
-    font-weight: 900; 
-    color: #713f12; 
-    text-transform: uppercase;
-}
-@keyframes marquee-scroll { 
-    from { transform: translateX(100%); } 
-    to { transform: translateX(-100%); } 
+.marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    background: linear-gradient(90deg, #4f46e5, #ec4899);
+    color: white;
+    padding: 8px 0;
 }
 
-/* QUIZ INTERFACE FOCUS */
-.quiz-card { 
-    border-left: 14px solid #e2e8f0; 
-    border-radius: 2.5rem; 
-    background: white; 
-    margin-bottom: 2.5rem; 
-    transition: all 0.5s ease; 
-    opacity: 0.3;
-    transform: scale(0.95);
+.marquee-text {
+    display: inline-block;
+    animation: marquee 25s linear infinite;
+    font-weight: 900;
 }
 
-.quiz-card.active-q { 
-    border-left-color: #4f46e5; 
-    opacity: 1; 
-    transform: scale(1.02); 
-    box-shadow: 0 25px 30px -10px rgba(0,0,0,0.1); 
+@keyframes marquee {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(-100%); }
 }
 
-.quiz-card.answered { 
-    border-left-color: #22c55e; 
-    opacity: 0.5; 
-    transform: scale(0.9); 
+.animate-pop {
+    animation: pop 0.4s ease forwards;
 }
 
-/* MODAL POP */
 @keyframes pop {
-    0% { transform: scale(0.8); opacity: 0; }
+    0%   { transform: scale(0.7); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
-.animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-/* Dropdown fixes for GitHub/Mobile */
-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    background-size: 1.2em;
+.bubble-text {
+    font-family: 'Bubblegum Sans', cursive;
+}
+
+#live-time {
+    font-variant-numeric: tabular-nums;
 }
