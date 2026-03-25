@@ -1,384 +1,145 @@
-// ================== FIREBASE CONFIG ==================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { 
-  getFirestore, collection, addDoc, getDocs, orderBy, query, doc, getDoc, serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-import { 
-  getStorage, ref, uploadBytes, getDownloadURL 
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
-import { 
-  getAuth, 
-  signOut, 
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masasa Online - Learn Smarter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="bg-gradient-to-br from-orange-50 to-indigo-50 min-h-screen font-sans">
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
-  authDomain: "masasa-online.firebaseapp.com",
-  projectId: "masasa-online",
-  storageBucket: "masasa-online.firebasestorage.app",
-  messagingSenderId: "975253887376",
-  appId: "1:975253887376:web:c1d6e59922a7d3ac2cbb15",
-  measurementId: "G-LLPYLLVV8V"
-};
+  <!-- Landing Screen -->
+  <div id="role-overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-10 max-w-md w-full text-center shadow-2xl">
+      <h1 class="text-4xl font-black mb-8 text-orange-600">Masasa Online</h1>
+      <p class="text-xl mb-10">Sign in to continue</p>
+      
+      <button onclick="signInWithGoogle()" 
+              class="w-full bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-800 font-bold py-5 rounded-3xl flex items-center justify-center gap-3 text-lg transition mb-6">
+        <img src="https://www.google.com/images/branding/googleg/1x/googleg_standard_color_24dp.png" alt="Google" class="w-6 h-6">
+        Sign in with Google
+      </button>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
-const auth = getAuth(app);
-
-let currentQuiz = null;
-let questionsPreview = [];
-
-// ====================== UTILITIES ======================
-function updateLiveTime() {
-  const timeEl = document.getElementById('live-time');
-  if (!timeEl) return;
-  setInterval(() => {
-    timeEl.textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
-  }, 1000);
-}
-
-function startCountdowns() {
-  setInterval(() => {
-    document.querySelectorAll('.countdown').forEach(el => {
-      const deadline = parseInt(el.getAttribute('data-deadline'));
-      if (!deadline) return;
-      const diff = deadline - Date.now();
-      if (diff <= 0) {
-        el.textContent = 'EXPIRED';
-        el.classList.add('text-red-500');
-      } else {
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        el.textContent = `${hours}h ${minutes}m left`;
-      }
-    });
-  }, 30000);
-}
-
-// ====================== GOOGLE SIGN-IN (Redirect - Best for GitHub Pages) ======================
-async function signInWithGoogle() {
-  const provider = new GoogleAuthProvider();
-  try {
-    await signInWithRedirect(auth, provider);
-  } catch (error) {
-    alert("Google sign-in failed: " + error.message);
-  }
-}
-
-async function handleRedirectResult() {
-  try {
-    const result = await getRedirectResult(auth);
-    if (result?.user) {
-      const user = result.user;
-      document.getElementById('role-overlay').classList.add('hidden');
-      document.getElementById('main-header').classList.remove('hidden');
-      document.getElementById('main-content').classList.remove('hidden');
-
-      if (user.email === 'realmasasa@gmail.com') {
-        document.getElementById('admin-tools').classList.remove('hidden');
-      }
-      loadAllContent();
-    }
-  } catch (error) {
-    console.error("Redirect error:", error);
-  }
-}
-
-function logout() {
-  signOut(auth).then(() => location.reload());
-}
-
-function continueAsStudent() {
-  document.getElementById('role-overlay').classList.add('hidden');
-  document.getElementById('main-header').classList.remove('hidden');
-  document.getElementById('main-content').classList.remove('hidden');
-  loadAllContent();
-}
-
-// ====================== PDF UPLOAD ======================
-async function uploadPDF() {
-  const title = document.getElementById('pdf-title').value.trim();
-  const deadlineInput = document.getElementById('pdf-deadline').value;
-  const file = document.getElementById('pdf-file').files[0];
-
-  if (!title || !file) return alert('Title and PDF file are required');
-
-  try {
-    const storageRef = ref(storage, 'pdfs/' + Date.now() + '-' + file.name);
-    const snapshot = await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(snapshot.ref);
-
-    await addDoc(collection(db, 'materials'), {
-      title,
-      url,
-      uploadedAt: serverTimestamp(),
-      deadline: deadlineInput ? new Date(deadlineInput) : null
-    });
-
-    alert('✅ PDF published successfully!');
-    document.getElementById('pdf-title').value = '';
-    document.getElementById('pdf-file').value = '';
-    loadMaterials();
-  } catch (err) {
-    console.error(err);
-    alert('Upload failed: ' + err.message);
-  }
-}
-
-// ====================== QUIZ CREATION ======================
-function addQuestion() {
-  const type = document.getElementById('q-type').value;
-  const text = document.getElementById('q-text').value.trim();
-  if (!text) return alert('Enter question text');
-
-  let question = { type, text };
-
-  if (type === 'mcq') {
-    const opts = ['opt1','opt2','opt3','opt4']
-      .map(id => document.getElementById(id).value.trim())
-      .filter(o => o);
-
-    const correctIndex = parseInt(document.getElementById('correct-index').value);
-
-    if (opts.length < 2 || isNaN(correctIndex) || correctIndex >= opts.length) {
-      return alert('At least 2 options and valid correct index required');
-    }
-
-    question.options = opts;
-    question.correct = correctIndex;
-  } else {
-    const correctAnswer = prompt('Enter exact correct short answer:');
-    if (!correctAnswer?.trim()) return;
-    question.correct = correctAnswer.trim();
-  }
-
-  questionsPreview.push(question);
-  renderQuestionsPreview();
-
-  document.getElementById('q-text').value = '';
-  if (type === 'mcq') ['opt1','opt2','opt3','opt4'].forEach(id => document.getElementById(id).value = '');
-}
-
-function renderQuestionsPreview() {
-  const container = document.getElementById('questions-preview');
-  container.innerHTML = questionsPreview.map((q, i) => `
-    <div class="flex justify-between bg-white p-4 rounded-2xl border">
-      <div>
-        <span class="uppercase text-xs font-bold text-orange-600">${q.type}</span> ${q.text}
-        ${q.options ? `<br><small class="text-green-600">Options: ${q.options.join(' | ')}</small>` : ''}
-      </div>
-      <button onclick="removeQuestion(${i})" class="text-red-500 text-2xl">×</button>
+      <button onclick="continueAsStudent()" 
+              class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-5 rounded-3xl text-xl transition">
+        👨‍🎓 Continue as Student (Demo Mode)
+      </button>
     </div>
-  `).join('');
-}
+  </div>
 
-function removeQuestion(i) {
-  questionsPreview.splice(i, 1);
-  renderQuestionsPreview();
-}
+  <!-- Main Header -->
+  <header id="main-header" class="hidden bg-white shadow sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">📚</span>
+        <h1 class="text-2xl font-black text-orange-600">Masasa Online</h1>
+      </div>
+      <div class="flex items-center gap-6">
+        <div id="live-time" class="font-mono text-lg font-medium"></div>
+        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-2xl font-bold">Logout</button>
+      </div>
+    </div>
+  </header>
 
-async function publishQuiz() {
-  const title = document.getElementById('quiz-title').value.trim();
-  const deadlineInput = document.getElementById('quiz-deadline').value;
+  <div id="main-content" class="hidden max-w-6xl mx-auto px-6 py-10">
 
-  if (!title || questionsPreview.length === 0) return alert('Title and at least one question required');
+    <!-- Admin Tools -->
+    <div id="admin-tools" class="hidden mb-12 bg-white p-8 rounded-3xl shadow">
+      <h2 class="text-3xl font-black mb-8">Admin Dashboard</h2>
 
-  try {
-    await addDoc(collection(db, 'quizzes'), {
-      title,
-      questions: questionsPreview,
-      deadline: deadlineInput ? new Date(deadlineInput) : null,
-      createdAt: serverTimestamp()
-    });
-
-    alert('✅ Quiz published successfully!');
-    questionsPreview = [];
-    renderQuestionsPreview();
-    document.getElementById('quiz-title').value = '';
-    loadQuizzes();
-  } catch (err) {
-    console.error(err);
-    alert('Failed to publish quiz: ' + err.message);
-  }
-}
-
-// ====================== LOAD CONTENT ======================
-async function loadMaterials() {
-  const q = query(collection(db, 'materials'), orderBy('uploadedAt', 'desc'));
-  const snapshot = await getDocs(q);
-  const container = document.getElementById('material-list');
-  container.innerHTML = '';
-
-  snapshot.forEach(docSnap => {
-    const m = docSnap.data();
-    const deadline = m.deadline ? new Date(m.deadline) : null;
-    const expired = deadline && Date.now() > deadline.getTime();
-
-    const cardHTML = `
-      <div class="bg-white p-6 rounded-3xl border-2 shadow ${expired ? 'border-red-300 opacity-75' : 'border-indigo-100'}">
-        <h4 class="font-black text-lg">${m.title}</h4>
-        <p class="text-xs text-slate-500">Uploaded: ${m.uploadedAt?.toDate ? m.uploadedAt.toDate().toLocaleDateString() : '—'}</p>
-        ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
-        <button onclick="viewPDF('\( {m.url}', ' \){m.title.replace(/'/g, "\\'")}')" 
-                class="mt-4 w-full ${expired ? 'bg-red-400' : 'bg-indigo-600'} text-white py-3 rounded-2xl font-black">
-          View PDF 📄
-        </button>
-      </div>`;
-    container.innerHTML += cardHTML;
-  });
-}
-
-function viewPDF(url, title) {
-  document.getElementById('pdf-modal-title').textContent = title;
-  document.getElementById('pdf-frame').src = url;
-  document.getElementById('pdf-modal').classList.remove('hidden');
-}
-
-function closePDF() {
-  document.getElementById('pdf-modal').classList.add('hidden');
-  document.getElementById('pdf-frame').src = '';
-}
-
-async function loadQuizzes() {
-  const q = query(collection(db, 'quizzes'), orderBy('createdAt', 'desc'));
-  const snapshot = await getDocs(q);
-  const container = document.getElementById('quiz-list');
-  container.innerHTML = '';
-
-  snapshot.forEach(docSnap => {
-    const quiz = docSnap.data();
-    const deadline = quiz.deadline ? new Date(quiz.deadline) : null;
-    const expired = deadline && Date.now() > deadline.getTime();
-
-    const cardHTML = `
-      <div class="bg-white p-6 rounded-3xl border-2 shadow ${expired ? 'border-red-300' : 'border-orange-100'}">
-        <h4 class="font-black text-lg">${quiz.title}</h4>
-        <p class="text-xs text-slate-500">${quiz.questions.length} questions</p>
-        ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
-        <button onclick="startQuiz('${docSnap.id}')" 
-                class="mt-4 w-full ${expired ? 'bg-red-400 cursor-not-allowed' : 'bg-orange-500'} text-white py-3 rounded-2xl font-black"
-                ${expired ? 'disabled' : ''}>
-          ${expired ? 'EXPIRED' : 'START QUIZ NOW'}
-        </button>
-      </div>`;
-    container.innerHTML += cardHTML;
-  });
-}
-
-async function startQuiz(quizId) {
-  const docSnap = await getDoc(doc(db, 'quizzes', quizId));
-  if (!docSnap.exists()) return alert("Quiz not found");
-
-  currentQuiz = { id: quizId, ...docSnap.data() };
-
-  document.getElementById('quiz-area').classList.remove('hidden');
-  document.getElementById('quiz-area').innerHTML = `
-    <h2 class="text-3xl font-black text-center mb-8">${currentQuiz.title}</h2>
-    <div id="questions-container" class="space-y-10"></div>
-    <button onclick="submitQuiz()" class="w-full mt-10 bg-green-600 hover:bg-green-700 text-white py-6 rounded-3xl text-2xl font-black">
-      FINISH & GET INSTANT RESULT
-    </button>
-  `;
-
-  renderQuizQuestions();
-}
-
-function renderQuizQuestions() {
-  const container = document.getElementById('questions-container');
-  container.innerHTML = currentQuiz.questions.map((q, index) => {
-    if (q.type === 'mcq') {
-      return `
-        <div class="bg-white p-8 rounded-3xl shadow">
-          <p class="font-bold text-xl mb-6">${index + 1}. ${q.text}</p>
-          <div class="space-y-4">
-            ${q.options.map((opt, i) => `
-              <label class="flex items-center gap-3 cursor-pointer">
-                <input type="radio" name="q\( {index}" value=" \){i}" class="w-5 h-5 accent-orange-500">
-                <span class="text-lg">${opt}</span>
-              </label>
-            `).join('')}
+      <!-- Upload PDF -->
+      <div class="mb-12">
+        <h3 class="font-bold text-xl mb-4">Upload New Material (PDF)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input id="pdf-title" type="text" placeholder="Material Title" class="p-4 border-2 rounded-2xl">
+          <input id="pdf-deadline" type="datetime-local" class="p-4 border-2 rounded-2xl">
+          <div class="flex gap-3">
+            <input id="pdf-file" type="file" accept="application/pdf" class="hidden">
+            <button onclick="document.getElementById('pdf-file').click()" 
+                    class="flex-1 bg-gray-100 hover:bg-gray-200 py-4 rounded-2xl font-bold">Choose PDF</button>
+            <button onclick="uploadPDF()" 
+                    class="flex-1 bg-emerald-600 text-white py-4 rounded-2xl font-black">Publish PDF</button>
           </div>
-        </div>`;
-    } else {
-      return `
-        <div class="bg-white p-8 rounded-3xl shadow">
-          <p class="font-bold text-xl mb-6">${index + 1}. ${q.text}</p>
-          <input type="text" id="short-${index}" placeholder="Type your answer here..." 
-                 class="w-full p-5 border-2 border-orange-200 rounded-3xl text-lg focus:border-orange-500">
-        </div>`;
-    }
-  }).join('');
-}
+        </div>
+      </div>
 
-function submitQuiz() {
-  let score = 0;
-  const total = currentQuiz.questions.length;
+      <!-- Create Quiz -->
+      <div>
+        <h3 class="font-bold text-xl mb-4">Create New Quiz</h3>
+        <input id="quiz-title" type="text" placeholder="Quiz Title" class="w-full p-4 border-2 rounded-2xl mb-4">
+        <input id="quiz-deadline" type="datetime-local" class="w-full p-4 border-2 rounded-2xl mb-6">
 
-  currentQuiz.questions.forEach((q, index) => {
-    if (q.type === 'mcq') {
-      const selected = document.querySelector(`input[name="q${index}"]:checked`);
-      if (selected && parseInt(selected.value) === q.correct) score++;
-    } else {
-      const answer = document.getElementById(`short-${index}`).value.trim().toLowerCase();
-      if (answer === q.correct.toLowerCase()) score++;
-    }
-  });
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-gray-50 p-6 rounded-3xl">
+            <select id="q-type" class="w-full p-4 border-2 rounded-2xl mb-4">
+              <option value="mcq">Multiple Choice</option>
+              <option value="short">Short Answer</option>
+            </select>
+            <input id="q-text" type="text" placeholder="Question text" class="w-full p-4 border-2 rounded-2xl mb-4">
 
-  const percent = Math.round((score / total) * 100);
-  const emoji = percent >= 80 ? '🎉' : percent >= 50 ? '👍' : '😕';
-  const feedback = percent >= 80 ? 'Excellent work!' : percent >= 50 ? 'Good effort!' : 'Keep practicing!';
+            <div class="space-y-3">
+              <input id="opt1" type="text" placeholder="Option 1" class="w-full p-3 border rounded-xl">
+              <input id="opt2" type="text" placeholder="Option 2" class="w-full p-3 border rounded-xl">
+              <input id="opt3" type="text" placeholder="Option 3" class="w-full p-3 border rounded-xl">
+              <input id="opt4" type="text" placeholder="Option 4" class="w-full p-3 border rounded-xl">
+              <select id="correct-index" class="w-full p-3 border rounded-xl">
+                <option value="">Correct Option Index (0-3)</option>
+                <option value="0">0</option><option value="1">1</option>
+                <option value="2">2</option><option value="3">3</option>
+              </select>
+            </div>
 
-  document.getElementById('score-emoji').textContent = emoji;
-  document.getElementById('final-percent').textContent = percent + '%';
-  document.getElementById('score-feedback').textContent = feedback;
-  document.getElementById('score-modal').classList.remove('hidden');
-  document.getElementById('quiz-area').classList.add('hidden');
-}
+            <button onclick="addQuestion()" 
+                    class="mt-6 w-full bg-orange-500 text-white py-4 rounded-2xl font-black">Add Question</button>
+          </div>
 
-function closeQuiz() {
-  document.getElementById('score-modal').classList.add('hidden');
-  currentQuiz = null;
-}
+          <div>
+            <h4 class="font-semibold mb-3">Questions Preview</h4>
+            <div id="questions-preview" class="space-y-3 min-h-[300px] bg-white p-4 rounded-3xl border"></div>
+            <button onclick="publishQuiz()" 
+                    class="mt-6 w-full bg-green-600 text-white py-4 rounded-2xl font-black">Publish Quiz</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-function loadAllContent() {
-  loadMaterials();
-  loadQuizzes();
-}
+    <!-- Student Content -->
+    <div class="grid md:grid-cols-2 gap-10">
+      <div>
+        <h2 class="text-3xl font-black mb-6 flex items-center gap-3">📄 Learning Materials</h2>
+        <div id="material-list" class="space-y-6"></div>
+      </div>
+      <div>
+        <h2 class="text-3xl font-black mb-6 flex items-center gap-3">🧠 Quizzes</h2>
+        <div id="quiz-list" class="space-y-6"></div>
+      </div>
+    </div>
 
-// ====================== INIT ======================
-window.onload = () => {
-  updateLiveTime();
-  startCountdowns();
-  handleRedirectResult();
+    <div id="quiz-area" class="hidden mt-12"></div>
+  </div>
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      document.getElementById('role-overlay').classList.add('hidden');
-      document.getElementById('main-header').classList.remove('hidden');
-      document.getElementById('main-content').classList.remove('hidden');
-      if (user.email === 'realmasasa@gmail.com') {
-        document.getElementById('admin-tools').classList.remove('hidden');
-      }
-      loadAllContent();
-    }
-  });
-};
+  <!-- PDF Modal -->
+  <div id="pdf-modal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+    <div class="bg-white w-full max-w-5xl h-[90vh] rounded-3xl overflow-hidden flex flex-col">
+      <div class="flex justify-between items-center p-6 border-b">
+        <h3 id="pdf-modal-title" class="font-black text-xl"></h3>
+        <button onclick="closePDF()" class="text-4xl leading-none">×</button>
+      </div>
+      <iframe id="pdf-frame" class="flex-1 w-full"></iframe>
+    </div>
+  </div>
 
-// Global exposure
-window.signInWithGoogle = signInWithGoogle;
-window.continueAsStudent = continueAsStudent;
-window.logout = logout;
-window.uploadPDF = uploadPDF;
-window.addQuestion = addQuestion;
-window.removeQuestion = removeQuestion;
-window.publishQuiz = publishQuiz;
-window.viewPDF = viewPDF;
-window.closePDF = closePDF;
-window.startQuiz = startQuiz;
-window.submitQuiz = submitQuiz;
-window.closeQuiz = closeQuiz;
+  <!-- Score Modal -->
+  <div id="score-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white rounded-3xl p-12 text-center max-w-md">
+      <div id="score-emoji" class="text-8xl mb-6"></div>
+      <div id="final-percent" class="text-7xl font-black text-orange-600 mb-2"></div>
+      <p id="score-feedback" class="text-2xl font-medium mb-10"></p>
+      <button onclick="closeQuiz()" class="bg-orange-600 text-white px-12 py-4 rounded-2xl font-black text-xl">Close</button>
+    </div>
+  </div>
+
+  <script type="module" src="index.js"></script>
+</body>
+</html>
