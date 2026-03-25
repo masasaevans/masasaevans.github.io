@@ -1,36 +1,16 @@
 // ================== FIREBASE CONFIG ==================
-// PASTE YOUR CONFIG HERE (from Firebase console)
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
-};
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { 
+  getFirestore, collection, addDoc, getDocs, orderBy, query, doc, getDoc 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { 
+  getStorage, ref, uploadBytes, getDownloadURL 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
+import { 
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const storage = firebase.storage();
-const auth = firebase.auth();
-
-let currentUserRole = null;
-let currentAdmin = null;
-let currentQuiz = null;
-let currentAnswers = {};
-let questionsPreview = [];
-
-// Live clock
-function updateLiveTime() {
-  const timeEl = document.getElementById('live-time');
-  setInterval(() => {
-    const now = new Date();
-    timeEl.textContent = now.toLocaleTimeString('en-US', { hour12: false });
-  }, 1000);
-}
-
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
   authDomain: "masasa-online.firebaseapp.com",
@@ -41,7 +21,45 @@ const firebaseConfig = {
   measurementId: "G-LLPYLLVV8V"
 };
 
-// Select role
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
+
+let currentUserRole = null;
+let currentAdmin = null;
+let currentQuiz = null;
+let questionsPreview = [];
+
+// ====================== UTILITIES ======================
+function updateLiveTime() {
+  const timeEl = document.getElementById('live-time');
+  if (!timeEl) return;
+  setInterval(() => {
+    timeEl.textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+  }, 1000);
+}
+
+function startCountdowns() {
+  setInterval(() => {
+    document.querySelectorAll('.countdown').forEach(el => {
+      const deadline = parseInt(el.getAttribute('data-deadline'));
+      if (!deadline) return;
+      const diff = deadline - Date.now();
+      if (diff <= 0) {
+        el.textContent = 'EXPIRED';
+        el.classList.add('text-red-500');
+      } else {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        el.textContent = `${hours}h ${minutes}m left`;
+      }
+    });
+  }, 30000); // update every 30 seconds
+}
+
+// ====================== ROLE & AUTH ======================
 function selectRole(role) {
   currentUserRole = role;
   document.getElementById('role-overlay').classList.add('hidden');
@@ -50,51 +68,49 @@ function selectRole(role) {
   if (role === 'student') loadAllContent();
 }
 
-// Admin login
 async function validateAdmin() {
-  const pass = document.getElementById('admin-pass').value;
+  const pass = document.getElementById('admin-pass').value.trim();
+  if (!pass) return alert('Please enter password');
+
   try {
-    const userCred = await auth.signInWithEmailAndPassword('admin@masasa.online', pass);
-    currentAdmin = userCred.user;
+    await signInWithEmailAndPassword(auth, 'admin@masasa.online', pass);
     document.getElementById('role-overlay').classList.add('hidden');
     document.getElementById('main-header').classList.remove('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     document.getElementById('admin-tools').classList.remove('hidden');
     loadAllContent();
+    alert('✅ Admin login successful!');
   } catch (e) {
-    alert('Wrong password! Use the password you set in Firebase Authentication.');
+    console.error(e);
+    alert('Wrong password!');
   }
 }
 
 function showAdminLogin() { document.getElementById('admin-login').classList.remove('hidden'); }
 function hideAdminLogin() { document.getElementById('admin-login').classList.add('hidden'); }
 
-// Logout
 function logout() {
-  auth.signOut();
-  location.reload();
+  signOut(auth).then(() => location.reload());
 }
 
-// Upload PDF
+// ====================== MATERIALS ======================
 async function uploadPDF() {
   const title = document.getElementById('pdf-title').value.trim();
   const deadlineInput = document.getElementById('pdf-deadline').value;
-  const fileInput = document.getElementById('pdf-file');
+  const file = document.getElementById('pdf-file').files[0];
 
-  if (!title || !fileInput.files[0]) return alert('Title and PDF required');
-
-  const file = fileInput.files[0];
-  const storageRef = storage.ref('pdfs/' + Date.now() + '-' + file.name);
+  if (!title || !file) return alert('Title and PDF file required');
 
   try {
-    const snapshot = await storageRef.put(file);
-    const url = await snapshot.ref.getDownloadURL();
+    const storageRef = ref(storage, 'pdfs/' + Date.now() + '-' + file.name);
+    const snapshot = await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(snapshot.ref);
 
-    await db.collection('materials').add({
-      title: title,
-      url: url,
-      uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      deadline: deadlineInput ? firebase.firestore.Timestamp.fromDate(new Date(deadlineInput)) : null
+    await addDoc(collection(db, 'materials'), {
+      title,
+      url,
+      uploadedAt: serverTimestamp(),
+      deadline: deadlineInput ? new Date(deadlineInput) : null
     });
 
     alert('✅ PDF published!');
@@ -103,83 +119,56 @@ async function uploadPDF() {
     loadMaterials();
   } catch (err) {
     console.error(err);
-    alert('Upload failed');
+    alert('Upload failed: ' + err.message);
   }
 }
 
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
-    authDomain: "masasa-online.firebaseapp.com",
-    projectId: "masasa-online",
-    storageBucket: "masasa-online.firebasestorage.app",
-    messagingSenderId: "975253887376",
-    appId: "1:975253887376:web:c1d6e59922a7d3ac2cbb15",
-    measurementId: "G-LLPYLLVV8V"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-
-// Add question to preview (quiz creator)
+// ====================== QUIZ CREATION ======================
 function addQuestion() {
   const type = document.getElementById('q-type').value;
   const text = document.getElementById('q-text').value.trim();
-
   if (!text) return alert('Enter question text');
 
   let question = { type, text };
 
   if (type === 'mcq') {
-    const opts = [
-      document.getElementById('opt1').value.trim(),
-      document.getElementById('opt2').value.trim(),
-      document.getElementById('opt3').value.trim(),
-      document.getElementById('opt4').value.trim()
-    ];
+    const opts = ['opt1','opt2','opt3','opt4']
+      .map(id => document.getElementById(id).value.trim())
+      .filter(o => o);
+
     const correctIndex = parseInt(document.getElementById('correct-index').value);
-    question.options = opts.filter(o => o !== '');
+
+    if (opts.length < 2 || isNaN(correctIndex) || correctIndex >= opts.length) {
+      return alert('Valid options and correct index required');
+    }
+
+    question.options = opts;
     question.correct = correctIndex;
   } else {
-    question.correct = ''; // will be set later? No, for short answer we need correct text
-    // For short answer we will add a field below in UI but for simplicity we ask correct answer now
-    const correctAnswer = prompt('Enter the exact correct short answer (case insensitive):');
-    if (!correctAnswer) return;
+    const correctAnswer = prompt('Enter exact correct short answer:');
+    if (!correctAnswer?.trim()) return;
     question.correct = correctAnswer.trim();
   }
 
   questionsPreview.push(question);
   renderQuestionsPreview();
-  
+
   // Clear form
   document.getElementById('q-text').value = '';
   if (type === 'mcq') {
-    document.getElementById('opt1').value = '';
-    document.getElementById('opt2').value = '';
-    document.getElementById('opt3').value = '';
-    document.getElementById('opt4').value = '';
+    ['opt1','opt2','opt3','opt4'].forEach(id => document.getElementById(id).value = '');
   }
 }
 
 function renderQuestionsPreview() {
   const container = document.getElementById('questions-preview');
   container.innerHTML = questionsPreview.map((q, i) => `
-    <div class="flex justify-between items-center bg-white p-3 rounded-2xl text-sm">
+    <div class="flex justify-between bg-white p-4 rounded-2xl border">
       <div>
-        <span class="font-bold uppercase text-xs">${q.type}</span> ${q.text}
+        <span class="uppercase text-xs font-bold text-orange-600">${q.type}</span> ${q.text}
         ${q.options ? `<br><small class="text-green-600">Options: ${q.options.join(' | ')}</small>` : ''}
       </div>
-      <button onclick="removeQuestion(${i})" class="text-red-500 text-xl">×</button>
+      <button onclick="removeQuestion(${i})" class="text-red-500 text-2xl">×</button>
     </div>
   `).join('');
 }
@@ -189,19 +178,18 @@ function removeQuestion(i) {
   renderQuestionsPreview();
 }
 
-// Publish Quiz
 async function publishQuiz() {
   const title = document.getElementById('quiz-title').value.trim();
   const deadlineInput = document.getElementById('quiz-deadline').value;
 
-  if (!title || questionsPreview.length === 0) return alert('Title and at least one question required');
+  if (!title || questionsPreview.length === 0) return alert('Title and questions required');
 
   try {
-    await db.collection('quizzes').add({
-      title: title,
+    await addDoc(collection(db, 'quizzes'), {
+      title,
       questions: questionsPreview,
-      deadline: deadlineInput ? firebase.firestore.Timestamp.fromDate(new Date(deadlineInput)) : null,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      deadline: deadlineInput ? new Date(deadlineInput) : null,
+      createdAt: serverTimestamp()
     });
 
     alert('✅ Quiz published!');
@@ -215,30 +203,32 @@ async function publishQuiz() {
   }
 }
 
-// Load Materials (PDFs)
+// ====================== LOAD CONTENT ======================
 async function loadMaterials() {
-  const snapshot = await db.collection('materials').orderBy('uploadedAt', 'desc').get();
+  const q = query(collection(db, 'materials'), orderBy('uploadedAt', 'desc'));
+  const snapshot = await getDocs(q);
   const container = document.getElementById('material-list');
   container.innerHTML = '';
 
-  snapshot.forEach(doc => {
-    const m = doc.data();
-    const deadline = m.deadline ? m.deadline.toDate() : null;
-    const expired = deadline && new Date() > deadline;
+  snapshot.forEach(docSnap => {
+    const m = docSnap.data();
+    const deadline = m.deadline ? new Date(m.deadline) : null;
+    const expired = deadline && Date.now() > deadline.getTime();
 
-    const card = document.createElement('div');
-    card.className = `bg-white p-6 rounded-3xl border-2 ${expired ? 'border-red-300 opacity-75' : 'border-indigo-100'} shadow`;
-    card.innerHTML = `
-      <h4 class="font-black text-lg mb-1">${m.title}</h4>
-      <p class="text-xs text-slate-500">Uploaded: ${m.uploadedAt ? m.uploadedAt.toDate().toLocaleDateString() : '—'}</p>
-      ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
-      <button onclick="viewPDF('\( {m.url}', ' \){m.title}')" class="mt-4 w-full ${expired ? 'bg-red-400' : 'bg-indigo-600'} text-white py-3 rounded-2xl font-black">View PDF 📄</button>
-    `;
-    container.appendChild(card);
+    const cardHTML = `
+      <div class="bg-white p-6 rounded-3xl border-2 shadow ${expired ? 'border-red-300 opacity-75' : 'border-indigo-100'}">
+        <h4 class="font-black text-lg">${m.title}</h4>
+        <p class="text-xs text-slate-500">Uploaded: ${m.uploadedAt ? new Date(m.uploadedAt.toDate()).toLocaleDateString() : '—'}</p>
+        ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
+        <button onclick="viewPDF('\( {m.url}', ' \){m.title.replace(/'/g, "\\'")}')" 
+                class="mt-4 w-full ${expired ? 'bg-red-400' : 'bg-indigo-600'} text-white py-3 rounded-2xl font-black">
+          View PDF 📄
+        </button>
+      </div>`;
+    container.innerHTML += cardHTML;
   });
 }
 
-// View PDF in modal
 function viewPDF(url, title) {
   document.getElementById('pdf-modal-title').textContent = title;
   document.getElementById('pdf-frame').src = url;
@@ -250,42 +240,46 @@ function closePDF() {
   document.getElementById('pdf-frame').src = '';
 }
 
-// Load Quizzes
 async function loadQuizzes() {
-  const snapshot = await db.collection('quizzes').orderBy('createdAt', 'desc').get();
+  const q = query(collection(db, 'quizzes'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
   const container = document.getElementById('quiz-list');
   container.innerHTML = '';
 
-  snapshot.forEach(doc => {
-    const q = doc.data();
-    const deadline = q.deadline ? q.deadline.toDate() : null;
-    const expired = deadline && new Date() > deadline;
+  snapshot.forEach(docSnap => {
+    const quiz = docSnap.data();
+    const deadline = quiz.deadline ? new Date(quiz.deadline) : null;
+    const expired = deadline && Date.now() > deadline.getTime();
 
-    const card = document.createElement('div');
-    card.className = `bg-white p-6 rounded-3xl border-2 ${expired ? 'border-red-300' : 'border-orange-100'} shadow`;
-    card.innerHTML = `
-      <h4 class="font-black text-lg mb-1">${q.title}</h4>
-      <p class="text-xs text-slate-500">${q.questions.length} questions</p>
-      ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
-      <button onclick="startQuiz('${doc.id}')" class="mt-4 w-full ${expired ? 'bg-red-400 cursor-not-allowed' : 'bg-orange-500'} text-white py-3 rounded-2xl font-black" ${expired ? 'disabled' : ''}>
-        ${expired ? 'EXPIRED' : 'START QUIZ NOW'}
-      </button>
-    `;
-    container.appendChild(card);
+    const cardHTML = `
+      <div class="bg-white p-6 rounded-3xl border-2 shadow ${expired ? 'border-red-300' : 'border-orange-100'}">
+        <h4 class="font-black text-lg">${quiz.title}</h4>
+        <p class="text-xs text-slate-500">${quiz.questions.length} questions</p>
+        ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
+        <button onclick="startQuiz('${docSnap.id}')" 
+                class="mt-4 w-full ${expired ? 'bg-red-400 cursor-not-allowed' : 'bg-orange-500'} text-white py-3 rounded-2xl font-black"
+                ${expired ? 'disabled' : ''}>
+          ${expired ? 'EXPIRED' : 'START QUIZ NOW'}
+        </button>
+      </div>`;
+    container.innerHTML += cardHTML;
   });
 }
 
-// Start a quiz
+// ====================== TAKE QUIZ ======================
 async function startQuiz(quizId) {
-  const doc = await db.collection('quizzes').doc(quizId).get();
-  currentQuiz = { id: quizId, ...doc.data() };
-  currentAnswers = {};
+  const docSnap = await getDoc(doc(db, 'quizzes', quizId));
+  if (!docSnap.exists()) return alert("Quiz not found");
+
+  currentQuiz = { id: quizId, ...docSnap.data() };
 
   document.getElementById('quiz-area').classList.remove('hidden');
   document.getElementById('quiz-area').innerHTML = `
     <h2 class="text-3xl font-black text-center mb-8">${currentQuiz.title}</h2>
     <div id="questions-container" class="space-y-10"></div>
-    <button onclick="submitQuiz()" class="w-full mt-10 bg-green-600 text-white py-6 rounded-3xl text-2xl font-black">FINISH &amp; GET INSTANT RESULT</button>
+    <button onclick="submitQuiz()" class="w-full mt-10 bg-green-600 hover:bg-green-700 text-white py-6 rounded-3xl text-2xl font-black">
+      FINISH & GET INSTANT RESULT
+    </button>
   `;
 
   renderQuizQuestions();
@@ -301,7 +295,7 @@ function renderQuizQuestions() {
           <div class="space-y-4">
             ${q.options.map((opt, i) => `
               <label class="flex items-center gap-3 cursor-pointer">
-                <input type="radio" name="q\( {index}" value=" \){i}" class="w-5 h-5">
+                <input type="radio" name="q\( {index}" value=" \){i}" class="w-5 h-5 accent-orange-500">
                 <span class="text-lg">${opt}</span>
               </label>
             `).join('')}
@@ -311,13 +305,13 @@ function renderQuizQuestions() {
       return `
         <div class="bg-white p-8 rounded-3xl shadow">
           <p class="font-bold text-xl mb-6">${index + 1}. ${q.text}</p>
-          <input type="text" id="short-${index}" placeholder="Type your answer here" class="w-full p-5 border-2 border-orange-200 rounded-3xl text-lg outline-none focus:border-orange-400">
+          <input type="text" id="short-${index}" placeholder="Type your answer here..." 
+                 class="w-full p-5 border-2 border-orange-200 rounded-3xl text-lg focus:border-orange-500">
         </div>`;
     }
   }).join('');
 }
 
-// Submit quiz → instant marking
 function submitQuiz() {
   let score = 0;
   const total = currentQuiz.questions.length;
@@ -341,7 +335,6 @@ function submitQuiz() {
   document.getElementById('score-feedback').textContent = feedback;
   document.getElementById('score-modal').classList.remove('hidden');
 
-  // Hide quiz area after submit
   document.getElementById('quiz-area').classList.add('hidden');
 }
 
@@ -350,38 +343,35 @@ function closeQuiz() {
   currentQuiz = null;
 }
 
-// Load everything for learners
 function loadAllContent() {
   loadMaterials();
   loadQuizzes();
 }
 
-// Countdown updater
-function startCountdowns() {
-  setInterval(() => {
-    document.querySelectorAll('.countdown').forEach(el => {
-      const deadline = parseInt(el.getAttribute('data-deadline'));
-      const diff = deadline - Date.now();
-      if (diff <= 0) {
-        el.textContent = 'EXPIRED';
-        el.classList.add('text-red-500');
-      } else {
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        el.textContent = `${hours}h ${minutes}m left`;
-      }
-    });
-  }, 60000);
-}
-
-// Init everything
+// ====================== INIT ======================
 window.onload = () => {
   updateLiveTime();
   startCountdowns();
-  // Listen for auth state (in case admin refreshes)
-  auth.onAuthStateChanged(user => {
+
+  onAuthStateChanged(auth, (user) => {
     if (user && user.email === 'admin@masasa.online') {
-      currentAdmin = user;
+      document.getElementById('admin-tools').classList.remove('hidden');
     }
   });
 };
+
+// Expose functions to window for inline onclick handlers
+window.selectRole = selectRole;
+window.validateAdmin = validateAdmin;
+window.showAdminLogin = showAdminLogin;
+window.hideAdminLogin = hideAdminLogin;
+window.logout = logout;
+window.uploadPDF = uploadPDF;
+window.addQuestion = addQuestion;
+window.removeQuestion = removeQuestion;
+window.publishQuiz = publishQuiz;
+window.viewPDF = viewPDF;
+window.closePDF = closePDF;
+window.startQuiz = startQuiz;
+window.submitQuiz = submitQuiz;
+window.closeQuiz = closeQuiz;
