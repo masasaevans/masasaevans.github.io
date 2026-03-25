@@ -319,3 +319,14 @@ window.uploadPDF = uploadPDF;
 window.addQuestionToList = addQuestionToList;
 window.publishQuiz = publishQuiz;
 
+// This makes the functions "Public" so the HTML can trigger them
+window.uploadPDF = uploadPDF;
+window.addQuestionToList = addQuestionToList;
+window.publishQuiz = publishQuiz;
+window.validateAdmin = validateAdmin;
+window.selectRole = selectRole;
+window.signInWithGoogle = signInWithGoogle;
+window.logout = logout;
+window.startQuiz = startQuiz;
+
+
