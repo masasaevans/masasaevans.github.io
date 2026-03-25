@@ -27,14 +27,22 @@ const adminTools = document.getElementById("admin-tools");
 const quizArea = document.getElementById("quiz-area");
 
 // ===== UTILITIES =====
-function showMain() {
+function showMain(isAdmin = false) {
   roleOverlay.classList.add("hidden");
   mainHeader.classList.remove("hidden");
   mainContent.classList.remove("hidden");
+  
+  if (isAdmin) {
+    adminTools.classList.remove("hidden");
+  }
 }
 
 // ===== STUDENT ROLE =====
-window.selectRole = () => { showMain(); loadMaterials(); loadQuizzes(); };
+window.selectRole = () => {
+  showMain(false);           // <-- FIXED: now properly hides overlay
+  loadMaterials();
+  loadQuizzes();
+};
 
 // ===== ADMIN PANEL =====
 window.showAdminLogin = () => document.getElementById("admin-login").classList.remove("hidden");
@@ -45,11 +53,13 @@ window.validateAdmin = async () => {
   const pass = document.getElementById("admin-pass").value;
   try {
     await signInWithEmailAndPassword(auth, "realmasasa@gmail.com", pass);
-    showMain();
-    adminTools.classList.remove("hidden");
+    showMain(true);          // <-- now passes true so admin tools show
     alert("Admin login successful ✅");
-    loadMaterials(); loadQuizzes();
-  } catch (err) { alert("Admin login failed ❌\n" + err.message); }
+    loadMaterials(); 
+    loadQuizzes();
+  } catch (err) { 
+    alert("Admin login failed ❌\n" + err.message); 
+  }
 };
 
 // ===== GOOGLE LOGIN =====
@@ -58,8 +68,12 @@ window.signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     alert(`Google login successful ✅\nWelcome ${result.user.displayName}`);
-    showMain(); loadMaterials(); loadQuizzes();
-  } catch (err) { alert("Google login failed ❌\n" + err.message); }
+    showMain(false);         // Google user = student (not admin)
+    loadMaterials(); 
+    loadQuizzes();
+  } catch (err) { 
+    alert("Google login failed ❌\n" + err.message); 
+  }
 };
 
 // ===== LOGOUT =====
@@ -80,33 +94,50 @@ async function uploadPDF() {
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
     await addDoc(collection(db, "materials"), { title, url, created: Date.now() });
-    alert("PDF uploaded successfully ✅"); loadMaterials();
+    alert("PDF uploaded successfully ✅"); 
+    loadMaterials();
   } catch (err) { alert("Upload failed ❌\n" + err.message); }
 }
 
 // ===== LOAD MATERIALS =====
 async function loadMaterials() {
-  const list = document.getElementById("material-list"); list.innerHTML = "";
+  const list = document.getElementById("material-list"); 
+  list.innerHTML = "";
   const q = query(collection(db, "materials"), orderBy("created","desc"));
   const snap = await getDocs(q);
-  snap.forEach(doc => { const m = doc.data(); list.innerHTML += `<div class="card">📄 ${m.title} <a href="${m.url}" target="_blank">Download</a></div>`; });
+  snap.forEach(doc => { 
+    const m = doc.data(); 
+    list.innerHTML += `<div class="card">📄 \( {m.title} <a href=" \){m.url}" target="_blank" class="text-orange-600 underline">Download</a></div>`; 
+  });
 }
 
 // ===== QUIZ SYSTEM =====
 let questions = [];
-function addQuestion() { questions.push({ q:"Sample question?", options:["A","B","C","D"], correct:0 }); alert("Sample question added"); }
+function addQuestion() { 
+  questions.push({ q:"Sample question?", options:["A","B","C","D"], correct:0 }); 
+  alert("Sample question added"); 
+}
 async function publishQuiz() {
   const title = document.getElementById("quiz-title").value;
   if(!title) return alert("Enter quiz title");
-  try { await addDoc(collection(db,"quizzes"),{title,questions}); questions=[]; alert("Quiz published ✅"); loadQuizzes(); }
+  try { 
+    await addDoc(collection(db,"quizzes"),{title,questions}); 
+    questions=[]; 
+    alert("Quiz published ✅"); 
+    loadQuizzes(); 
+  }
   catch(err){ alert("Quiz publish failed ❌\n"+err.message); }
 }
 
 // ===== LOAD QUIZZES =====
 async function loadQuizzes() {
-  const list = document.getElementById("quiz-list"); list.innerHTML="";
+  const list = document.getElementById("quiz-list"); 
+  list.innerHTML="";
   const snap = await getDocs(collection(db,"quizzes"));
-  snap.forEach(doc => { const quiz = doc.data(); list.innerHTML += `<div class="card">🧠 ${quiz.title} <button onclick="startQuiz('${doc.id}')">Start</button></div>`; });
+  snap.forEach(doc => { 
+    const quiz = doc.data(); 
+    list.innerHTML += `<div class="card">🧠 \( {quiz.title} <button onclick="startQuiz(' \){doc.id}')" class="bg-orange-500 text-white px-4 py-1 rounded">Start</button></div>`; 
+  });
 }
 
 // ===== START QUIZ =====
@@ -114,14 +145,24 @@ window.startQuiz = async id => {
   const snap = await getDocs(collection(db,"quizzes"));
   const quizDoc = snap.docs.find(d=>d.id===id);
   if(!quizDoc) return alert("Quiz not found ❌");
-  const quiz = quizDoc.data(); quizArea.classList.remove("hidden");
-  let html=`<h2>${quiz.title}</h2>`;
-  quiz.questions.forEach((q,i)=>{ html+=`<p>${i+1}. ${q.q}</p>`; q.options.forEach((opt,j)=>{ html+=`<label><input type="radio" name="q${i}" value="${j}">${opt}</label><br>`; }); });
-  html+=`<button onclick="submitQuiz()">Submit</button>`; quizArea.innerHTML=html;
+  const quiz = quizDoc.data(); 
+  quizArea.classList.remove("hidden");
+  let html=`<h2 class="text-2xl font-black mb-6">${quiz.title}</h2>`;
+  quiz.questions.forEach((q,i)=>{ 
+    html+=`<p class="font-bold mt-6">${i+1}. ${q.q}</p>`; 
+    q.options.forEach((opt,j)=>{ 
+      html+=`<label class="block mt-2"><input type="radio" name="q\( {i}" value=" \){j}"> ${opt}</label>`; 
+    }); 
+  });
+  html+=`<button onclick="submitQuiz()" class="mt-8 bg-green-600 text-white px-8 py-3 rounded-xl font-bold">Submit Quiz</button>`;
+  quizArea.innerHTML=html;
 };
 
 // ===== SUBMIT QUIZ =====
 window.submitQuiz = ()=>alert("Quiz submitted ✅");
 
 // ===== LIVE TIME =====
-setInterval(()=>{ const el=document.getElementById("live-time"); if(el) el.textContent=new Date().toLocaleString(); },1000);
+setInterval(()=>{ 
+  const el=document.getElementById("live-time"); 
+  if(el) el.textContent=new Date().toLocaleString(); 
+},1000);
