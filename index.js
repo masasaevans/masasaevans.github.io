@@ -60,7 +60,7 @@ function startCountdowns() {
   }, 30000);
 }
 
-// ====================== GOOGLE SIGN-IN ======================
+// ====================== GOOGLE SIGN-IN (Redirect - Best for GitHub Pages) ======================
 async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
   try {
@@ -85,7 +85,7 @@ async function handleRedirectResult() {
       loadAllContent();
     }
   } catch (error) {
-    console.error(error);
+    console.error("Redirect error:", error);
   }
 }
 
@@ -93,14 +93,14 @@ function logout() {
   signOut(auth).then(() => location.reload());
 }
 
-function selectRole(role) {
+function continueAsStudent() {
   document.getElementById('role-overlay').classList.add('hidden');
   document.getElementById('main-header').classList.remove('hidden');
   document.getElementById('main-content').classList.remove('hidden');
-  if (role === 'student') loadAllContent();
+  loadAllContent();
 }
 
-// ====================== PUBLISH PDF (Fixed) ======================
+// ====================== PDF UPLOAD ======================
 async function uploadPDF() {
   const title = document.getElementById('pdf-title').value.trim();
   const deadlineInput = document.getElementById('pdf-deadline').value;
@@ -114,8 +114,8 @@ async function uploadPDF() {
     const url = await getDownloadURL(snapshot.ref);
 
     await addDoc(collection(db, 'materials'), {
-      title: title,
-      url: url,
+      title,
+      url,
       uploadedAt: serverTimestamp(),
       deadline: deadlineInput ? new Date(deadlineInput) : null
     });
@@ -130,7 +130,7 @@ async function uploadPDF() {
   }
 }
 
-// ====================== QUIZ CREATION (Fixed) ======================
+// ====================== QUIZ CREATION ======================
 function addQuestion() {
   const type = document.getElementById('q-type').value;
   const text = document.getElementById('q-text').value.trim();
@@ -190,7 +190,7 @@ async function publishQuiz() {
 
   try {
     await addDoc(collection(db, 'quizzes'), {
-      title: title,
+      title,
       questions: questionsPreview,
       deadline: deadlineInput ? new Date(deadlineInput) : null,
       createdAt: serverTimestamp()
@@ -207,7 +207,7 @@ async function publishQuiz() {
   }
 }
 
-// ====================== LOAD & QUIZ FUNCTIONS ======================
+// ====================== LOAD CONTENT ======================
 async function loadMaterials() {
   const q = query(collection(db, 'materials'), orderBy('uploadedAt', 'desc'));
   const snapshot = await getDocs(q);
@@ -371,7 +371,7 @@ window.onload = () => {
 
 // Global exposure
 window.signInWithGoogle = signInWithGoogle;
-window.selectRole = selectRole;
+window.continueAsStudent = continueAsStudent;
 window.logout = logout;
 window.uploadPDF = uploadPDF;
 window.addQuestion = addQuestion;
