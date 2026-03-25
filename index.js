@@ -1,15 +1,18 @@
 // ================== FIREBASE CONFIG ==================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { 
-  getFirestore, collection, addDoc, getDocs, orderBy, query, doc, getDoc 
+  getFirestore, collection, addDoc, getDocs, orderBy, query, doc, getDoc, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { 
   getStorage, ref, uploadBytes, getDownloadURL 
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
 import { 
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged,
+  createUserWithEmailAndPassword 
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
@@ -28,7 +31,6 @@ const storage = getStorage(app);
 const auth = getAuth(app);
 
 let currentUserRole = null;
-let currentAdmin = null;
 let currentQuiz = null;
 let questionsPreview = [];
 
@@ -56,7 +58,7 @@ function startCountdowns() {
         el.textContent = `${hours}h ${minutes}m left`;
       }
     });
-  }, 30000); // update every 30 seconds
+  }, 30000);
 }
 
 // ====================== ROLE & AUTH ======================
@@ -73,21 +75,57 @@ async function validateAdmin() {
   if (!pass) return alert('Please enter password');
 
   try {
-    await signInWithEmailAndPassword(auth, 'admin@masasa.online', pass);
+    await signInWithEmailAndPassword(auth, 'realmasasa@gmail.com', pass);
+    
     document.getElementById('role-overlay').classList.add('hidden');
     document.getElementById('main-header').classList.remove('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     document.getElementById('admin-tools').classList.remove('hidden');
+    document.getElementById('create-admin-section').classList.add('hidden');
+    
     loadAllContent();
     alert('✅ Admin login successful!');
-  } catch (e) {
-    console.error(e);
-    alert('Wrong password!');
+  } catch (error) {
+    console.error("Login error:", error.code, error.message);
+    
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+      document.getElementById('create-admin-section').classList.remove('hidden');
+      alert('Admin account not found. Use the "Create Admin Account" button.');
+    } else if (error.code === 'auth/wrong-password') {
+      alert('Wrong password! Please try again.');
+    } else {
+      alert('Login failed: ' + error.message);
+    }
   }
 }
 
-function showAdminLogin() { document.getElementById('admin-login').classList.remove('hidden'); }
-function hideAdminLogin() { document.getElementById('admin-login').classList.add('hidden'); }
+async function createAdminAccount() {
+  const password = prompt("Enter a strong password for admin (minimum 6 characters):");
+  if (!password || password.length < 6) {
+    return alert("Password must be at least 6 characters long.");
+  }
+
+  try {
+    await createUserWithEmailAndPassword(auth, 'realmasasa@gmail.com', password);
+    alert(`✅ Admin account created!\n\nEmail: realmasasa@gmail.com\nPassword: ${password}\n\nYou can now login.`);
+    document.getElementById('create-admin-section').classList.add('hidden');
+  } catch (error) {
+    if (error.code === 'auth/email-already-in-use') {
+      alert('Account already exists. Try logging in with the correct password.');
+      document.getElementById('create-admin-section').classList.add('hidden');
+    } else {
+      alert('Failed to create account: ' + error.message);
+    }
+  }
+}
+
+function showAdminLogin() { 
+  document.getElementById('admin-login').classList.remove('hidden'); 
+}
+
+function hideAdminLogin() { 
+  document.getElementById('admin-login').classList.add('hidden'); 
+}
 
 function logout() {
   signOut(auth).then(() => location.reload());
@@ -113,7 +151,7 @@ async function uploadPDF() {
       deadline: deadlineInput ? new Date(deadlineInput) : null
     });
 
-    alert('✅ PDF published!');
+    alert('✅ PDF published successfully!');
     document.getElementById('pdf-title').value = '';
     document.getElementById('pdf-file').value = '';
     loadMaterials();
@@ -139,13 +177,13 @@ function addQuestion() {
     const correctIndex = parseInt(document.getElementById('correct-index').value);
 
     if (opts.length < 2 || isNaN(correctIndex) || correctIndex >= opts.length) {
-      return alert('Valid options and correct index required');
+      return alert('At least 2 options and valid correct index required');
     }
 
     question.options = opts;
     question.correct = correctIndex;
   } else {
-    const correctAnswer = prompt('Enter exact correct short answer:');
+    const correctAnswer = prompt('Enter exact correct short answer (case insensitive):');
     if (!correctAnswer?.trim()) return;
     question.correct = correctAnswer.trim();
   }
@@ -153,7 +191,6 @@ function addQuestion() {
   questionsPreview.push(question);
   renderQuestionsPreview();
 
-  // Clear form
   document.getElementById('q-text').value = '';
   if (type === 'mcq') {
     ['opt1','opt2','opt3','opt4'].forEach(id => document.getElementById(id).value = '');
@@ -182,7 +219,7 @@ async function publishQuiz() {
   const title = document.getElementById('quiz-title').value.trim();
   const deadlineInput = document.getElementById('quiz-deadline').value;
 
-  if (!title || questionsPreview.length === 0) return alert('Title and questions required');
+  if (!title || questionsPreview.length === 0) return alert('Title and at least one question required');
 
   try {
     await addDoc(collection(db, 'quizzes'), {
@@ -192,7 +229,7 @@ async function publishQuiz() {
       createdAt: serverTimestamp()
     });
 
-    alert('✅ Quiz published!');
+    alert('✅ Quiz published successfully!');
     questionsPreview = [];
     renderQuestionsPreview();
     document.getElementById('quiz-title').value = '';
@@ -218,7 +255,7 @@ async function loadMaterials() {
     const cardHTML = `
       <div class="bg-white p-6 rounded-3xl border-2 shadow ${expired ? 'border-red-300 opacity-75' : 'border-indigo-100'}">
         <h4 class="font-black text-lg">${m.title}</h4>
-        <p class="text-xs text-slate-500">Uploaded: ${m.uploadedAt ? new Date(m.uploadedAt.toDate()).toLocaleDateString() : '—'}</p>
+        <p class="text-xs text-slate-500">Uploaded: ${m.uploadedAt?.toDate ? m.uploadedAt.toDate().toLocaleDateString() : '—'}</p>
         ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
         <button onclick="viewPDF('\( {m.url}', ' \){m.title.replace(/'/g, "\\'")}')" 
                 class="mt-4 w-full ${expired ? 'bg-red-400' : 'bg-indigo-600'} text-white py-3 rounded-2xl font-black">
@@ -354,15 +391,17 @@ window.onload = () => {
   startCountdowns();
 
   onAuthStateChanged(auth, (user) => {
-    if (user && user.email === 'admin@masasa.online') {
+    if (user && user.email === 'realmasasa@gmail.com') {
       document.getElementById('admin-tools').classList.remove('hidden');
+      document.getElementById('create-admin-section').classList.add('hidden');
     }
   });
 };
 
-// Expose functions to window for inline onclick handlers
+// Make functions available globally
 window.selectRole = selectRole;
 window.validateAdmin = validateAdmin;
+window.createAdminAccount = createAdminAccount;
 window.showAdminLogin = showAdminLogin;
 window.hideAdminLogin = hideAdminLogin;
 window.logout = logout;
