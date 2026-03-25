@@ -1,183 +1,53 @@
-// ================== index.js - Simplified for GitHub Pages + Smartphone (2026) ==================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masasa Online</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- Role Selection / Login Overlay -->
+  <div id="role-overlay" class="overlay">
+    <div class="auth-container">
+      <h1 id="auth-title">Sign In</h1>
+      
+      <!-- Google Sign In -->
+      <button onclick="signInWithGoogle()" class="google-btn">Sign in with Google</button>
+      
+      <!-- Email/Password -->
+      <div class="email-auth">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button id="auth-button" onclick="handleEmailAuth()">Sign In</button>
+        
+        <p id="toggle-text">
+          Don't have an account? 
+          <span onclick="toggleAuthMode()" class="toggle-link">Sign up</span>
+        </p>
+      </div>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { 
-  getFirestore, collection, addDoc, getDocs, orderBy, query, doc, getDoc, serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-import { 
-  getStorage, ref, uploadBytes, getDownloadURL 
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
-import { 
-  getAuth, 
-  signOut, 
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithRedirect,          // ← Using redirect only (best for mobile)
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+      <button onclick="continueAsStudent()" class="demo-btn">Continue as Student (Demo)</button>
+    </div>
+  </div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
-  authDomain: "masasa-online.firebaseapp.com",
-  projectId: "masasa-online",
-  storageBucket: "masasa-online.firebasestorage.app",
-  messagingSenderId: "975253887376",
-  appId: "1:975253887376:web:c1d6e59922a7d3ac2cbb15",
-  measurementId: "G-LLPYLLVV8V"
-};
+  <!-- Main App (hidden until logged in) -->
+  <div id="main-header" class="hidden">
+    <header>
+      <h2>Masasa Online</h2>
+      <button onclick="logout()">Logout</button>
+    </header>
+  </div>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
-const auth = getAuth(app);
+  <div id="main-content" class="hidden">
+    <p>Welcome! You are now logged in.</p>
+    <!-- Your existing quiz, PDF, materials content goes here -->
+    <div id="admin-tools" class="hidden">
+      <h3>Admin Tools (visible only for realmasasa@gmail.com)</h3>
+      <!-- Your admin features -->
+    </div>
+  </div>
 
-let currentQuiz = null;
-let questionsPreview = [];
-
-// ====================== UTILITIES ======================
-function updateLiveTime() {
-  const timeEl = document.getElementById('live-time');
-  if (!timeEl) return;
-  setInterval(() => {
-    timeEl.textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
-  }, 1000);
-}
-
-function startCountdowns() {
-  setInterval(() => {
-    document.querySelectorAll('.countdown').forEach(el => {
-      const deadline = parseInt(el.getAttribute('data-deadline'));
-      if (!deadline) return;
-      const diff = deadline - Date.now();
-      if (diff <= 0) {
-        el.textContent = 'EXPIRED';
-        el.classList.add('text-red-500');
-      } else {
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        el.textContent = `${hours}h ${minutes}m left`;
-      }
-    });
-  }, 30000);
-}
-
-// ====================== GOOGLE SIGN-IN (Redirect Only - Reliable on Mobile) ======================
-async function signInWithGoogle() {
-  const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-
-  const googleBtn = document.getElementById('google-btn') || 
-                    document.querySelector('button[onclick*="signInWithGoogle"]');
-  
-  if (googleBtn) {
-    const originalText = googleBtn.textContent;
-    googleBtn.disabled = true;
-    googleBtn.textContent = "Redirecting to Google...";
-  }
-
-  try {
-    await signInWithRedirect(auth, provider);
-    // No code after this – the page will redirect to Google and come back
-  } catch (error) {
-    console.error("Google redirect error:", error);
-    alert("Google sign-in failed:\n" + error.message);
-    
-    if (googleBtn) {
-      googleBtn.disabled = false;
-      googleBtn.textContent = "Sign in with Google";
-    }
-  }
-}
-
-// ====================== EMAIL/PASSWORD AUTH ======================
-let isLoginMode = true;
-
-function toggleAuthMode() {
-  isLoginMode = !isLoginMode;
-  document.getElementById('auth-title').textContent = isLoginMode ? 'Sign In' : 'Create Account';
-  document.getElementById('auth-button').textContent = isLoginMode ? 'Sign In' : 'Sign Up';
-  document.getElementById('toggle-text').innerHTML = isLoginMode 
-    ? `Don't have an account? <span onclick="toggleAuthMode()" class="text-orange-600 cursor-pointer">Sign up</span>` 
-    : `Already have an account? <span onclick="toggleAuthMode()" class="text-orange-600 cursor-pointer">Sign in</span>`;
-}
-
-async function handleEmailAuth() {
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
-
-  if (!email || !password) {
-    alert("Please enter email and password");
-    return;
-  }
-
-  const btn = document.getElementById('auth-button');
-  const originalText = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = "Please wait...";
-
-  try {
-    let userCredential;
-    if (isLoginMode) {
-      userCredential = await signInWithEmailAndPassword(auth, email, password);
-    } else {
-      userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    }
-    showMainApp(userCredential.user);
-  } catch (error) {
-    console.error(error);
-    let msg = error.message;
-    if (error.code === 'auth/wrong-password') msg = "Incorrect password";
-    else if (error.code === 'auth/user-not-found') msg = "No account found with this email";
-    else if (error.code === 'auth/email-already-in-use') msg = "Email already registered. Please sign in.";
-    else if (error.code === 'auth/weak-password') msg = "Password should be at least 6 characters";
-    
-    alert("Error: " + msg);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = originalText;
-  }
-}
-
-function showMainApp(user) {
-  document.getElementById('role-overlay').classList.add('hidden');
-  document.getElementById('main-header').classList.remove('hidden');
-  document.getElementById('main-content').classList.remove('hidden');
-
-  if (user.email === 'realmasasa@gmail.com') {
-    document.getElementById('admin-tools').classList.remove('hidden');
-  }
-  loadAllContent();
-}
-
-// ====================== DEMO & LOGOUT ======================
-function continueAsStudent() {
-  document.getElementById('role-overlay').classList.add('hidden');
-  document.getElementById('main-header').classList.remove('hidden');
-  document.getElementById('main-content').classList.remove('hidden');
-  loadAllContent();
-}
-
-function logout() {
-  signOut(auth).then(() => location.reload()).catch(() => location.reload());
-}
-
-// ====================== INIT ======================
-window.onload = () => {
-  updateLiveTime();
-  startCountdowns();
-
-  // This listener will catch the user AFTER Google redirect comes back
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log("✅ User signed in:", user.email);
-      showMainApp(user);
-    } else {
-      console.log("No user signed in");
-    }
-  });
-
-  // Expose to window for onclick
-  window.signInWithGoogle = signInWithGoogle;
-  window.continueAsStudent = continueAsStudent;
-  window.logout
+  <script type="module" src="index.js"></script>
+</body>
+</html>
