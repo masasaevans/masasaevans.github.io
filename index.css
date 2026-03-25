@@ -1,20 +1,100 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  color: #333;
+  text-align: center;
+  padding: 20px;
 }
 
-.rounded-3xl {
-  border-radius: 1.5rem;
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
 }
 
-input:focus, select:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+.auth-container {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-.countdown {
-  font-weight: 600;
+h1 {
+  margin-bottom: 20px;
+  color: #ff6600;
+}
+
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.google-btn:hover { background: #3367d6; }
+
+.email-auth input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+#auth-button {
+  width: 100%;
+  padding: 12px;
+  background: #ff6600;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.toggle-link {
+  color: #ff6600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.demo-btn {
+  width: 100%;
+  padding: 12px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.hidden { display: none !important; }
+
+header {
+  background: #ff6600;
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
