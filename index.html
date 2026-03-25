@@ -1,142 +1,397 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Masasa Online | Learning Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css">
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.7.1/firebase-storage-compat.js"></script>
-</head>
-<body class="bg-indigo-50 font-sans antialiased overflow-x-hidden">
+// ================== FIREBASE CONFIG ==================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
-<div class="marquee-container">
-    <div class="marquee-text">🚀 Welcome to Masasa Online! 📚 PDFs & Quizzes • Deadlines & Instant Marking</div>
-</div>
+const firebaseConfig = {
+  apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
+  authDomain: "masasa-online.firebaseapp.com",
+  projectId: "masasa-online",
+  storageBucket: "masasa-online.firebasestorage.app",
+  messagingSenderId: "975253887376",
+  appId: "1:975253887376:web:c1d6e59922a7d3ac2cbb15",
+  measurementId: "G-LLPYLLVV8V"
+};
 
-<div id="role-overlay" class="fixed inset-0 bg-indigo-900 flex items-center justify-center z-[100] p-4">
-  <div class="bg-white rounded-[3rem] p-8 max-w-md w-full text-center shadow-2xl border-8 border-white animate-pop">
-    <div class="mb-6 p-4 bg-indigo-50 rounded-3xl border-2 border-indigo-100">
-        <div id="live-time" class="text-4xl font-black text-slate-800">00:00:00</div>
-        <div id="location-display" class="text-indigo-500 font-bold text-xs uppercase mt-1">📍 Nairobi, KE</div>
-    </div>
-    <h1 class="bubble-text text-5xl font-black text-indigo-600 mb-8">Masasa Online</h1>
-    <div id="role-buttons" class="space-y-4">
-        <button onclick="selectRole('student')" class="w-full bg-orange-500 text-white py-6 rounded-3xl text-2xl font-black shadow-[0_10px_0_#c2410c] active:translate-y-1 active:shadow-none transition-all">LEARNER PLACE 👩‍🎓</button>
-        <button onclick="showAdminLogin()" class="w-full bg-slate-100 text-slate-500 py-4 rounded-2xl font-bold hover:bg-slate-200">ADMIN 🔐</button>
-    </div>
-    <div id="admin-login" class="hidden mt-6">
-      <input id="admin-pass" type="password" placeholder="Enter Admin Password" class="w-full p-4 border-2 border-indigo-100 rounded-2xl mb-4 text-center font-bold outline-none focus:border-indigo-600">
-      <button onclick="validateAdmin()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg">Login as Evans</button>
-      <button onclick="hideAdminLogin()" class="mt-4 text-slate-400 text-xs underline block w-full cursor-pointer">Back to Selection</button>
-    </div>
-  </div>
-</div>
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
 
-<header id="main-header" class="hidden bg-white/90 backdrop-blur-md border-b-2 border-indigo-100 p-4 sticky top-12 z-50">
-  <div class="max-w-6xl mx-auto flex justify-between items-center px-4">
-    <div class="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full border-2 border-yellow-400">
-        <span class="text-xl">⭐</span>
-        <span id="star-count" class="font-black text-yellow-700 text-lg">0</span>
-    </div>
-    <button onclick="logout()" class="bg-red-50 text-red-500 px-6 py-2 rounded-full font-black text-xs border-2 border-red-100 uppercase tracking-widest">Quit Portal</button>
-  </div>
-</header>
+let currentUserRole = null;
+let currentAdmin = null;
+let currentQuiz = null;
+let currentAnswers = {};
+let questionsPreview = [];
 
-<main id="main-content" class="hidden max-w-6xl mx-auto p-4 md:p-6">
-  <!-- ADMIN TOOLS -->
-  <section id="admin-tools" class="hidden mb-10 p-6 bg-white rounded-[2.5rem] shadow-xl border-4 border-indigo-200">
-      <h3 class="text-xl font-black text-indigo-700 mb-4 uppercase italic">Teacher Management</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- PDF Upload -->
-          <div class="bg-indigo-50 p-6 rounded-3xl border-2 border-indigo-100">
-              <label class="font-black text-indigo-700 block mb-2 uppercase text-[10px]">1. Upload PDF Lesson</label>
-              <input id="pdf-title" type="text" placeholder="PDF Name (e.g. Literacy Week 3)" class="w-full p-3 rounded-xl border mb-2 outline-none">
-              <input id="pdf-deadline" type="datetime-local" class="w-full p-3 rounded-xl border mb-2 outline-none">
-              <input id="pdf-file" type="file" accept="application/pdf" class="w-full p-2 mb-2 bg-white rounded-xl text-xs">
-              <button onclick="uploadPDF()" class="w-full bg-indigo-600 text-white font-black py-3 rounded-xl">Publish PDF</button>
-          </div>
+// ====================== UTILITIES ======================
+function updateLiveTime() {
+  const timeEl = document.getElementById('live-time');
+  if (!timeEl) return;
+  setInterval(() => {
+    const now = new Date();
+    timeEl.textContent = now.toLocaleTimeString('en-US', { hour12: false });
+  }, 1000);
+}
 
-          <!-- Quiz Creator -->
-          <div class="bg-orange-50 p-6 rounded-3xl border-2 border-orange-100">
-              <label class="font-black text-orange-700 block mb-2 uppercase text-[10px]">2. Create Quiz</label>
-              <input id="quiz-title" type="text" placeholder="Quiz Title" class="w-full p-3 border rounded-xl mb-2 outline-none">
-              <input id="quiz-deadline" type="datetime-local" class="w-full p-3 border rounded-xl mb-4 outline-none">
+function startCountdowns() {
+  setInterval(() => {
+    document.querySelectorAll('.countdown').forEach(el => {
+      const deadline = parseInt(el.getAttribute('data-deadline'));
+      if (!deadline) return;
 
-              <div class="bg-white p-4 rounded-2xl mb-4" id="question-form">
-                  <select id="q-type" class="w-full p-3 border rounded-xl mb-2">
-                      <option value="mcq">Multiple Choice (MCQ)</option>
-                      <option value="short">Short Answer (Structural)</option>
-                  </select>
-                  <input id="q-text" type="text" placeholder="Question text" class="w-full p-3 border rounded-xl mb-2">
-                  
-                  <!-- MCQ fields -->
-                  <div id="mcq-fields">
-                      <div class="grid grid-cols-2 gap-2">
-                          <input id="opt1" placeholder="Option A" class="p-2 border rounded">
-                          <input id="opt2" placeholder="Option B" class="p-2 border rounded">
-                          <input id="opt3" placeholder="Option C" class="p-2 border rounded">
-                          <input id="opt4" placeholder="Option D" class="p-2 border rounded">
-                      </div>
-                      <select id="correct-index" class="w-full mt-2 p-2 border rounded">
-                          <option value="0">Correct: A</option>
-                          <option value="1">Correct: B</option>
-                          <option value="2">Correct: C</option>
-                          <option value="3">Correct: D</option>
-                      </select>
-                  </div>
-                  
-                  <button onclick="addQuestion()" class="mt-3 w-full bg-orange-500 text-white py-2 rounded-xl text-sm font-bold">+ Add Question to Quiz</button>
-              </div>
+      const diff = deadline - Date.now();
+      if (diff <= 0) {
+        el.textContent = 'EXPIRED';
+        el.classList.add('text-red-500');
+      } else {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        el.textContent = `${hours}h ${minutes}m left`;
+      }
+    });
+  }, 60000);
+}
 
-              <div id="questions-preview" class="mb-4 space-y-2"></div>
-              <button onclick="publishQuiz()" class="w-full bg-orange-500 text-white font-black py-3 rounded-xl">Publish Quiz Now</button>
-          </div>
-      </div>
-  </section>
+// ====================== ROLE & AUTH ======================
+function selectRole(role) {
+  currentUserRole = role;
+  document.getElementById('role-overlay').classList.add('hidden');
+  document.getElementById('main-header').classList.remove('hidden');
+  document.getElementById('main-content').classList.remove('hidden');
+  if (role === 'student') loadAllContent();
+}
 
-  <!-- LEARNER CONTENT -->
-  <section class="mb-8">
-      <h3 class="text-2xl font-black text-indigo-700 mb-6 px-4">📚 Materials & Quizzes</h3>
-      
-      <div class="mb-6">
-          <h4 class="font-bold text-indigo-600 mb-3 px-4">📄 PDF Lessons</h4>
-          <div id="material-list" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
-      </div>
-      
+async function validateAdmin() {
+  const pass = document.getElementById('admin-pass').value.trim();
+  if (!pass) return alert('Please enter password');
+
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, 'admin@masasa.online', pass);
+    currentAdmin = userCred.user;
+    
+    document.getElementById('role-overlay').classList.add('hidden');
+    document.getElementById('main-header').classList.remove('hidden');
+    document.getElementById('main-content').classList.remove('hidden');
+    document.getElementById('admin-tools').classList.remove('hidden');
+
+    loadAllContent();
+    alert('✅ Admin login successful!');
+  } catch (e) {
+    console.error(e);
+    alert('Wrong password! Make sure you use the correct password set in Firebase Authentication.');
+  }
+}
+
+function showAdminLogin() {
+  document.getElementById('admin-login').classList.remove('hidden');
+}
+
+function hideAdminLogin() {
+  document.getElementById('admin-login').classList.add('hidden');
+}
+
+function logout() {
+  signOut(auth).then(() => {
+    location.reload();
+  });
+}
+
+// ====================== MATERIALS (PDF) ======================
+async function uploadPDF() {
+  const title = document.getElementById('pdf-title').value.trim();
+  const deadlineInput = document.getElementById('pdf-deadline').value;
+  const fileInput = document.getElementById('pdf-file');
+
+  if (!title || !fileInput.files[0]) {
+    return alert('Title and PDF file are required');
+  }
+
+  const file = fileInput.files[0];
+  const storageRef = storage.ref('pdfs/' + Date.now() + '-' + file.name);
+
+  try {
+    const snapshot = await storageRef.put(file);
+    const url = await snapshot.ref.getDownloadURL();
+
+    await db.collection('materials').add({
+      title: title,
+      url: url,
+      uploadedAt: firebase.firestore.FieldValue.serverTimestamp(), // Wait — we'll fix this
+      deadline: deadlineInput ? new Date(deadlineInput) : null
+    });
+
+    alert('✅ PDF published successfully!');
+    document.getElementById('pdf-title').value = '';
+    document.getElementById('pdf-file').value = '';
+    loadMaterials();
+  } catch (err) {
+    console.error(err);
+    alert('Upload failed: ' + err.message);
+  }
+}
+
+// ====================== QUIZ CREATION ======================
+function addQuestion() {
+  const type = document.getElementById('q-type').value;
+  const text = document.getElementById('q-text').value.trim();
+
+  if (!text) return alert('Please enter question text');
+
+  let question = { type, text };
+
+  if (type === 'mcq') {
+    const opts = [
+      document.getElementById('opt1').value.trim(),
+      document.getElementById('opt2').value.trim(),
+      document.getElementById('opt3').value.trim(),
+      document.getElementById('opt4').value.trim()
+    ].filter(o => o !== '');
+
+    const correctIndex = parseInt(document.getElementById('correct-index').value);
+
+    if (opts.length < 2) return alert('At least 2 options required');
+    if (isNaN(correctIndex) || correctIndex < 0 || correctIndex >= opts.length) {
+      return alert('Please select a valid correct option');
+    }
+
+    question.options = opts;
+    question.correct = correctIndex;
+  } else {
+    const correctAnswer = prompt('Enter the exact correct short answer (case insensitive):');
+    if (!correctAnswer || !correctAnswer.trim()) return;
+    question.correct = correctAnswer.trim();
+  }
+
+  questionsPreview.push(question);
+  renderQuestionsPreview();
+
+  // Clear inputs
+  document.getElementById('q-text').value = '';
+  if (type === 'mcq') {
+    ['opt1','opt2','opt3','opt4'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  }
+}
+
+function renderQuestionsPreview() {
+  const container = document.getElementById('questions-preview');
+  container.innerHTML = questionsPreview.map((q, i) => `
+    <div class="flex justify-between items-center bg-white p-4 rounded-2xl text-sm border border-gray-200">
       <div>
-          <h4 class="font-bold text-orange-600 mb-3 px-4">❓ Quizzes</h4>
-          <div id="quiz-list" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        <span class="font-bold uppercase text-xs text-orange-600">${q.type}</span> 
+        <span class="font-medium">${q.text}</span>
+        ${q.options ? `<br><small class="text-green-600">Options: ${q.options.join(' | ')}</small>` : ''}
       </div>
-  </section>
-
-  <div id="quiz-area" class="hidden space-y-6 pb-60 pt-10"></div>
-</main>
-
-<div id="score-modal" class="hidden fixed inset-0 bg-indigo-900/90 flex items-center justify-center z-[200] p-4">
-    <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center border-8 border-white animate-pop">
-        <div class="text-8xl mb-4" id="score-emoji">🎉</div>
-        <div id="final-percent" class="text-7xl font-black text-orange-500 mb-2">0%</div>
-        <p id="score-feedback" class="text-lg font-bold text-slate-500 mb-8 italic"></p>
-        <button onclick="closeQuiz()" class="w-full bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg uppercase">Continue</button>
+      <button onclick="removeQuestion(${i})" class="text-red-500 hover:text-red-700 text-2xl leading-none">×</button>
     </div>
-</div>
+  `).join('');
+}
 
-<div id="pdf-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[300] p-4">
-    <div class="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-        <div class="p-4 border-b flex justify-between items-center">
-            <h3 id="pdf-modal-title" class="font-black text-xl"></h3>
-            <button onclick="closePDF()" class="text-3xl leading-none">×</button>
-        </div>
-        <iframe id="pdf-frame" class="flex-1 w-full rounded-b-3xl" style="height:80vh"></iframe>
-    </div>
-</div>
+function removeQuestion(i) {
+  questionsPreview.splice(i, 1);
+  renderQuestionsPreview();
+}
 
-<script src="index.js"></script>
-</body>
-</html>
+async function publishQuiz() {
+  const title = document.getElementById('quiz-title').value.trim();
+  const deadlineInput = document.getElementById('quiz-deadline').value;
+
+  if (!title || questionsPreview.length === 0) {
+    return alert('Quiz title and at least one question are required');
+  }
+
+  try {
+    await db.collection('quizzes').add({
+      title: title,
+      questions: questionsPreview,
+      deadline: deadlineInput ? new Date(deadlineInput) : null,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp() // Note: still using v8 style here
+    });
+
+    alert('✅ Quiz published successfully!');
+    questionsPreview = [];
+    renderQuestionsPreview();
+    document.getElementById('quiz-title').value = '';
+    loadQuizzes();
+  } catch (err) {
+    console.error(err);
+    alert('Failed to publish quiz: ' + err.message);
+  }
+}
+
+// ====================== LOAD CONTENT ======================
+async function loadMaterials() {
+  const snapshot = await db.collection('materials').orderBy('uploadedAt', 'desc').get();
+  const container = document.getElementById('material-list');
+  container.innerHTML = '';
+
+  snapshot.forEach(doc => {
+    const m = doc.data();
+    const deadline = m.deadline ? m.deadline.toDate ? m.deadline.toDate() : new Date(m.deadline) : null;
+    const expired = deadline && new Date() > deadline;
+
+    const card = document.createElement('div');
+    card.className = `bg-white p-6 rounded-3xl border-2 shadow ${expired ? 'border-red-300 opacity-75' : 'border-indigo-100'}`;
+    card.innerHTML = `
+      <h4 class="font-black text-lg mb-1">${m.title}</h4>
+      <p class="text-xs text-slate-500">Uploaded: ${m.uploadedAt ? m.uploadedAt.toDate().toLocaleDateString() : '—'}</p>
+      ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
+      <button onclick="viewPDF('\( {m.url}', ' \){m.title.replace(/'/g, "\\'")}')" 
+              class="mt-4 w-full ${expired ? 'bg-red-400' : 'bg-indigo-600'} text-white py-3 rounded-2xl font-black">
+        View PDF 📄
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function viewPDF(url, title) {
+  document.getElementById('pdf-modal-title').textContent = title;
+  document.getElementById('pdf-frame').src = url;
+  document.getElementById('pdf-modal').classList.remove('hidden');
+}
+
+function closePDF() {
+  document.getElementById('pdf-modal').classList.add('hidden');
+  document.getElementById('pdf-frame').src = '';
+}
+
+async function loadQuizzes() {
+  const snapshot = await db.collection('quizzes').orderBy('createdAt', 'desc').get();
+  const container = document.getElementById('quiz-list');
+  container.innerHTML = '';
+
+  snapshot.forEach(doc => {
+    const q = doc.data();
+    const deadline = q.deadline ? (q.deadline.toDate ? q.deadline.toDate() : new Date(q.deadline)) : null;
+    const expired = deadline && new Date() > deadline;
+
+    const card = document.createElement('div');
+    card.className = `bg-white p-6 rounded-3xl border-2 shadow ${expired ? 'border-red-300' : 'border-orange-100'}`;
+    card.innerHTML = `
+      <h4 class="font-black text-lg mb-1">${q.title}</h4>
+      <p class="text-xs text-slate-500">${q.questions.length} questions</p>
+      ${deadline ? `<p class="text-xs mt-2 \( {expired ? 'text-red-500' : 'text-orange-500'}">⏳ Deadline: <span class="countdown" data-deadline=" \){deadline.getTime()}"></span></p>` : ''}
+      <button onclick="startQuiz('${doc.id}')" 
+              class="mt-4 w-full ${expired ? 'bg-red-400 cursor-not-allowed' : 'bg-orange-500'} text-white py-3 rounded-2xl font-black"
+              ${expired ? 'disabled' : ''}>
+        ${expired ? 'EXPIRED' : 'START QUIZ NOW'}
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ====================== TAKE QUIZ ======================
+async function startQuiz(quizId) {
+  const doc = await db.collection('quizzes').doc(quizId).get();
+  if (!doc.exists) return alert("Quiz not found");
+
+  currentQuiz = { id: quizId, ...doc.data() };
+  currentAnswers = {};
+
+  document.getElementById('quiz-area').classList.remove('hidden');
+  document.getElementById('quiz-area').innerHTML = `
+    <h2 class="text-3xl font-black text-center mb-8">${currentQuiz.title}</h2>
+    <div id="questions-container" class="space-y-10"></div>
+    <button onclick="submitQuiz()" class="w-full mt-10 bg-green-600 hover:bg-green-700 text-white py-6 rounded-3xl text-2xl font-black">FINISH & GET INSTANT RESULT</button>
+  `;
+
+  renderQuizQuestions();
+}
+
+function renderQuizQuestions() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = currentQuiz.questions.map((q, index) => {
+    if (q.type === 'mcq') {
+      return `
+        <div class="bg-white p-8 rounded-3xl shadow">
+          <p class="font-bold text-xl mb-6">${index + 1}. ${q.text}</p>
+          <div class="space-y-4">
+            ${q.options.map((opt, i) => `
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="radio" name="q\( {index}" value=" \){i}" class="w-5 h-5 accent-orange-500">
+                <span class="text-lg">${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>`;
+    } else {
+      return `
+        <div class="bg-white p-8 rounded-3xl shadow">
+          <p class="font-bold text-xl mb-6">${index + 1}. ${q.text}</p>
+          <input type="text" id="short-${index}" placeholder="Type your answer here..." 
+                 class="w-full p-5 border-2 border-orange-200 rounded-3xl text-lg outline-none focus:border-orange-500">
+        </div>`;
+    }
+  }).join('');
+}
+
+function submitQuiz() {
+  let score = 0;
+  const total = currentQuiz.questions.length;
+
+  currentQuiz.questions.forEach((q, index) => {
+    if (q.type === 'mcq') {
+      const selected = document.querySelector(`input[name="q${index}"]:checked`);
+      if (selected && parseInt(selected.value) === q.correct) score++;
+    } else {
+      const answer = document.getElementById(`short-${index}`).value.trim().toLowerCase();
+      if (answer === q.correct.toLowerCase()) score++;
+    }
+  });
+
+  const percent = Math.round((score / total) * 100);
+  const emoji = percent >= 80 ? '🎉' : percent >= 50 ? '👍' : '😕';
+  const feedback = percent >= 80 ? 'Excellent work!' : percent >= 50 ? 'Good effort!' : 'Keep practicing!';
+
+  document.getElementById('score-emoji').textContent = emoji;
+  document.getElementById('final-percent').textContent = percent + '%';
+  document.getElementById('score-feedback').textContent = feedback;
+  document.getElementById('score-modal').classList.remove('hidden');
+
+  document.getElementById('quiz-area').classList.add('hidden');
+}
+
+function closeQuiz() {
+  document.getElementById('score-modal').classList.add('hidden');
+  currentQuiz = null;
+}
+
+function loadAllContent() {
+  loadMaterials();
+  loadQuizzes();
+}
+
+// ====================== INIT ======================
+window.onload = () => {
+  updateLiveTime();
+  startCountdowns();
+
+  onAuthStateChanged(auth, (user) => {
+    if (user && user.email === 'admin@masasa.online') {
+      currentAdmin = user;
+      document.getElementById('admin-tools').classList.remove('hidden');
+    }
+  });
+};
+
+// Make functions globally available for inline onclick handlers
+window.selectRole = selectRole;
+window.validateAdmin = validateAdmin;
+window.showAdminLogin = showAdminLogin;
+window.hideAdminLogin = hideAdminLogin;
+window.logout = logout;
+window.uploadPDF = uploadPDF;
+window.addQuestion = addQuestion;
+window.removeQuestion = removeQuestion;
+window.publishQuiz = publishQuiz;
+window.viewPDF = viewPDF;
+window.closePDF = closePDF;
+window.startQuiz = startQuiz;
+window.submitQuiz = submitQuiz;
+window.closeQuiz = closeQuiz;
