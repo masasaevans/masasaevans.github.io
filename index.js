@@ -96,6 +96,30 @@ async function uploadPDF() {
   }
 }
 
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
+    authDomain: "masasa-online.firebaseapp.com",
+    projectId: "masasa-online",
+    storageBucket: "masasa-online.firebasestorage.app",
+    messagingSenderId: "975253887376",
+    appId: "1:975253887376:web:c1d6e59922a7d3ac2cbb15",
+    measurementId: "G-LLPYLLVV8V"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
 // Add question to preview (quiz creator)
 function addQuestion() {
   const type = document.getElementById('q-type').value;
