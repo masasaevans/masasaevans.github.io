@@ -146,7 +146,74 @@ async function loadMaterials() {
     list.innerHTML = "<p class='text-red-500'>Failed to load materials</p>";
   }
 }
+// Keep track of questions for the quiz currently being built
+let currentQuizQuestions = [];
 
+window.addQuestionToList = () => {
+  const qText = document.getElementById("q-text").value.trim();
+  const options = [
+    document.getElementById("opt-0").value.trim(),
+    document.getElementById("opt-1").value.trim(),
+    document.getElementById("opt-2").value.trim(),
+    document.getElementById("opt-3").value.trim()
+  ];
+  const correctIdx = document.getElementById("q-correct").value;
+
+  // Validation
+  if (!qText || options.some(opt => !opt) || correctIdx === "") {
+    return alert("Please fill in the question, all 4 options, and select the correct answer.");
+  }
+
+  // Add to local array
+  currentQuizQuestions.push({
+    q: qText,
+    options: options,
+    correct: parseInt(correctIdx)
+  });
+
+  // Clear inputs for next question
+  document.getElementById("q-text").value = "";
+  document.getElementById("opt-0").value = "";
+  document.getElementById("opt-1").value = "";
+  document.getElementById("opt-2").value = "";
+  document.getElementById("opt-3").value = "";
+  document.getElementById("q-correct").value = "";
+
+  // Update the UI list
+  updateTempList();
+};
+
+function updateTempList() {
+  const listEl = document.getElementById("temp-questions-list");
+  listEl.innerHTML = `<strong>Current Questions (${currentQuizQuestions.length}):</strong><br>` + 
+    currentQuizQuestions.map((q, i) => `${i + 1}. ${q.q}`).join("<br>");
+}
+
+// Update the Publish function to use our new array
+async function publishQuiz() {
+  const title = document.getElementById("quiz-title").value.trim();
+  
+  if (!title) return alert("Please enter a quiz title.");
+  if (currentQuizQuestions.length === 0) return alert("Add at least one question first.");
+
+  try {
+    await addDoc(collection(db, "quizzes"), {
+      title: title,
+      questions: currentQuizQuestions, // The array of objects
+      created: Date.now()
+    });
+
+    // Reset everything
+    currentQuizQuestions = [];
+    document.getElementById("quiz-title").value = "";
+    document.getElementById("temp-questions-list").innerHTML = "No questions added to this quiz yet.";
+    
+    alert("Quiz published permanently to Firestore! ✅");
+    loadQuizzes(); // Refresh the student view
+  } catch (err) {
+    alert("Error saving quiz: " + err.message);
+  }
+}
 // ===== QUIZ SYSTEM =====
 let questions = [];
 
