@@ -1,4 +1,4 @@
-// ================== index.js - Updated for GitHub Pages + Mobile ==================
+// ================== index.js - Simplified for GitHub Pages + Smartphone (2026) ==================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { 
@@ -12,8 +12,7 @@ import {
   signOut, 
   onAuthStateChanged,
   GoogleAuthProvider,
-  signInWithPopup,
-  signInWithRedirect,
+  signInWithRedirect,          // ← Using redirect only (best for mobile)
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
@@ -63,53 +62,30 @@ function startCountdowns() {
   }, 30000);
 }
 
-// ====================== GOOGLE SIGN-IN (Hybrid - Best for Smartphone + GitHub Pages) ======================
+// ====================== GOOGLE SIGN-IN (Redirect Only - Reliable on Mobile) ======================
 async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
 
-  // Show loading on the Google button (add id="google-btn" to your button if possible)
   const googleBtn = document.getElementById('google-btn') || 
                     document.querySelector('button[onclick*="signInWithGoogle"]');
-  let originalText = googleBtn ? googleBtn.textContent.trim() : "Sign in with Google";
-
+  
   if (googleBtn) {
+    const originalText = googleBtn.textContent;
     googleBtn.disabled = true;
-    googleBtn.textContent = "Connecting to Google...";
+    googleBtn.textContent = "Redirecting to Google...";
   }
 
   try {
-    // 1. Try Popup first (smooth on desktop and many mobiles)
-    const result = await signInWithPopup(auth, provider);
-    console.log("✅ Google sign-in successful via Popup:", result.user.email);
-    showMainApp(result.user);
+    await signInWithRedirect(auth, provider);
+    // No code after this – the page will redirect to Google and come back
   } catch (error) {
-    console.warn("Popup failed:", error.code);
-
-    if (error.code === 'auth/popup-blocked' || 
-        error.code === 'auth/popup-closed-by-user' || 
-        error.code === 'auth/cancelled-popup-request') {
-
-      // 2. Fallback to Redirect (more reliable on strict mobile browsers)
-      console.log("↪️ Popup blocked on mobile → using redirect fallback");
-      try {
-        await signInWithRedirect(auth, provider);
-        // Nothing more to do here – page redirects and onAuthStateChanged will catch the login
-      } catch (redirectErr) {
-        console.error("Redirect also failed:", redirectErr);
-        alert("Google sign-in failed. Please try again or use Email/Password.\n\n" + redirectErr.message);
-      }
-    } 
-    else if (error.code === 'auth/unauthorized-domain') {
-      alert("❌ Domain not authorized!\n\nPlease add 'masasaevans.github.io' in Firebase Console → Authentication → Settings → Authorized domains");
-    } 
-    else {
-      alert("Google sign-in error:\n" + error.message);
-    }
-  } finally {
+    console.error("Google redirect error:", error);
+    alert("Google sign-in failed:\n" + error.message);
+    
     if (googleBtn) {
       googleBtn.disabled = false;
-      googleBtn.textContent = originalText;
+      googleBtn.textContent = "Sign in with Google";
     }
   }
 }
@@ -171,7 +147,7 @@ function showMainApp(user) {
   if (user.email === 'realmasasa@gmail.com') {
     document.getElementById('admin-tools').classList.remove('hidden');
   }
-  loadAllContent();   // Make sure this function exists and works
+  loadAllContent();
 }
 
 // ====================== DEMO & LOGOUT ======================
@@ -183,12 +159,7 @@ function continueAsStudent() {
 }
 
 function logout() {
-  signOut(auth).then(() => {
-    location.reload();   // Full reload for clean state on all devices
-  }).catch(err => {
-    console.error("Logout error:", err);
-    location.reload();
-  });
+  signOut(auth).then(() => location.reload()).catch(() => location.reload());
 }
 
 // ====================== INIT ======================
@@ -196,7 +167,7 @@ window.onload = () => {
   updateLiveTime();
   startCountdowns();
 
-  // Main auth listener – works for popup, redirect, email/password on all devices
+  // This listener will catch the user AFTER Google redirect comes back
   onAuthStateChanged(auth, (user) => {
     if (user) {
       console.log("✅ User signed in:", user.email);
@@ -206,15 +177,7 @@ window.onload = () => {
     }
   });
 
-  // Expose functions for HTML onclick handlers
+  // Expose to window for onclick
   window.signInWithGoogle = signInWithGoogle;
   window.continueAsStudent = continueAsStudent;
-  window.logout = logout;
-  window.handleEmailAuth = handleEmailAuth;
-  window.toggleAuthMode = toggleAuthMode;
-
-  // Add your other functions here, e.g.:
-  // window.uploadPDF = uploadPDF;
-  // window.addQuestion = addQuestion;
-  // etc.
-};
+  window.logout
