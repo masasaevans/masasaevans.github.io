@@ -11,7 +11,9 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  createUserWithEmailAndPassword 
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -30,7 +32,6 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
-let currentUserRole = null;
 let currentQuiz = null;
 let questionsPreview = [];
 
@@ -63,7 +64,6 @@ function startCountdowns() {
 
 // ====================== ROLE & AUTH ======================
 function selectRole(role) {
-  currentUserRole = role;
   document.getElementById('role-overlay').classList.add('hidden');
   document.getElementById('main-header').classList.remove('hidden');
   document.getElementById('main-content').classList.remove('hidden');
@@ -76,23 +76,20 @@ async function validateAdmin() {
 
   try {
     await signInWithEmailAndPassword(auth, 'realmasasa@gmail.com', pass);
-    
     document.getElementById('role-overlay').classList.add('hidden');
     document.getElementById('main-header').classList.remove('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     document.getElementById('admin-tools').classList.remove('hidden');
     document.getElementById('create-admin-section').classList.add('hidden');
-    
     loadAllContent();
     alert('✅ Admin login successful!');
   } catch (error) {
-    console.error("Login error:", error.code, error.message);
-    
+    console.error(error.code, error.message);
     if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
       document.getElementById('create-admin-section').classList.remove('hidden');
-      alert('Admin account not found. Use the "Create Admin Account" button.');
+      alert('Admin account not found. Use the Create Admin button.');
     } else if (error.code === 'auth/wrong-password') {
-      alert('Wrong password! Please try again.');
+      alert('Wrong password!');
     } else {
       alert('Login failed: ' + error.message);
     }
@@ -100,21 +97,47 @@ async function validateAdmin() {
 }
 
 async function createAdminAccount() {
-  const password = prompt("Enter a strong password for admin (minimum 6 characters):");
-  if (!password || password.length < 6) {
-    return alert("Password must be at least 6 characters long.");
-  }
+  const password = prompt("Enter a strong password (min 6 characters):");
+  if (!password || password.length < 6) return alert("Password too short.");
 
   try {
     await createUserWithEmailAndPassword(auth, 'realmasasa@gmail.com', password);
-    alert(`✅ Admin account created!\n\nEmail: realmasasa@gmail.com\nPassword: ${password}\n\nYou can now login.`);
+    alert(`✅ Admin account created!\nEmail: realmasasa@gmail.com\nPassword: ${password}`);
     document.getElementById('create-admin-section').classList.add('hidden');
   } catch (error) {
-    if (error.code === 'auth/email-already-in-use') {
-      alert('Account already exists. Try logging in with the correct password.');
-      document.getElementById('create-admin-section').classList.add('hidden');
+    alert('Create failed: ' + error.message);
+  }
+}
+
+// ====================== GOOGLE SIGN-IN ======================
+async function signInWithGoogle() {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    document.getElementById('role-overlay').classList.add('hidden');
+    document.getElementById('main-header').classList.remove('hidden');
+    document.getElementById('main-content').classList.remove('hidden');
+
+    if (user.email === 'realmasasa@gmail.com') {
+      document.getElementById('admin-tools').classList.remove('hidden');
+      alert(`✅ Welcome Admin - ${user.displayName || user.email}`);
     } else {
-      alert('Failed to create account: ' + error.message);
+      alert(`✅ Welcome ${user.displayName || user.email} (Student)`);
+    }
+
+    loadAllContent();
+  } catch (error) {
+    console.error("Google sign-in error:", error.code, error.message);
+    if (error.code === 'auth/popup-blocked') {
+      alert('Popup was blocked by your browser. Please allow popups for this site and try again.');
+    } else if (error.code === 'auth/popup-closed-by-user') {
+      // User closed popup - do nothing
+    } else {
+      alert('Google sign-in failed: ' + error.message);
     }
   }
 }
@@ -183,7 +206,7 @@ function addQuestion() {
     question.options = opts;
     question.correct = correctIndex;
   } else {
-    const correctAnswer = prompt('Enter exact correct short answer (case insensitive):');
+    const correctAnswer = prompt('Enter exact correct short answer:');
     if (!correctAnswer?.trim()) return;
     question.correct = correctAnswer.trim();
   }
@@ -192,9 +215,7 @@ function addQuestion() {
   renderQuestionsPreview();
 
   document.getElementById('q-text').value = '';
-  if (type === 'mcq') {
-    ['opt1','opt2','opt3','opt4'].forEach(id => document.getElementById(id).value = '');
-  }
+  if (type === 'mcq') ['opt1','opt2','opt3','opt4'].forEach(id => document.getElementById(id).value = '');
 }
 
 function renderQuestionsPreview() {
@@ -391,14 +412,20 @@ window.onload = () => {
   startCountdowns();
 
   onAuthStateChanged(auth, (user) => {
-    if (user && user.email === 'realmasasa@gmail.com') {
-      document.getElementById('admin-tools').classList.remove('hidden');
-      document.getElementById('create-admin-section').classList.add('hidden');
+    if (user) {
+      document.getElementById('role-overlay').classList.add('hidden');
+      document.getElementById('main-header').classList.remove('hidden');
+      document.getElementById('main-content').classList.remove('hidden');
+
+      if (user.email === 'realmasasa@gmail.com') {
+        document.getElementById('admin-tools').classList.remove('hidden');
+      }
+      loadAllContent();
     }
   });
 };
 
-// Make functions available globally
+// Expose functions globally
 window.selectRole = selectRole;
 window.validateAdmin = validateAdmin;
 window.createAdminAccount = createAdminAccount;
@@ -414,3 +441,4 @@ window.closePDF = closePDF;
 window.startQuiz = startQuiz;
 window.submitQuiz = submitQuiz;
 window.closeQuiz = closeQuiz;
+window.signInWithGoogle = signInWithGoogle;
