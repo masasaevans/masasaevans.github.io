@@ -25,9 +25,7 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  background: #e55d00;
-}
+button:hover { background: #e55d00; }
 
 input {
   width: 100%;
