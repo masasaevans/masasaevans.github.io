@@ -1,10 +1,9 @@
-// ===== FIREBASE IMPORTS =====
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
-import { getAuth, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
-// ===== FIREBASE CONFIG =====
+// ===== CONFIG =====
 const firebaseConfig = {
   apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
   authDomain: "masasa-online.firebaseapp.com",
@@ -15,7 +14,6 @@ const firebaseConfig = {
   measurementId: "G-LLPYLLVV8V"
 };
 
-// ===== INIT =====
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -62,30 +60,21 @@ window.validateAdmin = async () => {
   }
 };
 
-// ===== GOOGLE LOGIN =====
+// ===== GOOGLE LOGIN (POPUP) =====
 window.signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
   try {
-    await signInWithRedirect(auth, provider);
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    alert(`Google login successful ✅\nWelcome ${user.displayName}`);
+    showMain();
+    loadMaterials();
+    loadQuizzes();
   } catch (err) {
     alert("Google login failed ❌\n" + err.message);
     console.error(err);
   }
 };
-
-getRedirectResult(auth)
-  .then(res => {
-    if (res?.user) {
-      showMain();
-      loadMaterials();
-      loadQuizzes();
-      alert("Google login successful ✅");
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Google login error ❌\n" + err.message);
-  });
 
 // ===== LOGOUT =====
 window.logout = () => signOut(auth).then(() => location.reload());
