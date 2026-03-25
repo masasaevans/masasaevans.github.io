@@ -30,6 +30,17 @@ function updateLiveTime() {
   }, 1000);
 }
 
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
+  authDomain: "masasa-online.firebaseapp.com",
+  projectId: "masasa-online",
+  storageBucket: "masasa-online.firebasestorage.app",
+  messagingSenderId: "975253887376",
+  appId: "1:975253887376:web:c1d6e59922a7d3ac2cbb15",
+  measurementId: "G-LLPYLLVV8V"
+};
+
 // Select role
 function selectRole(role) {
   currentUserRole = role;
