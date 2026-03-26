@@ -30,8 +30,12 @@
             100% { transform: translateY(-120vh) scale(0.4); opacity: 0; } 
         }
        
-        .card-hover { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .card-hover:hover { transform: translateY(-8px) scale(1.02); }
+        .card-hover { 
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        .card-hover:hover { 
+            transform: translateY(-8px) scale(1.02); 
+        }
 
         .pill-btn {
             padding: 12px 20px;
@@ -109,7 +113,7 @@
             </button>
             <button onclick="showSection('assessment')" 
                     class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">
-                📝 Self Assessment (MCQ)
+                📝 Self Assessment
             </button>
         </div>
 
@@ -125,11 +129,12 @@
             </div>
         </div>
 
-        <!-- Self Assessment - MCQ -->
+        <!-- Self Assessment -->
         <div id="assessment-section" class="hidden">
-            <h2 class="text-4xl font-bold text-center mb-8">Self Assessment (MCQ)</h2>
-            <div id="mcq-container" class="max-w-2xl mx-auto bg-white/10 backdrop-blur-xl rounded-3xl p-8">
-                <!-- MCQ will be injected by JS -->
+            <h2 class="text-4xl font-bold text-center mb-8">Self Assessment</h2>
+            <div class="text-center py-20 opacity-75">
+                <div class="text-8xl mb-6">❓</div>
+                <p class="text-xl">Self Assessment feature coming soon</p>
             </div>
         </div>
     </div>
@@ -139,7 +144,7 @@
         <div id="bottom-marquee" class="flex items-center gap-12 text-pink-200 whitespace-nowrap"></div>
     </div>
 
-    <!-- Admin Upload Modal -->
+    <!-- Admin Modal -->
     <div id="admin-section" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
         <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 max-w-lg w-full">
             <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
@@ -177,9 +182,13 @@
         let extendedWorks = JSON.parse(localStorage.getItem('learnsphere_extended')) || [];
         let isAdminMode = false;
 
-        const announcements = ["🇰🇪 Karibu LearnSphere", "Triple-tap to upload PDFs", "Master every topic", "Keep shining!"];
+        const announcements = [
+            "🇰🇪 Karibu LearnSphere",
+            "Triple-tap to upload PDFs",
+            "Master every topic",
+            "Keep shining!"
+        ];
 
-        // Bubbles, Date/Time, Marquees (same as before)
         function createBubbles() {
             const container = document.getElementById('bubbles');
             container.innerHTML = '';
@@ -200,7 +209,9 @@
             const now = new Date();
             document.getElementById('day').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
             document.getElementById('date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', {
+                hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
+            });
         }
 
         // Triple click handler
@@ -218,6 +229,7 @@
                 return;
             }
 
+            // Normal triple click anywhere = open admin
             tapCount++;
             if (tapCount === 1) tapTimer = setTimeout(() => tapCount = 0, 700);
             if (tapCount === 3) {
@@ -226,7 +238,7 @@
                 isAdminMode = true;
                 document.getElementById('admin-section').classList.remove('hidden');
                 document.getElementById('file-name').focus();
-                renderExtended(); // Refresh to show delete buttons
+                renderExtended();
             }
         });
 
@@ -237,9 +249,9 @@
         }
 
         function uploadPDF() {
-            // ... (same upload logic as before)
             const fileInput = document.getElementById('file-input');
             const nameInput = document.getElementById('file-name').value.trim();
+           
             if (!fileInput.files.length) return alert("Please select a PDF file");
             const file = fileInput.files[0];
             if (file.type !== "application/pdf") return alert("Only PDF files allowed!");
@@ -250,7 +262,11 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64 = e.target.result.split(',')[1];
-                extendedWorks.push({ name: displayName, base64: base64, size: file.size });
+                extendedWorks.push({
+                    name: displayName,
+                    base64: base64,
+                    size: file.size
+                });
                 localStorage.setItem('learnsphere_extended', JSON.stringify(extendedWorks));
                 renderExtended();
                 hideAdmin();
@@ -264,7 +280,9 @@
         function viewPDF(base64, filename) {
             const byteCharacters = atob(base64);
             const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
             const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
             const tab = window.open(url, '_blank');
@@ -275,7 +293,9 @@
         function downloadPDF(base64, filename) {
             const byteCharacters = atob(base64);
             const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
             const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -323,67 +343,31 @@
 
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
-                                class="pill-btn bg-white text-black hover:bg-gray-100">👁️ View</button>
+                                class="pill-btn bg-white text-black hover:bg-gray-100">
+                            👁️ View
+                        </button>
                         <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
-                                class="pill-btn bg-white text-black hover:bg-gray-100">⬇️ Download</button>
+                                class="pill-btn bg-white text-black hover:bg-gray-100">
+                            ⬇️ Download
+                        </button>
                     </div>
                     
                     ${isAdminMode ? `
                     <button onclick="deleteWork(${index})" 
-                            class="w-full mt-4 border border-red-400 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400 text-sm">
-                        🗑️ Delete (Admin)
+                            class="w-full mt-4 border border-red-400 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400">
+                        🗑️ Delete (Admin only)
                     </button>` : ''}
                 `;
                 grid.appendChild(card);
             });
         }
 
-        // Simple MCQ Demo
-        function loadMCQ() {
-            const container = document.getElementById('mcq-container');
-            container.innerHTML = `
-                <div class="space-y-8">
-                    <div class="text-center">
-                        <h3 class="text-2xl font-bold mb-2">Form 2 Mathematics Quiz</h3>
-                        <p class="opacity-75">Answer all questions</p>
-                    </div>
-                    <div id="quiz-questions"></div>
-                    <button onclick="submitMCQ()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-3xl font-bold">Submit & See Score</button>
-                </div>
-            `;
-
-            const questionsHTML = `
-                <div class="space-y-10">
-                    <div>
-                        <p class="font-semibold mb-3">1. What is the value of π (approx)?</p>
-                        <label class="block"><input type="radio" name="q1" value="a"> a) 22/7</label>
-                        <label class="block"><input type="radio" name="q1" value="b"> b) 3.14</label>
-                        <label class="block"><input type="radio" name="q1" value="c"> c) 3</label>
-                    </div>
-                    <div>
-                        <p class="font-semibold mb-3">2. Solve: 2x + 4 = 10</p>
-                        <label class="block"><input type="radio" name="q2" value="a"> a) x=3</label>
-                        <label class="block"><input type="radio" name="q2" value="b"> b) x=7</label>
-                        <label class="block"><input type="radio" name="q2" value="c"> c) x=2</label>
-                    </div>
-                    <!-- Add more questions if needed -->
-                </div>
-            `;
-            document.getElementById('quiz-questions').innerHTML = questionsHTML;
-        }
-
-        function submitMCQ() {
-            alert("Score: 80% - Well done! Keep practicing.");
-            // You can expand this with real scoring later
-        }
-
         function showSection(section) {
             document.getElementById('extended-section').classList.add('hidden');
             document.getElementById('assessment-section').classList.add('hidden');
             document.getElementById(section + '-section').classList.remove('hidden');
-
+            
             if (section === 'extended') renderExtended();
-            if (section === 'assessment') loadMCQ();
         }
 
         function setupMarquees() {
@@ -392,6 +376,7 @@
             document.getElementById('bottom-marquee').innerHTML = html + html;
         }
 
+        // Initialize
         window.onload = () => {
             createBubbles();
             updateDateTime();
