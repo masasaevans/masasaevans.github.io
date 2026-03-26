@@ -1,37 +1,16 @@
-// index.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  getDocs, 
-  query, 
-  orderBy, 
-  doc, 
-  getDoc,
-  setDoc,
-  serverTimestamp 
+import {
+  getFirestore, collection, addDoc, getDocs, query, where
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
-  onAuthStateChanged 
+import {
+  getStorage, ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
+import {
+  getAuth, signInWithPopup, GoogleAuthProvider, signOut
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
-// Firebase Config
 const firebaseConfig = {
-  apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
-  authDomain: "masasa-online.firebaseapp.com",
-  projectId: "masasa-online",
-  storageBucket: "masasa-online.firebasestorage.app",
-  messagingSenderId: "975253887376",
-  appId: "1:975253887376:web:c1d6e59922a7d3ac2cbb15",
-  measurementId: "G-LLPYLLVV8V"
+  apiKey: "YOUR_KEY"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -39,343 +18,134 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
-// Global Variables
 let currentUser = null;
-let currentQuiz = null;
-let currentQuizId = null;
-let timerInterval = null;
-let timeLeft = 1800; // 30 minutes
-let currentQuizQuestions = [];
 
-// DOM Elements
-const roleOverlay = document.getElementById("role-overlay");
-const mainHeader = document.getElementById("main-header");
-const mainContent = document.getElementById("main-content");
+// UI refs
+const overlay = document.getElementById("role-overlay");
+const main = document.getElementById("main-content");
+const header = document.getElementById("main-header");
 const adminTools = document.getElementById("admin-tools");
-const quizArea = document.getElementById("quiz-area");
-const materialList = document.getElementById("material-list");
-const quizList = document.getElementById("quiz-list");
-const resultsList = document.getElementById("results-list");
 
-// Auth State Listener
-onAuthStateChanged(auth, (user) => {
-  currentUser = user;
-  if (user) {
-    const isAdmin = user.email === "realmasasa@gmail.com";
-    showMain(isAdmin);
-    loadMaterials();
-    loadQuizzes();
-    if (!isAdmin) loadMyResults();
-  } else {
-    hideAll();
-  }
-});
-
-function showMain(isAdmin) {
-  roleOverlay.classList.add("hidden");
-  mainHeader.classList.remove("hidden");
-  mainContent.classList.remove("hidden");
-  adminTools.classList.toggle("hidden", !isAdmin);
-}
-
-function hideAll() {
-  roleOverlay.classList.remove("hidden");
-  mainHeader.classList.add("hidden");
-  mainContent.classList.add("hidden");
-  adminTools.classList.add("hidden");
-  quizArea.classList.add("hidden");
-}
-
-// ====================== MATERIALS ======================
-window.uploadPDF = async () => {
-  if (!currentUser || currentUser.email !== "realmasasa@gmail.com") {
-    return alert("❌ Only realmasasa@gmail.com can upload materials.");
-  }
-
-  const title = document.getElementById("pdf-title").value.trim();
-  const file = document.getElementById("pdf-file").files[0];
-
-  if (!title || !file) return alert("Please provide title and select PDF file.");
-
-  try {
-    const storageRef = ref(storage, `materials/${Date.now()}-${file.name}`);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-
-    await addDoc(collection(db, "materials"), {
-      title, url, created: Date.now(), uploadedBy: currentUser.email
-    });
-
-    alert("✅ PDF uploaded successfully!");
-    document.getElementById("pdf-title").value = "";
-    document.getElementById("pdf-file").value = "";
-    loadMaterials();
-  } catch (err) {
-    alert("Upload failed: " + err.message);
-  }
+// ================= AUTH =================
+window.continueStudent = () => {
+  localStorage.setItem("role", "student");
+  showApp(false);
 };
 
-async function loadMaterials() {
-  materialList.innerHTML = `<p class="text-gray-500">Loading materials...</p>`;
-  try {
-    const q = query(collection(db, "materials"), orderBy("created", "desc"));
-    const snap = await getDocs(q);
-
-    if (snap.empty) {
-      materialList.innerHTML = `<p class="text-gray-500">No materials yet.</p>`;
-      return;
-    }
-
-    materialList.innerHTML = "";
-    snap.forEach(doc => {
-      const m = doc.data();
-      materialList.innerHTML += `
-        <div class="card p-5">
-          📄 <strong>${m.title}</strong><br>
-          <a href="${m.url}" target="_blank" class="text-orange-600 underline">Download PDF</a>
-        </div>`;
-    });
-  } catch (e) {
-    materialList.innerHTML = `<p class="text-red-500">Error loading materials</p>`;
-  }
-}
-
-// ====================== QUIZ BUILDER ======================
-window.addQuestionToList = () => {
-  if (!currentUser || currentUser.email !== "realmasasa@gmail.com") {
-    return alert("Admin only");
-  }
-
-  const qText = document.getElementById("q-text").value.trim();
-  const options = [
-    document.getElementById("opt-0").value.trim(),
-    document.getElementById("opt-1").value.trim(),
-    document.getElementById("opt-2").value.trim(),
-    document.getElementById("opt-3").value.trim()
-  ];
-  const correct = parseInt(document.getElementById("q-correct").value);
-
-  if (!qText || options.some(o => !o) || isNaN(correct)) {
-    return alert("Fill all fields and select correct answer.");
-  }
-
-  currentQuizQuestions.push({ q: qText, options, correct });
-
-  document.getElementById("q-text").value = "";
-  document.getElementById("opt-0").value = "";
-  document.getElementById("opt-1").value = "";
-  document.getElementById("opt-2").value = "";
-  document.getElementById("opt-3").value = "";
-  document.getElementById("q-correct").value = "";
-
-  updateTempList();
+window.showAdminLogin = () => {
+  document.getElementById("admin-login").classList.remove("hidden");
 };
 
-function updateTempList() {
-  const el = document.getElementById("temp-questions-list");
-  el.innerHTML = currentQuizQuestions.length === 0 
-    ? "No questions added yet." 
-    : `<strong>Questions (${currentQuizQuestions.length}):</strong><br>` + 
-      currentQuizQuestions.map((q,i) => `${i+1}. ${q.q.substring(0,60)}${q.q.length>60?'...':''}`).join("<br>");
-}
-
-window.publishQuiz = async () => {
-  if (!currentUser || currentUser.email !== "realmasasa@gmail.com") {
-    return alert("Admin only");
-  }
-
-  const title = document.getElementById("quiz-title").value.trim();
-  if (!title || currentQuizQuestions.length === 0) {
-    return alert("Enter quiz title and add questions.");
-  }
-
-  try {
-    await addDoc(collection(db, "quizzes"), {
-      title, 
-      questions: currentQuizQuestions,
-      created: Date.now(),
-      createdBy: currentUser.email
-    });
-
-    alert("✅ Quiz published successfully!");
-    currentQuizQuestions = [];
-    document.getElementById("quiz-title").value = "";
-    document.getElementById("temp-questions-list").innerHTML = "No questions added yet.";
-    loadQuizzes();
-  } catch (err) {
-    alert("Publish failed: " + err.message);
-  }
+window.hideAdminLogin = () => {
+  document.getElementById("admin-login").classList.add("hidden");
 };
 
-// ====================== QUIZZES ======================
-async function loadQuizzes() {
-  quizList.innerHTML = `<p class="text-gray-500">Loading quizzes...</p>`;
-  try {
-    const snap = await getDocs(collection(db, "quizzes"));
-    if (snap.empty) {
-      quizList.innerHTML = `<p class="text-gray-500">No quizzes available yet.</p>`;
-      return;
-    }
-
-    quizList.innerHTML = "";
-    snap.forEach(d => {
-      const quiz = d.data();
-      quizList.innerHTML += `
-        <div class="card p-5">
-          🧠 <strong>${quiz.title}</strong><br>
-          <button onclick="startQuiz('${d.id}')" 
-                  class="mt-4 bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-2xl w-full">
-            Start Quiz
-          </button>
-        </div>`;
-    });
-  } catch (e) {
-    quizList.innerHTML = `<p class="text-red-500">Error loading quizzes</p>`;
-  }
-}
-
-window.startQuiz = async (quizId) => {
-  try {
-    const docSnap = await getDoc(doc(db, "quizzes", quizId));
-    if (!docSnap.exists()) return alert("Quiz not found");
-
-    currentQuiz = docSnap.data();
-    currentQuizId = quizId;
-    timeLeft = 1800;
-
-    quizArea.classList.remove("hidden");
-    let html = `
-      <div class="flex justify-between mb-8">
-        <h2 class="text-3xl font-bold">${currentQuiz.title}</h2>
-        <div id="timer" class="bg-red-100 text-red-700 px-6 py-3 rounded-2xl font-mono text-xl font-bold">30:00</div>
-      </div>`;
-
-    currentQuiz.questions.forEach((q, i) => {
-      html += `<div class="mb-10"><p class="font-semibold text-lg mb-4">${i+1}. ${q.q}</p>`;
-      q.options.forEach((opt, j) => {
-        html += `
-          <label class="flex items-center gap-3 mb-4 cursor-pointer hover:bg-orange-50 p-3 rounded-2xl transition">
-            <input type="radio" name="q${i}" value="${j}" class="w-5 h-5 accent-orange-500">
-            <span class="text-gray-700">${opt}</span>
-          </label>`;
-      });
-      html += `</div>`;
-    });
-
-    html += `<button onclick="submitQuiz()" class="w-full bg-green-600 hover:bg-green-700 text-white py-5 rounded-3xl text-xl font-bold">Submit Quiz</button>`;
-    quizArea.innerHTML = html;
-    startTimer();
-  } catch (err) {
-    alert("Failed to load quiz");
-  }
-};
-
-function startTimer() {
-  if (timerInterval) clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    const min = Math.floor(timeLeft / 60);
-    const sec = timeLeft % 60;
-    const timerEl = document.getElementById("timer");
-    if (timerEl) timerEl.textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
-
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      submitQuiz();
-    }
-  }, 1000);
-}
-
-window.submitQuiz = async () => {
-  if (timerInterval) clearInterval(timerInterval);
-  if (!currentQuiz || !currentUser) return;
-
-  let score = 0;
-  const total = currentQuiz.questions.length;
-
-  currentQuiz.questions.forEach((q, i) => {
-    const selected = document.querySelector(`input[name="q${i}"]:checked`);
-    if (selected && parseInt(selected.value) === q.correct) score++;
-  });
-
-  const percentage = Math.round((score / total) * 100);
-
-  // Save result
-  try {
-    await setDoc(doc(db, "quizResults", `${currentQuizId}_${currentUser.uid}`), {
-      quizId: currentQuizId,
-      quizTitle: currentQuiz.title,
-      userId: currentUser.uid,
-      userEmail: currentUser.email,
-      score, total, percentage,
-      submittedAt: serverTimestamp()
-    });
-  } catch (e) { console.error(e); }
-
-  alert(`✅ Quiz Completed!\n\nScore: ${score}/${total} (${percentage}%)\n\n${percentage >= 80 ? '🎉 Excellent!' : percentage >= 60 ? '👍 Good job!' : '💪 Keep practicing!'}`);
-
-  quizArea.classList.add("hidden");
-  if (currentUser.email !== "realmasasa@gmail.com") loadMyResults();
-};
-
-// ====================== MY RESULTS ======================
-async function loadMyResults() {
-  if (!currentUser || currentUser.email === "realmasasa@gmail.com") return;
-
-  resultsList.innerHTML = `<p class="text-gray-500">Loading your results...</p>`;
-  try {
-    const snap = await getDocs(collection(db, "quizResults"));
-    let html = "";
-
-    snap.forEach(d => {
-      const r = d.data();
-      if (r.userId === currentUser.uid) {
-        html += `
-          <div class="card p-5">
-            <strong>${r.quizTitle}</strong><br>
-            <span class="text-green-600 font-bold">${r.score}/${r.total} (${r.percentage}%)</span><br>
-            <small class="text-gray-500">${new Date(r.submittedAt?.toDate()).toLocaleDateString()}</small>
-          </div>`;
-      }
-    });
-
-    resultsList.innerHTML = html || `<p class="text-gray-500">No results yet. Take a quiz!</p>`;
-  } catch (e) {
-    resultsList.innerHTML = `<p class="text-red-500">Error loading results</p>`;
-  }
-}
-
-// ====================== AUTH ======================
-window.selectRole = () => showMain(false);
-window.showAdminLogin = () => document.getElementById("admin-login").classList.remove("hidden");
-window.hideAdminLogin = () => document.getElementById("admin-login").classList.add("hidden");
-
-window.validateAdmin = async () => {
+window.validateAdmin = () => {
   const pass = document.getElementById("admin-pass").value;
-  if (!pass) return alert("Enter password");
-  try {
-    await signInWithEmailAndPassword(auth, "realmasasa@gmail.com", pass);
+
+  if (pass === "1234") {
+    localStorage.setItem("role", "admin");
     hideAdminLogin();
-    document.getElementById("admin-pass").value = "";
-  } catch (err) {
-    alert("Login failed. Wrong password.");
+    showApp(true);
+  } else {
+    alert("Wrong password");
   }
 };
 
 window.signInWithGoogle = async () => {
-  try {
-    await signInWithPopup(auth, new GoogleAuthProvider());
-  } catch (err) {
-    alert("Google sign in failed: " + err.message);
-  }
+  const result = await signInWithPopup(auth, new GoogleAuthProvider());
+  currentUser = result.user;
+  localStorage.setItem("role", "student");
+  showApp(false);
 };
+
+// ================= UI =================
+function showApp(isAdmin) {
+  overlay.classList.add("hidden");
+  main.classList.remove("hidden");
+  header.classList.remove("hidden");
+
+  if (isAdmin) adminTools.classList.remove("hidden");
+
+  loadMaterials();
+  loadResults();
+}
 
 window.logout = () => {
-  if (confirm("Logout?")) signOut(auth);
+  localStorage.clear();
+  signOut(auth);
+  location.reload();
 };
 
-// Live Time
+// ================= MATERIALS =================
+window.uploadPDF = async () => {
+  if (localStorage.getItem("role") !== "admin") {
+    return alert("Admin only");
+  }
+
+  const title = document.getElementById("pdf-title").value;
+  const file = document.getElementById("pdf-file").files[0];
+
+  const storageRef = ref(storage, file.name);
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+
+  await addDoc(collection(db, "materials"), { title, url });
+
+  alert("Uploaded!");
+  loadMaterials();
+};
+
+async function loadMaterials() {
+  const list = document.getElementById("material-list");
+  list.innerHTML = "Loading...";
+
+  const snap = await getDocs(collection(db, "materials"));
+
+  list.innerHTML = "";
+  snap.forEach(doc => {
+    const m = doc.data();
+    list.innerHTML += `
+      <div class="card">
+        ${m.title}<br>
+        <a href="${m.url}" target="_blank">Open</a>
+      </div>
+    `;
+  });
+}
+
+// ================= RESULTS =================
+async function loadResults() {
+  if (!auth.currentUser) return;
+
+  const q = query(
+    collection(db, "quizResults"),
+    where("userId", "==", auth.currentUser.uid)
+  );
+
+  const snap = await getDocs(q);
+
+  const list = document.getElementById("results-list");
+  list.innerHTML = "";
+
+  snap.forEach(doc => {
+    const r = doc.data();
+    list.innerHTML += `
+      <div class="card">
+        ${r.quizTitle} - ${r.percentage}%
+      </div>
+    `;
+  });
+}
+
+// ================= INIT =================
+window.onload = () => {
+  const role = localStorage.getItem("role");
+  if (role) showApp(role === "admin");
+};
+
+// live time
 setInterval(() => {
-  const el = document.getElementById("live-time");
-  if (el) el.textContent = new Date().toLocaleString("en-GB");
+  document.getElementById("live-time").innerText =
+    new Date().toLocaleString();
 }, 1000);
