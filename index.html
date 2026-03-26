@@ -117,8 +117,8 @@
             </button>
         </div>
 
-        <!-- Extended Class Work - Main tab for PDFs -->
-        <div id="extended-section">
+        <!-- Extended Class Work - PDFs only appear when this tab is clicked -->
+        <div id="extended-section" class="hidden">
             <h2 class="text-4xl font-bold text-center mb-8">Extended Class Work</h2>
             <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             
@@ -491,14 +491,24 @@
             });
 
             const percentage = Math.round((score / mcqQuestions.length) * 100);
-            const appreciation = percentage >= 80 ? "Excellent! You're doing very well! 🎉" :
-                                percentage >= 60 ? "Good job! Keep practicing! 👏" : 
-                                "Nice effort! Review the topics and try again 💪";
+            let appreciation = "";
+            let emojis = "";
+
+            if (percentage >= 80) {
+                appreciation = "Excellent! You're doing very well! 🎉";
+                emojis = "🎉🎊🥳✨";
+            } else if (percentage >= 60) {
+                appreciation = "Good job! Keep practicing! 👏";
+                emojis = "👏👍💪";
+            } else {
+                appreciation = "Nice effort! Review the topics and try again 💪";
+                emojis = "💪📚";
+            }
 
             const container = document.getElementById('mcq-area');
             container.innerHTML = `
                 <div class="text-center py-12">
-                    <div class="text-7xl mb-4">🏆</div>
+                    <div class="text-7xl mb-6">${emojis}</div>
                     <h3 class="text-3xl font-bold mb-3">Your Score</h3>
                     <div class="text-8xl font-black text-emerald-300 mb-6">${percentage}%</div>
                     <div class="w-full bg-white/20 h-5 rounded-full mb-8 overflow-hidden">
@@ -535,8 +545,9 @@
             setInterval(updateDateTime, 1000);
             setInterval(createBubbles, 25000);
             setupMarquees();
-            renderExtended();
-            showSection('extended');
+            // Start with both sections hidden - user must click to see content
+            document.getElementById('extended-section').classList.add('hidden');
+            document.getElementById('assessment-section').classList.add('hidden');
         };
     </script>
 </body>
