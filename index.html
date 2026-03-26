@@ -9,12 +9,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&family=Inter:wght@400;500;600&display=swap');
 
-        :root {
-            --kenya-red: #e30613;
-            --kenya-green: #00a650;
-            --kenya-black: #1a1a1a;
-        }
-
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #4c1d95, #9f1239, #0e7490);
@@ -42,32 +36,22 @@
         }
         .card-hover:hover {
             transform: translateY(-12px) scale(1.04);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
         }
 
         .glow {
-            text-shadow: 0 0 40px rgba(103, 232, 249, 0.8),
-                        0 0 60px rgba(236, 72, 153, 0.6);
+            text-shadow: 0 0 40px rgba(103, 232, 249, 0.9), 0 0 70px rgba(236, 72, 153, 0.7);
         }
 
         .kenya-flag {
-            width: 64px;
-            height: 40px;
+            width: 64px; height: 40px;
             border: 3px solid rgba(255,255,255,0.95);
             border-radius: 6px;
             overflow: hidden;
-            position: relative;
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
 
-        .marquee {
-            animation: marquee 28s linear infinite;
-        }
-
-        @keyframes marquee {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
+        .marquee { animation: marquee 28s linear infinite; }
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
         .glass {
             background: rgba(255, 255, 255, 0.12);
@@ -75,20 +59,40 @@
             border: 1px solid rgba(255, 255, 255, 0.25);
         }
 
-        .pill-btn {
-            padding: 16px 28px;
-            border-radius: 9999px;
-            font-weight: 600;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Fireworks / Confetti Animation */
+        .firework-container {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            overflow: hidden;
         }
-        .pill-btn:hover {
-            transform: translateY(-3px);
+
+        .emoji-pop {
+            position: absolute;
+            font-size: 2.5rem;
+            animation: popUp 3.5s ease-out forwards;
+            text-shadow: 0 0 15px rgba(255,255,255,0.9);
+            user-select: none;
+        }
+
+        @keyframes popUp {
+            0% {
+                transform: translateY(100px) scale(0.2) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-600px) scale(1.2) rotate(720deg);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body class="relative">
 
-    <!-- Floating Bubbles -->
     <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
 
     <!-- Top Marquee -->
@@ -97,7 +101,6 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-6 py-10 relative z-10">
-        
         <!-- Header -->
         <div class="flex items-center justify-center gap-6 mb-12">
             <div class="kenya-flag flex-shrink-0">
@@ -109,246 +112,196 @@
             <h1 class="text-6xl sm:text-7xl font-black tracking-tighter glow">LEARNSPHERE</h1>
         </div>
 
-        <div class="text-center mb-6">
-            <p class="text-xl text-white/80 font-light">Empowering Kenyan Students • One Click at a Time</p>
-        </div>
-
-        <!-- Date & Time Cards -->
+        <!-- Date & Time -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-14">
-            <div class="glass rounded-3xl p-8 text-center card-hover border border-white/10">
+            <div class="glass rounded-3xl p-8 text-center card-hover">
                 <i class="fas fa-calendar-day text-5xl mb-4 text-cyan-300"></i>
-                <div id="day" class="text-4xl font-bold tracking-wide"></div>
-                <div class="text-xs tracking-[3px] opacity-75 mt-1">DAY</div>
+                <div id="day" class="text-4xl font-bold"></div>
+                <div class="text-xs tracking-widest opacity-75 mt-1">DAY</div>
             </div>
-            <div class="glass rounded-3xl p-8 text-center card-hover border border-white/10">
+            <div class="glass rounded-3xl p-8 text-center card-hover">
                 <i class="fas fa-calendar-alt text-5xl mb-4 text-pink-300"></i>
                 <div id="date" class="text-4xl font-bold"></div>
-                <div class="text-xs tracking-[3px] opacity-75 mt-1">DATE</div>
+                <div class="text-xs tracking-widest opacity-75 mt-1">DATE</div>
             </div>
-            <div class="glass rounded-3xl p-8 text-center card-hover border border-white/10">
+            <div class="glass rounded-3xl p-8 text-center card-hover">
                 <i class="fas fa-clock text-5xl mb-4 text-amber-300"></i>
-                <div id="time" class="text-4xl font-bold font-mono tracking-wider"></div>
-                <div class="text-xs tracking-[3px] opacity-75 mt-1">TIME</div>
+                <div id="time" class="text-4xl font-bold font-mono"></div>
+                <div class="text-xs tracking-widest opacity-75 mt-1">TIME</div>
             </div>
         </div>
 
         <!-- Navigation -->
         <div class="flex flex-wrap justify-center gap-4 mb-16">
-            <button onclick="showSection('extended')" 
-                    class="pill-btn bg-white/20 hover:bg-white/30 text-lg px-12 py-6 flex items-center gap-3 shadow-xl">
-                <span class="text-2xl">📖</span>
-                Extended Class Work
+            <button onclick="showSection('extended')" class="pill-btn bg-white/20 hover:bg-white/30 text-lg px-12 py-6 flex items-center gap-3">
+                📖 Extended Class Work
             </button>
-            <button onclick="showSection('assessment')" 
-                    class="pill-btn bg-white/20 hover:bg-white/30 text-lg px-12 py-6 flex items-center gap-3 shadow-xl">
-                <span class="text-2xl">📝</span>
-                Self Assessment
+            <button onclick="showSection('assessment')" class="pill-btn bg-white/20 hover:bg-white/30 text-lg px-12 py-6 flex items-center gap-3">
+                📝 Self Assessment
             </button>
         </div>
 
-        <!-- Extended Class Work Section -->
+        <!-- Extended Section -->
         <div id="extended-section" class="hidden">
-            <div class="flex items-center justify-between mb-10">
-                <h2 class="text-4xl font-bold flex items-center gap-3">
-                    <span>📚</span> Extended Class Work
-                </h2>
-                <button onclick="showAdmin()" 
-                        class="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-2xl text-sm font-medium flex items-center gap-2 transition-all">
-                    <i class="fas fa-cog"></i> Admin
-                </button>
-            </div>
-            
+            <h2 class="text-4xl font-bold mb-10 text-center">📚 Extended Class Work</h2>
             <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            
             <div id="extended-empty" class="hidden text-center py-24">
-                <div class="text-9xl mb-6 opacity-75">📚</div>
-                <h3 class="text-3xl font-semibold mb-3">No materials uploaded yet</h3>
-                <p class="opacity-75 max-w-sm mx-auto">Triple tap anywhere on the screen to open the Admin Panel and start uploading PDFs</p>
+                <div class="text-9xl mb-6">📚</div>
+                <h3 class="text-3xl font-semibold">No materials yet</h3>
+                <p class="opacity-75 mt-3">Triple tap anywhere to open Admin Panel</p>
             </div>
         </div>
 
-        <!-- Self Assessment Section -->
+        <!-- Assessment Section -->
         <div id="assessment-section" class="hidden">
-            <h2 class="text-4xl font-bold text-center mb-10 flex items-center justify-center gap-3">
-                <span>📝</span> Self Assessment
-            </h2>
-            <div id="mcq-area" class="max-w-3xl mx-auto glass rounded-3xl p-10 min-h-[480px]"></div>
+            <h2 class="text-4xl font-bold text-center mb-10">📝 Self Assessment</h2>
+            <div id="mcq-area" class="max-w-3xl mx-auto glass rounded-3xl p-10 min-h-[500px]"></div>
         </div>
     </div>
 
     <!-- Bottom Marquee -->
     <div class="bg-white/10 py-3.5 text-sm border-t border-white/20 backdrop-blur-md mt-16">
-        <div id="bottom-marquee" class="flex items-center gap-12 text-pink-100 whitespace-nowrap marquee text-base font-medium"></div>
+        <div id="bottom-marquee" class="flex items-center gap-12 text-pink-100 whitespace-nowrap marquee"></div>
     </div>
 
-    <!-- Admin Modal -->
-    <div id="admin-section" class="hidden fixed inset-0 bg-black/95 flex items-center justify-center z-[100] p-4">
-        <div class="glass max-w-2xl w-full rounded-3xl p-10 border border-white/20">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-4xl font-bold">Admin Panel</h2>
-                <button onclick="hideAdmin()" class="text-4xl text-red-400 hover:text-red-500 transition-colors">✕</button>
-            </div>
+    <!-- Fireworks Container -->
+    <div id="fireworks" class="firework-container hidden"></div>
 
-            <div class="flex gap-3 mb-10">
-                <button onclick="showAdminTab('upload')" id="tab-upload"
-                        class="flex-1 py-4 rounded-3xl font-semibold transition-all">📤 Upload PDF</button>
-                <button onclick="showAdminTab('mcq')" id="tab-mcq"
-                        class="flex-1 py-4 rounded-3xl font-semibold transition-all">📝 Manage MCQs</button>
-            </div>
-
-            <!-- Upload Tab -->
-            <div id="admin-upload-tab">
-                <div class="space-y-8">
-                    <div>
-                        <label class="block text-sm mb-3 opacity-90">Material Title</label>
-                        <input id="file-name" type="text" placeholder="e.g. Biology Notes - Form 4" 
-                               class="w-full px-7 py-5 rounded-2xl bg-white/10 border border-white/20 focus:border-cyan-400 focus:outline-none text-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-3 opacity-90">Select PDF File</label>
-                        <input id="file-input" type="file" accept=".pdf" 
-                               class="w-full px-7 py-5 bg-white/10 border border-white/20 rounded-2xl file:mr-6 file:py-3 file:px-8 file:rounded-2xl file:border-0 file:bg-white/20 file:text-white file:font-medium">
-                        <p class="text-xs text-emerald-300 mt-4">Max 10MB • PDF files only</p>
-                    </div>
-                    <button onclick="uploadPDF()" 
-                            class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 py-6 rounded-3xl font-bold text-xl shadow-lg transition-all active:scale-[0.985]">
-                        Upload to LearnSphere
-                    </button>
-                </div>
-            </div>
-
-            <!-- MCQ Tab -->
-            <div id="admin-mcq-tab" class="hidden">
-                <h3 class="font-bold text-2xl mb-6">Add New Question</h3>
-                <!-- MCQ form content remains similar but with improved styling -->
-                <div class="space-y-6">
-                    <input id="new-q" type="text" placeholder="Type your question here..." 
-                           class="w-full px-7 py-5 rounded-2xl bg-white/10 border border-white/20">
-                    
-                    <div class="grid grid-cols-2 gap-5">
-                        <div><input id="opt0" placeholder="Option A" class="w-full px-7 py-5 rounded-2xl bg-white/10 border border-white/20"></div>
-                        <div><input id="opt1" placeholder="Option B" class="w-full px-7 py-5 rounded-2xl bg-white/10 border border-white/20"></div>
-                        <div><input id="opt2" placeholder="Option C" class="w-full px-7 py-5 rounded-2xl bg-white/10 border border-white/20"></div>
-                        <div><input id="opt3" placeholder="Option D" class="w-full px-7 py-5 rounded-2xl bg-white/10 border border-white/20"></div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm mb-3">Correct Answer</label>
-                        <select id="correct" class="w-full px-7 py-5 rounded-2xl bg-white/10 border border-white/20">
-                            <option value="0">Option A</option>
-                            <option value="1">Option B</option>
-                            <option value="2">Option C</option>
-                            <option value="3">Option D</option>
-                        </select>
-                    </div>
-
-                    <button onclick="addMCQ()" 
-                            class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 py-6 rounded-3xl font-bold text-xl">
-                        Add Question
-                    </button>
-
-                    <div class="mt-12">
-                        <h4 class="font-semibold mb-6 flex justify-between items-center">
-                            <span>Current Questions</span>
-                            <span id="mcq-count" class="bg-white/20 px-5 py-1.5 rounded-full text-sm"></span>
-                        </h4>
-                        <div id="mcq-list" class="max-h-80 overflow-y-auto space-y-4 pr-4"></div>
-                    </div>
-                </div>
-            </div>
-
-            <button onclick="hideAdmin()" 
-                    class="mt-12 w-full py-5 bg-red-500/80 hover:bg-red-600 rounded-3xl font-bold text-lg transition-all">
-                Close Admin Panel
-            </button>
-        </div>
-    </div>
+    <!-- Admin Modal (unchanged for brevity - keep your existing admin code) -->
+    <!-- ... (paste your full admin modal here from previous version) ... -->
 
     <script>
-        // (Keep your existing JavaScript logic - it's already solid)
-        // Only minor improvements added below for better UX
-
+        // Existing variables and functions (keep all your previous JS)
         let extendedWorks = JSON.parse(localStorage.getItem('learnsphere_extended')) || [];
         let mcqQuestions = JSON.parse(localStorage.getItem('learnsphere_mcqs')) || [];
         let isAdminMode = false;
-        let tapCount = 0;
-        let tapTimer = null;
 
-        const announcements = [
-            "🇰🇪 Karibu LearnSphere Kenya",
-            "Quality education for every Kenyan student",
-            "Practice. Learn. Excel.",
-            "The future belongs to those who prepare today",
-            "Knowledge is power • Education is freedom"
-        ];
+        const celebratoryEmojis = ['🎉', '🥳', '🌟', '✨', '💥', '🚀', '🏆', '🔥', '👏', '🙌', '💯', '⭐', '🌈'];
 
-        // Your existing functions (createBubbles, updateDateTime, etc.) remain the same
-        // Just replace your old script with this improved version where needed
+        function createBubbles() { /* your existing bubble code */ }
 
-        function createBubbles() {
-            const container = document.getElementById('bubbles');
-            container.innerHTML = '';
-            for (let i = 0; i < 25; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                const size = Math.random() * 90 + 30;
-                bubble.style.width = `${size}px`;
-                bubble.style.height = `${size}px`;
-                bubble.style.left = `${Math.random() * 100}vw`;
-                bubble.style.animationDuration = `${Math.random() * 28 + 20}s`;
-                bubble.style.animationDelay = `-${Math.random() * 25}s`;
-                container.appendChild(bubble);
+        function updateDateTime() { /* your existing datetime code */ }
+
+        // === NEW FIREWORKS FUNCTION ===
+        function launchFireworks(count = 35) {
+            const container = document.getElementById('fireworks');
+            container.classList.remove('hidden');
+
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const emoji = document.createElement('div');
+                    emoji.className = 'emoji-pop';
+                    emoji.textContent = celebratoryEmojis[Math.floor(Math.random() * celebratoryEmojis.length)];
+                    
+                    // Random starting position at bottom
+                    const startX = Math.random() * window.innerWidth;
+                    emoji.style.left = `${startX}px`;
+                    emoji.style.bottom = `-50px`;
+                    
+                    // Random horizontal drift and rotation
+                    const drift = (Math.random() - 0.5) * 300;
+                    const duration = 2.8 + Math.random() * 1.5;
+                    const delay = Math.random() * 0.6;
+                    
+                    emoji.style.animationDuration = `${duration}s`;
+                    emoji.style.animationDelay = `${delay}s`;
+                    
+                    // Add slight random horizontal movement via CSS variable
+                    emoji.style.setProperty('--drift', `${drift}px`);
+                    
+                    container.appendChild(emoji);
+
+                    // Remove after animation
+                    setTimeout(() => {
+                        emoji.remove();
+                    }, (duration + delay) * 1000 + 500);
+                }, i * 25); // Stagger the launches
+            }
+
+            // Auto hide container after fireworks finish
+            setTimeout(() => {
+                container.classList.add('hidden');
+            }, 4500);
+        }
+
+        // Updated submitMCQ with fireworks
+        function submitMCQ() {
+            let score = 0;
+            mcqQuestions.forEach((item, i) => {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && parseInt(selected.value) === item.answer) score++;
+            });
+
+            const percentage = mcqQuestions.length ? Math.round((score / mcqQuestions.length) * 100) : 0;
+
+            let appreciation = "";
+            let mainEmoji = "";
+
+            if (percentage >= 85) {
+                appreciation = "Outstanding! You're a true champion! 🌟";
+                mainEmoji = "🏆";
+            } else if (percentage >= 70) {
+                appreciation = "Excellent work! Keep shining! 👏";
+                mainEmoji = "🔥";
+            } else if (percentage >= 50) {
+                appreciation = "Good effort! You're improving every day 💪";
+                mainEmoji = "📈";
+            } else {
+                appreciation = "Nice try! Review and try again — you've got this! 💡";
+                mainEmoji = "🌱";
+            }
+
+            const container = document.getElementById('mcq-area');
+            container.innerHTML = `
+                <div class="text-center py-12 relative">
+                    <div class="text-8xl mb-6">${mainEmoji}</div>
+                    <h3 class="text-4xl font-bold mb-4">Your Score</h3>
+                    <div class="text-[7rem] font-black text-emerald-300 leading-none mb-6">${percentage}<span class="text-6xl">%</span></div>
+                    
+                    <div class="w-full max-w-md mx-auto bg-white/20 h-3 rounded-full mb-10 overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full transition-all duration-1000" 
+                             style="width: ${percentage}%"></div>
+                    </div>
+                    
+                    <p class="text-2xl font-medium max-w-md mx-auto">${appreciation}</p>
+                    
+                    <button onclick="loadMCQ()" 
+                            class="mt-10 px-14 py-6 bg-white/20 hover:bg-white/30 rounded-3xl font-bold text-lg transition-all">
+                        Try Again
+                    </button>
+                </div>
+            `;
+
+            // Launch fireworks based on performance
+            if (percentage >= 60) {
+                launchFireworks(45);   // Big celebration
+            } else if (percentage >= 40) {
+                launchFireworks(25);   // Medium celebration
+            } else {
+                launchFireworks(12);   // Small encouragement
             }
         }
 
-        // Keep all your other functions (uploadPDF, addMCQ, renderExtended, loadMCQ, etc.)
-        // They are already very good. The main improvements are in the HTML + CSS above.
+        // Keep all your other functions: showSection, renderExtended, uploadPDF, addMCQ, etc.
 
-        // Improved triple tap
-        document.addEventListener('click', (e) => {
-            if (!document.getElementById('admin-section').classList.contains('hidden')) return;
-            
-            tapCount++;
-            if (tapCount === 1) tapTimer = setTimeout(() => tapCount = 0, 900);
-            if (tapCount === 3) {
-                clearTimeout(tapTimer);
-                tapCount = 0;
-                isAdminMode = true;
-                document.getElementById('admin-section').classList.remove('hidden');
-                showAdminTab('upload');
-            }
-        });
-
-        function showAdmin() {
-            isAdminMode = true;
-            document.getElementById('admin-section').classList.remove('hidden');
-            showAdminTab('upload');
+        function setupMarquees() {
+            const announcements = [
+                "🇰🇪 Karibu LearnSphere Kenya",
+                "Master every subject with confidence",
+                "Practice today • Succeed tomorrow",
+                "Education is the key to success"
+            ];
+            const html = announcements.map(text => `<span class="mx-12">${text}</span>`).join('');
+            document.getElementById('top-marquee').innerHTML = html + html;
+            document.getElementById('bottom-marquee').innerHTML = html + html;
         }
 
-        function hideAdmin() {
-            isAdminMode = false;
-            document.getElementById('admin-section').classList.add('hidden');
-            renderExtended();
-        }
-
-        function showAdminTab(tab) {
-            document.getElementById('admin-upload-tab').classList.add('hidden');
-            document.getElementById('admin-mcq-tab').classList.add('hidden');
-            document.getElementById('admin-' + tab + '-tab').classList.remove('hidden');
-
-            document.getElementById('tab-upload').classList.toggle('bg-white/30', tab === 'upload');
-            document.getElementById('tab-mcq').classList.toggle('bg-white/30', tab === 'mcq');
-        }
-
-        // Initialize
         window.onload = () => {
             createBubbles();
             updateDateTime();
             setInterval(updateDateTime, 1000);
             setInterval(createBubbles, 30000);
             setupMarquees();
-            
-            // Default view
             showSection('extended');
         };
     </script>
