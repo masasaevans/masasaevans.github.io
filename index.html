@@ -53,7 +53,6 @@
             border: 2px solid rgba(255,255,255,0.3); 
         }
 
-        /* Kenya Flag */
         .kenya-flag {
             width: 52px; height: 32px; 
             border: 2px solid rgba(255,255,255,0.7); 
@@ -262,24 +261,34 @@
             reader.readAsDataURL(file);
         }
 
-        // Improved View PDF function using Blob (more reliable)
-        function viewPDF(base64, name) {
-            const byteCharacters = atob(base64);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
+        // Reliable PDF Viewer Function
+        function viewPDF(base64, filename) {
+            try {
+                const byteCharacters = atob(base64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                const blobUrl = URL.createObjectURL(blob);
+
+                // Open in new tab
+                const newTab = window.open(blobUrl, '_blank');
+                
+                // Try to set title (works in many cases)
+                if (newTab) {
+                    setTimeout(() => {
+                        if (newTab.document) newTab.document.title = filename + ".pdf";
+                    }, 500);
+                }
+
+                // Cleanup
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 120000);
+            } catch (err) {
+                alert("Failed to open PDF. Try downloading instead.");
+                console.error(err);
             }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: 'application/pdf' });
-            const blobUrl = URL.createObjectURL(blob);
-            
-            const newTab = window.open(blobUrl, '_blank');
-            if (newTab) {
-                newTab.document.title = name + ".pdf";   // Sets tab title
-            }
-            
-            // Clean up URL after some time
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
         }
 
         function renderExtended() {
@@ -310,9 +319,9 @@
                     </div>
 
                     <div class="flex gap-3">
-                        <button onclick="viewPDF('${item.base64}', '${item.name}')" 
+                        <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
                                 class="pill-btn flex-1 bg-white text-black text-center hover:bg-gray-100">
-                            👁️ View
+                            👁️ View PDF
                         </button>
                         <a href="data:application/pdf;base64,${item.base64}" 
                            download="${item.name}.pdf"
@@ -351,7 +360,6 @@
             document.getElementById('bottom-marquee').innerHTML = html + html;
         }
 
-        // Initialize
         window.onload = () => {
             createBubbles();
             updateDateTime();
