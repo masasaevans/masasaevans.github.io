@@ -39,7 +39,7 @@
         }
 
         .pill-btn {
-            padding: 12px 24px;
+            padding: 12px 20px;
             border-radius: 9999px;
             font-size: 0.9rem;
             font-weight: 600;
@@ -214,7 +214,6 @@
             });
         }
 
-        // Triple tap to open upload
         let tapCount = 0;
         let tapTimer = null;
         document.addEventListener('click', (e) => {
@@ -262,7 +261,31 @@
             reader.readAsDataURL(file);
         }
 
-        // Auto-download without "Save As" dialog
+        // View in new tab (cleaner method)
+        function viewPDF(base64, filename) {
+            try {
+                const byteCharacters = atob(base64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                const blobUrl = URL.createObjectURL(blob);
+
+                const newTab = window.open(blobUrl, '_blank');
+                if (newTab) {
+                    setTimeout(() => {
+                        try { newTab.document.title = filename + ".pdf"; } catch(e) {}
+                    }, 800);
+                }
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 120000);
+            } catch (err) {
+                alert("Could not open PDF for viewing. Try Download instead.");
+            }
+        }
+
+        // Automatic download to Downloads folder (no Save As dialog)
         function downloadPDF(base64, filename) {
             try {
                 const byteCharacters = atob(base64);
@@ -275,12 +298,11 @@
 
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = filename + ".pdf";     // Forces automatic download with correct name
+                link.download = filename + ".pdf";
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
 
-                // Cleanup memory
                 setTimeout(() => URL.revokeObjectURL(link.href), 5000);
             } catch (err) {
                 alert("Download failed. Please try again.");
@@ -314,10 +336,16 @@
                         <i class="fas fa-file-pdf text-6xl text-red-400"></i>
                     </div>
 
-                    <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
-                            class="pill-btn w-full bg-white text-black text-center hover:bg-gray-100">
-                        ⬇️ Download PDF
-                    </button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
+                                class="pill-btn bg-white text-black hover:bg-gray-100">
+                            👁️ View
+                        </button>
+                        <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
+                                class="pill-btn bg-white text-black hover:bg-gray-100">
+                            ⬇️ Download
+                        </button>
+                    </div>
                     
                     <button onclick="deleteWork(${index})" 
                             class="w-full mt-4 border border-white/70 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400 text-sm">
