@@ -1,1 +1,74 @@
+body {
+    margin: 0;
+    font-family: Poppins, sans-serif;
+    background: linear-gradient(135deg,#6b21a8,#db2777,#22d3ee);
+    color: white;
+    overflow-x: hidden;
+}
 
+/* MARQUEE */
+.marquee {
+    overflow: hidden;
+    white-space: nowrap;
+    background: rgba(255,255,255,0.1);
+}
+
+.marquee div {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll 20s linear infinite;
+}
+
+@keyframes scroll {
+    0% {transform: translateX(0);}
+    100% {transform: translateX(-100%);}
+}
+
+/* BUBBLES */
+#bubbles div {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    animation: float 20s infinite;
+}
+
+@keyframes float {
+    0% {transform: translateY(100vh);}
+    100% {transform: translateY(-100vh);}
+}
+
+/* LAYOUT */
+.container {
+    text-align: center;
+    padding: 20px;
+}
+
+.title {
+    font-size: 50px;
+}
+
+.buttons button {
+    margin: 10px;
+    padding: 15px;
+    border-radius: 20px;
+}
+
+/* ADMIN */
+#admin {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+}
+
+.admin-box {
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    max-width: 400px;
+    margin: auto;
+    margin-top: 100px;
+}
+
+/* HIDDEN */
+.hidden {
+    display: none;
+}
