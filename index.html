@@ -71,6 +71,7 @@
 <body class="relative">
     <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
 
+    <!-- Top Marquee -->
     <div class="bg-white/10 py-2 text-sm border-b border-white/20 overflow-hidden">
         <div id="top-marquee" class="flex items-center gap-12 text-cyan-200 whitespace-nowrap"></div>
     </div>
@@ -86,6 +87,7 @@
             <h1 class="text-5xl sm:text-6xl font-black glow tracking-tighter">LEARNSPHERE</h1>
         </div>
 
+        <!-- Date & Time -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
             <div class="datetime-card rounded-3xl p-6 text-center card-hover">
                 <i class="fas fa-calendar-alt text-4xl mb-3 text-cyan-300"></i>
@@ -105,18 +107,25 @@
         </div>
 
         <div class="flex flex-wrap justify-center gap-4 mb-10">
-            <button onclick="showSection('extended')" class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📖 Extended Class Work</button>
-            <button onclick="showSection('assessment')" class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📝 Self Assessment</button>
+            <button onclick="showSection('extended')" 
+                    class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">
+                📖 Extended Class Work
+            </button>
+            <button onclick="showSection('assessment')" 
+                    class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">
+                📝 Self Assessment
+            </button>
         </div>
 
-        <!-- Extended Class Work -->
+        <!-- Extended Class Work - All PDFs shown here -->
         <div id="extended-section">
             <h2 class="text-4xl font-bold text-center mb-8">Extended Class Work</h2>
             <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            
             <div id="extended-empty" class="text-center py-20">
                 <div class="text-8xl mb-6">📚</div>
                 <h3 class="text-2xl font-semibold">No PDFs yet</h3>
-                <p class="opacity-80">Triple-tap anywhere to upload (Admin only)</p>
+                <p class="opacity-80">Admin can add PDFs</p>
             </div>
         </div>
 
@@ -138,8 +147,10 @@
             <h2 class="text-3xl font-bold mb-6">Admin Panel</h2>
             
             <div class="flex gap-3 mb-6">
-                <button onclick="showAdminTab('upload')" class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📤 Upload PDF</button>
-                <button onclick="showAdminTab('mcq')" class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📝 Manage MCQ</button>
+                <button onclick="showAdminTab('upload')" 
+                        class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📤 Upload PDF</button>
+                <button onclick="showAdminTab('mcq')" 
+                        class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📝 Manage MCQ</button>
             </div>
 
             <!-- Upload Tab -->
@@ -147,13 +158,19 @@
                 <div class="space-y-6">
                     <div>
                         <label class="block text-sm mb-2">PDF Title</label>
-                        <input id="file-name" type="text" placeholder="e.g. Mathematics Notes" class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300">
+                        <input id="file-name" type="text" placeholder="e.g. Mathematics Notes"
+                               class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-sm mb-2">Select PDF File</label>
-                        <input id="file-input" type="file" accept=".pdf" class="w-full px-5 py-4 bg-white/20 rounded-2xl text-white">
+                        <input id="file-input" type="file" accept=".pdf"
+                               class="w-full px-5 py-4 bg-white/20 rounded-2xl text-white">
+                        <p class="text-xs text-emerald-200 mt-2">Max 10MB • PDF only</p>
                     </div>
-                    <button onclick="uploadPDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold">Upload Now</button>
+                    <button onclick="uploadPDF()" 
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">
+                        Upload Now
+                    </button>
                 </div>
             </div>
 
@@ -164,7 +181,8 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm mb-2">Question</label>
-                        <input id="new-q" type="text" placeholder="Type the full question" class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white">
+                        <input id="new-q" type="text" placeholder="Type the full question" 
+                               class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300">
                     </div>
                     
                     <div class="grid grid-cols-2 gap-3">
@@ -196,7 +214,10 @@
                         </select>
                     </div>
 
-                    <button onclick="addMCQ()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">Add Question</button>
+                    <button onclick="addMCQ()" 
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">
+                        Add Question
+                    </button>
 
                     <div class="mt-6 pt-4 border-t border-white/30">
                         <h4 class="font-medium mb-3">Current Questions (${mcqQuestions.length})</h4>
@@ -205,7 +226,10 @@
                 </div>
             </div>
 
-            <button onclick="hideAdmin()" class="mt-8 w-full bg-red-500 hover:bg-red-600 py-4 rounded-3xl font-bold">Cancel / Logout</button>
+            <button onclick="hideAdmin()" 
+                    class="mt-8 w-full bg-red-500 hover:bg-red-600 py-4 rounded-3xl font-bold">
+                    Cancel / Logout
+            </button>
         </div>
     </div>
 
@@ -214,7 +238,7 @@
         let mcqQuestions = JSON.parse(localStorage.getItem('learnsphere_mcqs')) || [];
         let isAdminMode = false;
 
-        const announcements = ["🇰🇪 Karibu LearnSphere", "Triple-tap for Admin", "Master every topic", "Keep shining!"];
+        const announcements = ["🇰🇪 Karibu LearnSphere", "Master every topic", "Keep shining!"];
 
         function createBubbles() {
             const container = document.getElementById('bubbles');
@@ -418,10 +442,16 @@
                         <i class="fas fa-file-pdf text-6xl text-red-400"></i>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" class="pill-btn bg-white text-black hover:bg-gray-100">👁️ View</button>
-                        <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" class="pill-btn bg-white text-black hover:bg-gray-100">⬇️ Download</button>
+                        <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
+                                class="pill-btn bg-white text-black hover:bg-gray-100">👁️ View</button>
+                        <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
+                                class="pill-btn bg-white text-black hover:bg-gray-100">⬇️ Download</button>
                     </div>
-                    ${isAdminMode ? `<button onclick="deleteWork(${index})" class="w-full mt-4 border border-red-400 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400">🗑️ Delete (Admin only)</button>` : ''}
+                    ${isAdminMode ? `
+                    <button onclick="deleteWork(${index})" 
+                            class="w-full mt-4 border border-red-400 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400">
+                        🗑️ Delete (Admin only)
+                    </button>` : ''}
                 `;
                 grid.appendChild(card);
             });
@@ -461,31 +491,24 @@
             });
 
             const percentage = Math.round((score / mcqQuestions.length) * 100);
-            let appreciation = "";
-            let emojis = "";
-
-            if (percentage >= 80) {
-                appreciation = "Outstanding performance! You nailed it! 🎉";
-                emojis = "🎉🎊🥳✨";
-            } else if (percentage >= 60) {
-                appreciation = "Great job! You're making excellent progress! 👏";
-                emojis = "👏👍💪";
-            } else {
-                appreciation = "Good effort! Keep practicing and you'll improve! 💪";
-                emojis = "💪📚";
-            }
+            const appreciation = percentage >= 80 ? "Excellent! You're doing very well! 🎉" :
+                                percentage >= 60 ? "Good job! Keep practicing! 👏" : 
+                                "Nice effort! Review the topics and try again 💪";
 
             const container = document.getElementById('mcq-area');
             container.innerHTML = `
                 <div class="text-center py-12">
-                    <div class="text-7xl mb-6">${emojis}</div>
+                    <div class="text-7xl mb-4">🏆</div>
                     <h3 class="text-3xl font-bold mb-3">Your Score</h3>
                     <div class="text-8xl font-black text-emerald-300 mb-6">${percentage}%</div>
                     <div class="w-full bg-white/20 h-5 rounded-full mb-8 overflow-hidden">
                         <div class="h-full bg-emerald-400 rounded-full transition-all duration-1000" style="width: ${percentage}%"></div>
                     </div>
                     <p class="text-xl font-medium">${appreciation}</p>
-                    <button onclick="loadMCQ()" class="mt-10 px-10 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">Try Again</button>
+                    <button onclick="loadMCQ()" 
+                            class="mt-10 px-10 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">
+                        Try Again
+                    </button>
                 </div>
             `;
         }
