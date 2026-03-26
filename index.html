@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&family=Inter:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap');
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -19,7 +19,7 @@
 
         .bubble { 
             position: absolute; 
-            background: rgba(255,255,255,0.15); 
+            background: rgba(255,255,255,0.18); 
             border-radius: 50%; 
             pointer-events: none; 
             animation: float 22s infinite linear; 
@@ -31,27 +31,35 @@
             100% { transform: translateY(-120vh) scale(0.3); opacity: 0; } 
         }
 
-        .card-hover {
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        .card-hover { 
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
-        .card-hover:hover {
-            transform: translateY(-12px) scale(1.04);
+        .card-hover:hover { 
+            transform: translateY(-12px) scale(1.04); 
         }
 
-        .glow {
-            text-shadow: 0 0 40px rgba(103, 232, 249, 0.9), 0 0 70px rgba(236, 72, 153, 0.7);
+        .glow { 
+            text-shadow: 0 0 40px rgba(103, 232, 249, 0.9), 0 0 70px rgba(236, 72, 153, 0.6); 
         }
 
         .kenya-flag {
-            width: 64px; height: 40px;
-            border: 3px solid rgba(255,255,255,0.95);
-            border-radius: 6px;
-            overflow: hidden;
+            width: 64px; 
+            height: 40px; 
+            border: 3px solid rgba(255,255,255,0.95); 
+            border-radius: 6px; 
+            overflow: hidden; 
+            position: relative;
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
 
-        .marquee { animation: marquee 28s linear infinite; }
-        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .marquee {
+            animation: marquee 28s linear infinite;
+        }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
 
         .glass {
             background: rgba(255, 255, 255, 0.12);
@@ -59,33 +67,31 @@
             border: 1px solid rgba(255, 255, 255, 0.25);
         }
 
-        /* Fireworks / Confetti Animation */
+        /* Fireworks Emojis */
         .firework-container {
-            position: absolute;
+            position: fixed;
             inset: 0;
             pointer-events: none;
-            z-index: 50;
+            z-index: 100;
             overflow: hidden;
         }
 
         .emoji-pop {
             position: absolute;
-            font-size: 2.5rem;
-            animation: popUp 3.5s ease-out forwards;
-            text-shadow: 0 0 15px rgba(255,255,255,0.9);
+            font-size: 2.8rem;
+            animation: fireworksPop 4s ease-out forwards;
+            text-shadow: 0 0 20px rgba(255,255,255,0.9);
             user-select: none;
         }
 
-        @keyframes popUp {
+        @keyframes fireworksPop {
             0% {
-                transform: translateY(100px) scale(0.2) rotate(0deg);
+                transform: translateY(150px) scale(0.1) rotate(0deg);
                 opacity: 0;
             }
-            20% {
-                opacity: 1;
-            }
+            15% { opacity: 1; }
             100% {
-                transform: translateY(-600px) scale(1.2) rotate(720deg);
+                transform: translateY(-650px) scale(1.3) rotate(720deg);
                 opacity: 0;
             }
         }
@@ -96,94 +102,210 @@
     <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
 
     <!-- Top Marquee -->
-    <div class="bg-white/10 py-3.5 text-sm border-b border-white/20 backdrop-blur-md">
-        <div id="top-marquee" class="flex items-center gap-12 text-cyan-100 whitespace-nowrap marquee text-base font-medium"></div>
+    <div class="bg-white/10 py-3 text-sm border-b border-white/20 overflow-hidden backdrop-blur-md">
+        <div id="top-marquee" class="flex items-center gap-12 text-cyan-200 whitespace-nowrap marquee"></div>
     </div>
 
     <div class="max-w-7xl mx-auto px-6 py-10 relative z-10">
         <!-- Header -->
-        <div class="flex items-center justify-center gap-6 mb-12">
-            <div class="kenya-flag flex-shrink-0">
+        <div class="flex items-center justify-center gap-4 mb-10">
+            <div class="kenya-flag">
                 <div class="h-[33%] bg-black"></div>
-                <div class="h-[34%] bg-[#e30613]"></div>
-                <div class="h-[33%] bg-[#00a650]"></div>
-                <div class="absolute inset-0 flex items-center justify-center text-3xl">🛡️</div>
+                <div class="h-[34%] bg-red-600"></div>
+                <div class="h-[33%] bg-green-600"></div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl">🛡️</div>
             </div>
-            <h1 class="text-6xl sm:text-7xl font-black tracking-tighter glow">LEARNSPHERE</h1>
+            <h1 class="text-5xl sm:text-6xl font-black glow tracking-tighter">LEARNSPHERE</h1>
         </div>
 
         <!-- Date & Time -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-14">
-            <div class="glass rounded-3xl p-8 text-center card-hover">
-                <i class="fas fa-calendar-day text-5xl mb-4 text-cyan-300"></i>
-                <div id="day" class="text-4xl font-bold"></div>
-                <div class="text-xs tracking-widest opacity-75 mt-1">DAY</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+            <div class="glass rounded-3xl p-6 text-center card-hover">
+                <i class="fas fa-calendar-alt text-4xl mb-3 text-cyan-300"></i>
+                <div id="day" class="text-3xl font-bold"></div>
+                <div class="text-xs opacity-75 tracking-widest">DAY</div>
             </div>
-            <div class="glass rounded-3xl p-8 text-center card-hover">
-                <i class="fas fa-calendar-alt text-5xl mb-4 text-pink-300"></i>
-                <div id="date" class="text-4xl font-bold"></div>
-                <div class="text-xs tracking-widest opacity-75 mt-1">DATE</div>
+            <div class="glass rounded-3xl p-6 text-center card-hover">
+                <i class="fas fa-clock text-4xl mb-3 text-pink-300"></i>
+                <div id="date" class="text-3xl font-bold"></div>
+                <div class="text-xs opacity-75 tracking-widest">DATE</div>
             </div>
-            <div class="glass rounded-3xl p-8 text-center card-hover">
-                <i class="fas fa-clock text-5xl mb-4 text-amber-300"></i>
-                <div id="time" class="text-4xl font-bold font-mono"></div>
-                <div class="text-xs tracking-widest opacity-75 mt-1">TIME</div>
+            <div class="glass rounded-3xl p-6 text-center card-hover">
+                <i class="fas fa-hourglass-half text-4xl mb-3 text-yellow-300"></i>
+                <div id="time" class="text-3xl font-bold font-mono"></div>
+                <div class="text-xs opacity-75 tracking-widest">TIME</div>
             </div>
         </div>
 
-        <!-- Navigation -->
-        <div class="flex flex-wrap justify-center gap-4 mb-16">
-            <button onclick="showSection('extended')" class="pill-btn bg-white/20 hover:bg-white/30 text-lg px-12 py-6 flex items-center gap-3">
+        <!-- Navigation Buttons -->
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+            <button onclick="showSection('extended')" 
+                    class="flex-1 sm:flex-none px-10 py-5 bg-white/20 hover:bg-white/30 rounded-3xl font-bold text-lg transition-all active:scale-95">
                 📖 Extended Class Work
             </button>
-            <button onclick="showSection('assessment')" class="pill-btn bg-white/20 hover:bg-white/30 text-lg px-12 py-6 flex items-center gap-3">
+            <button onclick="showSection('assessment')" 
+                    class="flex-1 sm:flex-none px-10 py-5 bg-white/20 hover:bg-white/30 rounded-3xl font-bold text-lg transition-all active:scale-95">
                 📝 Self Assessment
             </button>
         </div>
 
-        <!-- Extended Section -->
+        <!-- Extended Class Work -->
         <div id="extended-section" class="hidden">
-            <h2 class="text-4xl font-bold mb-10 text-center">📚 Extended Class Work</h2>
-            <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-            <div id="extended-empty" class="hidden text-center py-24">
-                <div class="text-9xl mb-6">📚</div>
-                <h3 class="text-3xl font-semibold">No materials yet</h3>
-                <p class="opacity-75 mt-3">Triple tap anywhere to open Admin Panel</p>
+            <h2 class="text-4xl font-bold text-center mb-10">Extended Class Work</h2>
+            <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            
+            <div id="extended-empty" class="hidden text-center py-20">
+                <div class="text-8xl mb-6">📚</div>
+                <h3 class="text-2xl font-semibold mb-2">No materials yet</h3>
+                <p class="opacity-80">Triple tap anywhere to open Admin Panel</p>
             </div>
         </div>
 
-        <!-- Assessment Section -->
+        <!-- Self Assessment -->
         <div id="assessment-section" class="hidden">
-            <h2 class="text-4xl font-bold text-center mb-10">📝 Self Assessment</h2>
-            <div id="mcq-area" class="max-w-3xl mx-auto glass rounded-3xl p-10 min-h-[500px]"></div>
+            <h2 class="text-4xl font-bold text-center mb-10">Self Assessment</h2>
+            <div id="mcq-area" class="max-w-2xl mx-auto glass rounded-3xl p-8 min-h-[400px]"></div>
         </div>
     </div>
 
     <!-- Bottom Marquee -->
-    <div class="bg-white/10 py-3.5 text-sm border-t border-white/20 backdrop-blur-md mt-16">
-        <div id="bottom-marquee" class="flex items-center gap-12 text-pink-100 whitespace-nowrap marquee"></div>
+    <div class="bg-white/10 py-3 text-sm border-t border-white/20 overflow-hidden mt-12">
+        <div id="bottom-marquee" class="flex items-center gap-12 text-pink-200 whitespace-nowrap marquee"></div>
     </div>
 
     <!-- Fireworks Container -->
     <div id="fireworks" class="firework-container hidden"></div>
 
-    <!-- Admin Modal (unchanged for brevity - keep your existing admin code) -->
-    <!-- ... (paste your full admin modal here from previous version) ... -->
+    <!-- Admin Modal -->
+    <div id="admin-section" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+        <div class="glass max-w-lg w-full rounded-3xl p-8 border border-white/20">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Admin Panel</h2>
+                <button onclick="hideAdmin()" class="text-red-400 hover:text-red-500 text-3xl">✕</button>
+            </div>
+            
+            <div class="flex gap-3 mb-8">
+                <button onclick="showAdminTab('upload')" id="tab-upload"
+                        class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">📤 Upload PDF</button>
+                <button onclick="showAdminTab('mcq')" id="tab-mcq"
+                        class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">📝 Manage MCQs</button>
+            </div>
+
+            <!-- Upload Tab -->
+            <div id="admin-upload-tab">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm mb-2 opacity-90">PDF Title</label>
+                        <input id="file-name" type="text" placeholder="e.g. Mathematics Notes - Form 3" 
+                               class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-2 opacity-90">Select PDF File</label>
+                        <input id="file-input" type="file" accept=".pdf" 
+                               class="w-full px-6 py-4 bg-white/20 rounded-2xl text-white file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:bg-white/30 file:text-white">
+                        <p class="text-xs text-emerald-200 mt-3">Maximum file size: 10MB • PDF only</p>
+                    </div>
+                    <button onclick="uploadPDF()" 
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg transition-all">
+                        Upload PDF Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- MCQ Tab -->
+            <div id="admin-mcq-tab" class="hidden">
+                <h3 class="font-bold mb-5 text-lg">Add New Question</h3>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm mb-2">Question</label>
+                        <input id="new-q" type="text" placeholder="Enter the full question here..." 
+                               class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-sm mb-2">Option A</label><input id="opt0" type="text" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white"></div>
+                        <div><label class="block text-sm mb-2">Option B</label><input id="opt1" type="text" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white"></div>
+                        <div><label class="block text-sm mb-2">Option C</label><input id="opt2" type="text" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white"></div>
+                        <div><label class="block text-sm mb-2">Option D</label><input id="opt3" type="text" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm mb-2">Correct Answer</label>
+                        <select id="correct" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white">
+                            <option value="0">Option A</option>
+                            <option value="1">Option B</option>
+                            <option value="2">Option C</option>
+                            <option value="3">Option D</option>
+                        </select>
+                    </div>
+
+                    <button onclick="addMCQ()" 
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">
+                        Add Question
+                    </button>
+
+                    <div class="mt-8 pt-6 border-t border-white/30">
+                        <h4 class="font-medium mb-4 flex items-center justify-between">
+                            Current Questions 
+                            <span id="mcq-count" class="bg-white/20 px-3 py-1 rounded-full text-xs"></span>
+                        </h4>
+                        <div id="mcq-list" class="text-sm max-h-64 overflow-y-auto space-y-3 pr-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="hideAdmin()" 
+                    class="mt-10 w-full bg-red-500/80 hover:bg-red-600 py-4 rounded-3xl font-bold transition-all">
+                Close Admin Panel
+            </button>
+        </div>
+    </div>
 
     <script>
-        // Existing variables and functions (keep all your previous JS)
         let extendedWorks = JSON.parse(localStorage.getItem('learnsphere_extended')) || [];
         let mcqQuestions = JSON.parse(localStorage.getItem('learnsphere_mcqs')) || [];
         let isAdminMode = false;
+        let tapCount = 0;
+        let tapTimer = null;
+
+        const announcements = [
+            "🇰🇪 Karibu LearnSphere - Your Learning Companion",
+            "Master every topic with confidence",
+            "Keep shining! Education is the key to success",
+            "Practice makes perfect"
+        ];
 
         const celebratoryEmojis = ['🎉', '🥳', '🌟', '✨', '💥', '🚀', '🏆', '🔥', '👏', '🙌', '💯', '⭐', '🌈'];
 
-        function createBubbles() { /* your existing bubble code */ }
+        function createBubbles() {
+            const container = document.getElementById('bubbles');
+            container.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 80 + 25;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.animationDuration = `${Math.random() * 25 + 18}s`;
+                bubble.style.animationDelay = `-${Math.random() * 20}s`;
+                bubble.style.opacity = Math.random() * 0.6 + 0.4;
+                container.appendChild(bubble);
+            }
+        }
 
-        function updateDateTime() { /* your existing datetime code */ }
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('day').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US', { 
+                month: 'long', day: 'numeric', year: 'numeric' 
+            });
+            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', {
+                hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
+            });
+        }
 
-        // === NEW FIREWORKS FUNCTION ===
-        function launchFireworks(count = 35) {
+        function launchFireworks(count = 30) {
             const container = document.getElementById('fireworks');
             container.classList.remove('hidden');
 
@@ -193,38 +315,279 @@
                     emoji.className = 'emoji-pop';
                     emoji.textContent = celebratoryEmojis[Math.floor(Math.random() * celebratoryEmojis.length)];
                     
-                    // Random starting position at bottom
                     const startX = Math.random() * window.innerWidth;
                     emoji.style.left = `${startX}px`;
-                    emoji.style.bottom = `-50px`;
+                    emoji.style.bottom = '-60px';
                     
-                    // Random horizontal drift and rotation
-                    const drift = (Math.random() - 0.5) * 300;
-                    const duration = 2.8 + Math.random() * 1.5;
-                    const delay = Math.random() * 0.6;
-                    
+                    const duration = 3 + Math.random() * 1.5;
                     emoji.style.animationDuration = `${duration}s`;
-                    emoji.style.animationDelay = `${delay}s`;
-                    
-                    // Add slight random horizontal movement via CSS variable
-                    emoji.style.setProperty('--drift', `${drift}px`);
                     
                     container.appendChild(emoji);
 
-                    // Remove after animation
-                    setTimeout(() => {
-                        emoji.remove();
-                    }, (duration + delay) * 1000 + 500);
-                }, i * 25); // Stagger the launches
+                    setTimeout(() => emoji.remove(), duration * 1000 + 500);
+                }, i * 20);
             }
 
-            // Auto hide container after fireworks finish
             setTimeout(() => {
                 container.classList.add('hidden');
-            }, 4500);
+            }, 5000);
         }
 
-        // Updated submitMCQ with fireworks
+        // Triple tap to open admin
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('admin-section').classList.contains('hidden')) {
+                if (e.target.closest('input, select, button')) return;
+                return;
+            }
+
+            tapCount++;
+            if (tapCount === 1) {
+                tapTimer = setTimeout(() => { tapCount = 0; }, 800);
+            }
+            if (tapCount === 3) {
+                clearTimeout(tapTimer);
+                tapCount = 0;
+                isAdminMode = true;
+                document.getElementById('admin-section').classList.remove('hidden');
+                showAdminTab('upload');
+                renderExtended();
+                loadCurrentMCQs();
+            }
+        });
+
+        function hideAdmin() {
+            isAdminMode = false;
+            document.getElementById('admin-section').classList.add('hidden');
+            renderExtended();
+        }
+
+        function showAdminTab(tab) {
+            document.getElementById('admin-upload-tab').classList.add('hidden');
+            document.getElementById('admin-mcq-tab').classList.add('hidden');
+            document.getElementById('admin-' + tab + '-tab').classList.remove('hidden');
+            
+            document.getElementById('tab-upload').classList.toggle('bg-white/40', tab === 'upload');
+            document.getElementById('tab-mcq').classList.toggle('bg-white/40', tab === 'mcq');
+        }
+
+        function uploadPDF() {
+            const fileInput = document.getElementById('file-input');
+            const nameInput = document.getElementById('file-name').value.trim();
+            
+            if (!fileInput.files[0]) return alert("Please select a PDF file");
+            const file = fileInput.files[0];
+            
+            if (file.type !== "application/pdf") return alert("Only PDF files are allowed!");
+            if (file.size > 10 * 1024 * 1024) return alert("File size must be less than 10MB");
+
+            const displayName = nameInput || file.name.replace('.pdf', '');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result.split(',')[1];
+                extendedWorks.push({ 
+                    name: displayName, 
+                    base64: base64, 
+                    size: file.size 
+                });
+                
+                localStorage.setItem('learnsphere_extended', JSON.stringify(extendedWorks));
+                renderExtended();
+                hideAdmin();
+                
+                document.getElementById('file-name').value = '';
+                fileInput.value = '';
+                alert(`✅ "${displayName}" uploaded successfully!`);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addMCQ() {
+            const q = document.getElementById('new-q').value.trim();
+            const opt0 = document.getElementById('opt0').value.trim();
+            const opt1 = document.getElementById('opt1').value.trim();
+            const opt2 = document.getElementById('opt2').value.trim();
+            const opt3 = document.getElementById('opt3').value.trim();
+            const correct = parseInt(document.getElementById('correct').value);
+
+            if (!q || !opt0 || !opt1 || !opt2 || !opt3) {
+                alert("Please fill in all fields");
+                return;
+            }
+
+            mcqQuestions.push({
+                q: q,
+                options: [opt0, opt1, opt2, opt3],
+                answer: correct
+            });
+
+            localStorage.setItem('learnsphere_mcqs', JSON.stringify(mcqQuestions));
+            alert("Question added successfully!");
+            
+            document.getElementById('new-q').value = '';
+            document.getElementById('opt0').value = '';
+            document.getElementById('opt1').value = '';
+            document.getElementById('opt2').value = '';
+            document.getElementById('opt3').value = '';
+
+            loadCurrentMCQs();
+        }
+
+        function loadCurrentMCQs() {
+            const container = document.getElementById('mcq-list');
+            const countEl = document.getElementById('mcq-count');
+            container.innerHTML = '';
+            countEl.textContent = mcqQuestions.length;
+
+            if (mcqQuestions.length === 0) {
+                container.innerHTML = '<p class="opacity-60 text-center py-8">No questions added yet</p>';
+                return;
+            }
+
+            mcqQuestions.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = "bg-white/10 p-4 rounded-2xl flex justify-between items-start gap-4";
+                div.innerHTML = `
+                    <div class="flex-1">
+                        <span class="font-medium">${i+1}. ${item.q.substring(0, 70)}${item.q.length > 70 ? '...' : ''}</span>
+                    </div>
+                    <button onclick="deleteMCQ(${i}); event.stopImmediatePropagation()" 
+                            class="text-red-400 hover:text-red-500 text-sm font-medium px-3 py-1">
+                        Delete
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function deleteMCQ(i) {
+            if (confirm("Delete this question?")) {
+                mcqQuestions.splice(i, 1);
+                localStorage.setItem('learnsphere_mcqs', JSON.stringify(mcqQuestions));
+                loadCurrentMCQs();
+            }
+        }
+
+        function viewPDF(base64, filename) {
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+        }
+
+        function downloadPDF(base64, filename) {
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename + ".pdf";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(link.href), 5000);
+        }
+
+        function deleteWork(index) {
+            if (confirm("Delete this PDF?")) {
+                extendedWorks.splice(index, 1);
+                localStorage.setItem('learnsphere_extended', JSON.stringify(extendedWorks));
+                renderExtended();
+            }
+        }
+
+        function renderExtended() {
+            const grid = document.getElementById('extended-grid');
+            const empty = document.getElementById('extended-empty');
+            grid.innerHTML = '';
+
+            if (extendedWorks.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+
+            extendedWorks.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card-hover glass rounded-3xl p-6 border border-white/10';
+                
+                card.innerHTML = `
+                    <div class="flex items-center gap-4 mb-6">
+                        <i class="fas fa-file-pdf text-5xl text-red-400"></i>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-lg truncate">${item.name}</h3>
+                            <p class="text-xs opacity-75">${(item.size / 1024 / 1024).toFixed(1)} MB</p>
+                        </div>
+                    </div>
+                    <div class="bg-black/30 rounded-2xl mb-6 h-48 flex items-center justify-center border border-red-400/20">
+                        <i class="fas fa-file-pdf text-7xl text-red-400 opacity-80"></i>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
+                                class="pill-btn bg-white text-black hover:bg-gray-100">👁️ View</button>
+                        <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
+                                class="pill-btn bg-white text-black hover:bg-gray-100">⬇️ Download</button>
+                    </div>
+                    ${isAdminMode ? `
+                    <button onclick="deleteWork(${index}); event.stopImmediatePropagation()" 
+                            class="w-full mt-4 border border-red-400/70 hover:border-red-400 font-medium py-3 rounded-3xl text-red-300 hover:text-red-400 transition-colors">
+                        🗑️ Delete
+                    </button>` : ''}
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function loadMCQ() {
+            const container = document.getElementById('mcq-area');
+            
+            if (mcqQuestions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-20 opacity-75">
+                        <div class="text-7xl mb-6">❓</div>
+                        <p class="text-xl">No MCQs available yet.</p>
+                        <p class="mt-2">Ask your teacher/admin to add questions.</p>
+                    </div>`;
+                return;
+            }
+
+            let html = `<div class="space-y-10">`;
+            
+            mcqQuestions.forEach((item, i) => {
+                html += `
+                    <div class="bg-white/5 p-6 rounded-2xl">
+                        <p class="font-semibold mb-5 text-lg">${i+1}. ${item.q}</p>
+                        <div class="space-y-4">
+                            ${item.options.map((opt, j) => `
+                                <label class="flex items-center gap-4 cursor-pointer group">
+                                    <input type="radio" name="q${i}" value="${j}" 
+                                           class="w-5 h-5 accent-emerald-400 cursor-pointer">
+                                    <span class="group-hover:text-cyan-200 transition-colors">${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>`;
+            });
+
+            html += `
+                <button onclick="submitMCQ()" 
+                        class="w-full bg-emerald-500 hover:bg-emerald-600 py-6 rounded-3xl font-bold text-xl transition-all active:scale-95 mt-6">
+                    Submit & See Score
+                </button>
+            </div>`;
+
+            container.innerHTML = html;
+        }
+
         function submitMCQ() {
             let score = 0;
             mcqQuestions.forEach((item, i) => {
@@ -238,71 +601,75 @@
             let mainEmoji = "";
 
             if (percentage >= 85) {
-                appreciation = "Outstanding! You're a true champion! 🌟";
+                appreciation = "Outstanding performance! You're a star! 🌟";
                 mainEmoji = "🏆";
             } else if (percentage >= 70) {
-                appreciation = "Excellent work! Keep shining! 👏";
+                appreciation = "Great job! You're making excellent progress 👏";
                 mainEmoji = "🔥";
             } else if (percentage >= 50) {
-                appreciation = "Good effort! You're improving every day 💪";
-                mainEmoji = "📈";
+                appreciation = "Good effort! Keep practicing and you'll improve 💪";
+                mainEmoji = "📚";
             } else {
-                appreciation = "Nice try! Review and try again — you've got this! 💡";
+                appreciation = "Nice try! Review the material and try again 💡";
                 mainEmoji = "🌱";
             }
 
             const container = document.getElementById('mcq-area');
             container.innerHTML = `
-                <div class="text-center py-12 relative">
-                    <div class="text-8xl mb-6">${mainEmoji}</div>
+                <div class="text-center py-16 relative">
+                    <div class="text-8xl mb-8">${mainEmoji}</div>
                     <h3 class="text-4xl font-bold mb-4">Your Score</h3>
-                    <div class="text-[7rem] font-black text-emerald-300 leading-none mb-6">${percentage}<span class="text-6xl">%</span></div>
+                    <div class="text-[6rem] font-black text-emerald-300 mb-8 leading-none">${percentage}<span class="text-5xl">%</span></div>
                     
-                    <div class="w-full max-w-md mx-auto bg-white/20 h-3 rounded-full mb-10 overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full transition-all duration-1000" 
+                    <div class="w-full bg-white/20 h-4 rounded-full mb-10 overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full transition-all duration-1500" 
                              style="width: ${percentage}%"></div>
                     </div>
                     
                     <p class="text-2xl font-medium max-w-md mx-auto">${appreciation}</p>
                     
                     <button onclick="loadMCQ()" 
-                            class="mt-10 px-14 py-6 bg-white/20 hover:bg-white/30 rounded-3xl font-bold text-lg transition-all">
+                            class="mt-12 px-12 py-5 bg-white/20 hover:bg-white/30 rounded-3xl font-bold text-lg transition-all">
                         Try Again
                     </button>
                 </div>
             `;
 
-            // Launch fireworks based on performance
-            if (percentage >= 60) {
-                launchFireworks(45);   // Big celebration
-            } else if (percentage >= 40) {
-                launchFireworks(25);   // Medium celebration
-            } else {
-                launchFireworks(12);   // Small encouragement
-            }
+            // Launch fireworks based on score
+            if (percentage >= 70) launchFireworks(45);
+            else if (percentage >= 50) launchFireworks(30);
+            else launchFireworks(15);
         }
 
-        // Keep all your other functions: showSection, renderExtended, uploadPDF, addMCQ, etc.
+        function showSection(section) {
+            document.getElementById('extended-section').classList.add('hidden');
+            document.getElementById('assessment-section').classList.add('hidden');
+            
+            document.getElementById(section + '-section').classList.remove('hidden');
+            
+            if (section === 'extended') renderExtended();
+            if (section === 'assessment') loadMCQ();
+        }
 
         function setupMarquees() {
-            const announcements = [
-                "🇰🇪 Karibu LearnSphere Kenya",
-                "Master every subject with confidence",
-                "Practice today • Succeed tomorrow",
-                "Education is the key to success"
-            ];
-            const html = announcements.map(text => `<span class="mx-12">${text}</span>`).join('');
+            const html = announcements.map(text => 
+                `<span class="mx-12 inline-block">${text}</span>`
+            ).join('');
+            
             document.getElementById('top-marquee').innerHTML = html + html;
             document.getElementById('bottom-marquee').innerHTML = html + html;
         }
 
+        // Initialize
         window.onload = () => {
             createBubbles();
             updateDateTime();
             setInterval(updateDateTime, 1000);
-            setInterval(createBubbles, 30000);
+            setInterval(createBubbles, 28000);
             setupMarquees();
-            showSection('extended');
+            
+            document.getElementById('extended-section').classList.add('hidden');
+            document.getElementById('assessment-section').classList.add('hidden');
         };
     </script>
 </body>
