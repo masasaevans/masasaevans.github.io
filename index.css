@@ -1,10 +1,19 @@
 body {
-  font-family: system-ui;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 .card {
   background: white;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 10px;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+}
+
+.card:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.hidden {
+  display: none !important;
 }
