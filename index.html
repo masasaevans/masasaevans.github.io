@@ -7,58 +7,52 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="index.css">
 </head>
-
 <body class="bg-gradient-to-br from-orange-50 to-indigo-50 min-h-screen">
 
-<!-- ROLE SELECT -->
-<div id="overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center">
-  <div class="bg-white p-10 rounded-3xl text-center">
-    <h1 class="text-3xl font-bold mb-6 text-orange-600">Masasa Online 🚀</h1>
-
-    <button onclick="enterStudent()" class="block w-full bg-orange-500 text-white py-4 rounded mb-4">
-      Student
-    </button>
-
-    <button onclick="showAdminLogin()" class="block w-full bg-indigo-600 text-white py-4 rounded mb-4">
-      Admin
-    </button>
-
-    <button onclick="googleLogin()" class="block w-full border py-4 rounded">
-      Google Login
-    </button>
+  <!-- LOGIN OVERLAY -->
+  <div id="overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div class="bg-white p-10 rounded-3xl text-center max-w-md w-full shadow-2xl">
+      <h1 class="text-4xl font-black mb-8 text-orange-600">Masasa Online 🚀</h1>
+      <button onclick="googleLogin()" 
+              class="w-full bg-white border-2 border-gray-300 hover:border-orange-500 py-5 rounded-3xl font-bold text-lg flex items-center justify-center gap-3">
+        Sign in with Google
+      </button>
+      <p class="text-sm text-gray-500 mt-6">Only realmasasa@gmail.com is allowed</p>
+    </div>
   </div>
-</div>
 
-<!-- ADMIN LOGIN -->
-<div id="adminBox" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
-  <div class="bg-white p-6 rounded-2xl">
-    <input id="adminPass" type="password" placeholder="Admin password" class="p-3 border mb-4 w-full">
-    <button onclick="loginAdmin()" class="bg-indigo-600 text-white px-6 py-2 w-full">Login</button>
-  </div>
-</div>
+  <!-- HEADER -->
+  <header id="header" class="hidden bg-white shadow sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-black text-orange-600">📚 Masasa Online</h1>
+      <div class="flex items-center gap-6">
+        <span id="time" class="font-mono text-sm font-medium"></span>
+        <button onclick="logout()" 
+                class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-2xl text-sm font-medium transition">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
 
-<header class="hidden p-4 bg-white shadow flex justify-between" id="header">
-  <h1 class="font-bold text-orange-600">Masasa</h1>
-  <div>
-    <span id="time"></span>
-    <button onclick="logout()" class="ml-4 bg-red-500 text-white px-3 py-1">Logout</button>
-  </div>
-</header>
+  <!-- MAIN APP -->
+  <main id="app" class="hidden max-w-6xl mx-auto px-6 py-10">
+    <div class="bg-white p-8 rounded-3xl shadow mb-10">
+      <h2 class="text-2xl font-bold mb-6">Upload New Material</h2>
+      <input id="title" placeholder="Material Title" 
+             class="w-full p-4 border rounded-2xl mb-4 focus:outline-none focus:border-orange-500">
+      <input id="file" type="file" accept="application/pdf" 
+             class="block w-full mb-6 text-sm text-gray-500 file:mr-4 file:py-4 file:px-6 file:rounded-2xl file:border-0 file:bg-orange-100 file:text-orange-700 hover:file:bg-orange-200">
+      <button onclick="upload()" 
+              class="w-full bg-green-600 hover:bg-green-700 text-white py-5 rounded-3xl font-bold text-lg transition">
+        Upload PDF
+      </button>
+    </div>
 
-<main id="app" class="hidden p-6">
+    <h2 class="text-2xl font-bold mb-6">📄 Available Materials</h2>
+    <div id="materials" class="space-y-4"></div>
+  </main>
 
-<div id="adminPanel" class="hidden mb-6 bg-white p-6 rounded shadow">
-  <h2 class="font-bold mb-3">Upload PDF</h2>
-  <input id="title" placeholder="Title" class="border p-2 w-full mb-2">
-  <input id="file" type="file" class="mb-2">
-  <button onclick="upload()" class="bg-green-600 text-white px-4 py-2">Upload</button>
-</div>
-
-<h2 class="font-bold mb-3">Materials</h2>
-<div id="materials"></div>
-
-</main>
-
-<script type="module" src="index.js"></script>
+  <script type="module" src="index.js"></script>
 </body>
 </html>
