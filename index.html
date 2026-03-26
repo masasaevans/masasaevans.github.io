@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 LearnSphere</title>
+    <title>🚀 Masasa Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -13,7 +13,6 @@
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #6b21a8, #db2777, #22d3ee);
             min-height: 100vh;
-            overflow-x: hidden;
             color: white;
         }
         
@@ -21,32 +20,22 @@
         @keyframes float { 0% { transform: translateY(120vh) scale(1); opacity: 0.9; } 100% { transform: translateY(-100vh) scale(0.3); opacity: 0; } }
         
         .material-card, .mcq-card { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .material-card:hover, .mcq-card:hover { transform: translateY(-15px) scale(1.04); box-shadow: 0 30px 60px -15px rgba(236, 72, 153, 0.5); }
+        .material-card:hover, .mcq-card:hover { transform: translateY(-12px) scale(1.03); box-shadow: 0 25px 50px -12px rgba(236, 72, 153, 0.5); }
         
         .glow-text { text-shadow: 0 0 25px rgba(165, 243, 252, 0.9); }
-        .datetime-card { background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); border: 2px solid rgba(255,255,255,0.3); }
+        .datetime-card { background: rgba(255,255,255,0.18); backdrop-filter: blur(14px); border: 2px solid rgba(255,255,255,0.35); }
         
         .option { transition: all 0.2s; }
-        .option:hover { background-color: rgba(255,255,255,0.2); }
+        .option:hover { background-color: rgba(255,255,255,0.25); }
         .correct { background-color: #22c55e !important; color: white; }
         .wrong { background-color: #ef4444 !important; color: white; }
         
         .marquee { overflow: hidden; white-space: nowrap; }
-        .marquee-content { display: inline-flex; animation: marquee 25s linear infinite; }
+        .marquee-content { display: inline-flex; animation: marquee 28s linear infinite; }
         @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         
-        /* Progress Bar */
-        .progress-container { height: 8px; background: rgba(255,255,255,0.2); border-radius: 9999px; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(to right, #22d3ee, #c026d3); transition: width 0.4s ease-out; }
-        
-        /* Encouragement Popup */
-        #encouragement-popup {
-            animation: popIn 0.4s ease-out forwards;
-        }
-        @keyframes popIn {
-            0% { transform: scale(0.7); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        .progress-container { height: 10px; background: rgba(255,255,255,0.25); border-radius: 9999px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(to right, #67e8f9, #c026d3); transition: width 0.5s ease-out; }
     </style>
 </head>
 <body class="relative">
@@ -54,91 +43,123 @@
     <!-- Floating Bubbles -->
     <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
 
-    <!-- Top Announcement -->
-    <div class="marquee bg-white/10 backdrop-blur-md py-3 text-sm font-medium border-b border-white/20">
-        <div id="top-marquee" class="marquee-content flex items-center gap-12 text-cyan-200"></div>
+    <!-- Top Marquee -->
+    <div class="marquee bg-white/10 py-3 text-sm border-b border-white/20">
+        <div id="top-marquee" class="marquee-content flex items-center gap-16 text-cyan-200"></div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 py-8 relative z-10">
-        <!-- Header & Date/Time (unchanged) -->
-        <div class="text-center mb-12">
-            <h1 class="text-6xl md:text-7xl font-black mb-3 glow-text tracking-tighter">LEARNSPHERE</h1>
-            <p class="text-2xl md:text-3xl opacity-90 font-medium">Ignite Your Learning Adventure! ✨</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 relative z-10">
+        <!-- Header -->
+        <div class="text-center mb-10 sm:mb-12">
+            <h1 class="text-5xl sm:text-6xl md:text-7xl font-black mb-3 glow-text tracking-tighter">LEARNSPHERE</h1>
+            <p class="text-xl sm:text-2xl md:text-3xl opacity-90">Ignite Your Learning Adventure! ✨</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16">
-            <div class="datetime-card rounded-3xl p-8 text-center">
-                <i class="fas fa-calendar-alt text-5xl mb-4 text-cyan-300"></i>
-                <div id="day" class="text-4xl font-bold"></div>
-                <div class="text-sm opacity-75 mt-1">DAY</div>
+        <!-- Big Responsive Date / Day / Time Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16">
+            <div class="datetime-card rounded-3xl p-6 sm:p-8 text-center">
+                <i class="fas fa-calendar-alt text-4xl sm:text-5xl mb-4 text-cyan-300"></i>
+                <div id="day" class="text-3xl sm:text-4xl font-bold"></div>
+                <div class="text-xs sm:text-sm opacity-75 mt-1">DAY</div>
             </div>
-            <div class="datetime-card rounded-3xl p-8 text-center">
-                <i class="fas fa-clock text-5xl mb-4 text-pink-300"></i>
-                <div id="date" class="text-4xl font-bold"></div>
-                <div class="text-sm opacity-75 mt-1">DATE</div>
+            <div class="datetime-card rounded-3xl p-6 sm:p-8 text-center">
+                <i class="fas fa-clock text-4xl sm:text-5xl mb-4 text-pink-300"></i>
+                <div id="date" class="text-3xl sm:text-4xl font-bold"></div>
+                <div class="text-xs sm:text-sm opacity-75 mt-1">DATE</div>
             </div>
-            <div class="datetime-card rounded-3xl p-8 text-center">
-                <i class="fas fa-hourglass-half text-5xl mb-4 text-yellow-300"></i>
-                <div id="time" class="text-4xl font-bold"></div>
-                <div class="text-sm opacity-75 mt-1">TIME</div>
+            <div class="datetime-card rounded-3xl p-6 sm:p-8 text-center">
+                <i class="fas fa-hourglass-half text-4xl sm:text-5xl mb-4 text-yellow-300"></i>
+                <div id="time" class="text-3xl sm:text-4xl font-bold font-mono"></div>
+                <div class="text-xs sm:text-sm opacity-75 mt-1">TIME</div>
             </div>
         </div>
 
-        <div class="flex justify-center gap-4 mb-12">
-            <button onclick="showSection('materials')" class="px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📚 Materials</button>
-            <button onclick="showSection('mcqs')" class="px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">❓ MCQs</button>
+        <div class="flex flex-wrap justify-center gap-3 mb-10">
+            <button onclick="showSection('materials')" class="flex-1 sm:flex-none px-6 sm:px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold text-base">📚 Materials</button>
+            <button onclick="showSection('mcqs')" class="flex-1 sm:flex-none px-6 sm:px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold text-base">❓ MCQs</button>
         </div>
 
-        <!-- Materials & MCQs sections (same as before) -->
-        <div id="materials-section"> ... </div> <!-- Keep your existing materials code here -->
-        <div id="mcqs-section" class="hidden"> ... </div> <!-- Keep your existing MCQ list -->
+        <!-- Materials Section -->
+        <div id="materials-section">
+            <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8">📚 Course Materials</h2>
+            <div id="materials-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="materials-empty" class="text-center py-16 hidden">
+                <div class="text-7xl mb-6">🌟</div>
+                <h3 class="text-2xl font-semibold mb-3">No materials yet</h3>
+                <p class="opacity-80">Triple-tap anywhere to add PDFs</p>
+            </div>
+        </div>
+
+        <!-- MCQs Section -->
+        <div id="mcqs-section" class="hidden">
+            <h2 class="text-3xl sm:text-4xl font-bold text-center mb-8">❓ Multiple Choice Quizzes</h2>
+            <div id="mcq-list" class="space-y-6"></div>
+            <div id="mcq-empty" class="text-center py-16">
+                <div class="text-7xl mb-6">❓</div>
+                <h3 class="text-2xl font-semibold mb-3">No MCQs yet</h3>
+                <p class="opacity-80">Triple-tap to create (up to 100 questions)</p>
+            </div>
+        </div>
 
         <!-- Quiz Area with Progress Bar -->
-        <div id="quiz-area" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 overflow-auto">
-            <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 max-w-2xl w-full mx-4 my-8">
-                
-                <!-- Progress Bar -->
+        <div id="quiz-area" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 overflow-auto">
+            <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 max-w-2xl w-full">
+                <!-- Progress -->
                 <div class="mb-6">
-                    <div class="flex justify-between text-sm mb-2">
-                        <span id="progress-text" class="font-medium">Question 1 of 10</span>
-                        <span id="progress-percent" class="font-medium">10%</span>
+                    <div class="flex justify-between text-sm mb-2 font-medium">
+                        <span id="progress-text">Question 1 of 10</span>
+                        <span id="progress-percent">10%</span>
                     </div>
                     <div class="progress-container">
-                        <div id="progress-bar" class="progress-bar" style="width: 10%"></div>
+                        <div id="progress-bar" class="progress-bar w-[10%]"></div>
                     </div>
                 </div>
 
-                <div class="flex justify-between mb-6">
-                    <div id="quiz-progress" class="font-bold text-lg"></div>
+                <div class="flex justify-between items-center mb-6">
+                    <div id="quiz-progress" class="font-bold"></div>
                     <div id="quiz-timer" class="font-mono text-xl text-yellow-300"></div>
                 </div>
                 
-                <h3 id="quiz-question" class="text-2xl font-semibold mb-8"></h3>
+                <h3 id="quiz-question" class="text-xl sm:text-2xl font-semibold mb-8 leading-tight"></h3>
                 <div id="quiz-options" class="space-y-4"></div>
-                <button onclick="nextQuestion()" id="next-btn" class="hidden mt-10 w-full bg-cyan-400 text-black font-bold py-5 rounded-3xl text-lg">Next Question →</button>
+                <button onclick="nextQuestion()" id="next-btn" class="hidden mt-10 w-full bg-cyan-400 hover:bg-cyan-300 text-black font-bold py-5 rounded-3xl text-lg">Next Question →</button>
             </div>
         </div>
 
         <!-- Encouragement Popup -->
-        <div id="encouragement-popup" class="hidden fixed top-1/3 left-1/2 transform -translate-x-1/2 bg-white/95 text-purple-900 rounded-3xl px-10 py-8 shadow-2xl z-[100] text-center max-w-xs w-full">
-            <div id="encouragement-emoji" class="text-6xl mb-4"></div>
-            <div id="encouragement-text" class="text-xl font-semibold"></div>
+        <div id="encouragement-popup" class="hidden fixed top-1/3 left-1/2 -translate-x-1/2 bg-white text-purple-900 rounded-3xl px-8 py-6 shadow-2xl z-[100] text-center max-w-xs w-full">
+            <div id="encouragement-emoji" class="text-6xl mb-3"></div>
+            <div id="encouragement-text" class="font-semibold text-lg"></div>
         </div>
 
-        <!-- Results Screen (unchanged) -->
-        <div id="results-screen" class="hidden fixed inset-0 ..."> ... </div>
+        <!-- Results -->
+        <div id="results-screen" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+            <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 sm:p-10 max-w-md w-full text-center">
+                <div id="results-emoji" class="text-7xl mb-6"></div>
+                <h2 id="results-title" class="text-3xl font-bold mb-3"></h2>
+                <p id="results-score" class="text-5xl font-black mb-8"></p>
+                <p id="results-message" class="text-lg mb-10"></p>
+                <button onclick="closeResults()" class="bg-white text-purple-700 font-bold px-10 py-4 rounded-3xl">Back to Home</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Bottom Announcement -->
-    <div class="marquee bg-white/10 backdrop-blur-md py-3 text-sm font-medium border-t border-white/20">
-        <div id="bottom-marquee" class="marquee-content flex items-center gap-12 text-pink-200"></div>
+    <!-- Bottom Marquee -->
+    <div class="marquee bg-white/10 py-3 text-sm border-t border-white/20">
+        <div id="bottom-marquee" class="marquee-content flex items-center gap-16 text-pink-200"></div>
     </div>
 
-    <!-- Instructor Mode (unchanged) -->
-    <div id="admin-section" class="hidden ..."> ... </div>
+    <!-- Instructor Mode -->
+    <div id="admin-section" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[200] p-4 overflow-auto">
+        <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 max-w-lg w-full">
+            <!-- Your existing instructor PDF + MCQ form here (copy from previous version) -->
+            <!-- For brevity, add your addPdf, MCQ creation form as in the last code -->
+            <button onclick="hideAdmin()" class="mt-8 w-full bg-red-500 py-4 rounded-3xl font-bold">Close</button>
+        </div>
+    </div>
 
     <script>
-        // === CONFIG ===
+        // === YOUR CONFIG ===
         const REPO_USERNAME = "YOUR_GITHUB_USERNAME";
         const REPO_NAME = "YOUR_REPO_NAME";
 
@@ -150,77 +171,76 @@
         let timerInterval = null;
         let selectedAnswer = null;
 
-        const announcements = [ /* your existing announcements */ ];
-
-        // Encouragement messages at 33%, 66%, 100%
-        const encouragementMessages = [
-            { percent: 33, emoji: "🌟", text: "You're off to a fantastic start! Keep going!" },
-            { percent: 66, emoji: "🔥", text: "Halfway there – you're doing amazing! Don't stop now!" },
-            { percent: 100, emoji: "🎉", text: "You made it! Incredible effort – you're a star!" }
+        const announcements = [
+            "🚀 Welcome to LearnSphere – Learn, Quiz, Shine!",
+            "🌟 Triple-tap anywhere for instructor mode",
+            "💡 Practice daily and become unstoppable!",
+            "📚 Materials & Quizzes updated regularly"
         ];
 
-        function showEncouragement(percent) {
-            const msg = encouragementMessages.find(m => Math.abs(m.percent - percent) < 5);
-            if (!msg) return;
-            
-            const popup = document.getElementById('encouragement-popup');
-            document.getElementById('encouragement-emoji').textContent = msg.emoji;
-            document.getElementById('encouragement-text').textContent = msg.text;
-            popup.classList.remove('hidden');
-            
-            setTimeout(() => {
-                popup.classList.add('hidden');
-            }, 3000);
-        }
-
-        // ... (keep all previous functions: createBubbles, updateDateTime, triple-tap, marquees, PDF/MCQ creation, render functions)
-
-        function loadQuestion() {
-            const q = currentQuiz[currentQuestionIndex];
-            const total = currentQuiz.length;
-            const progress = Math.round(((currentQuestionIndex) / total) * 100);
-            
-            // Update progress bar
-            document.getElementById('progress-text').textContent = `Question ${currentQuestionIndex + 1} of ${total}`;
-            document.getElementById('progress-percent').textContent = `${progress}%`;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-            
-            // Show encouragement at key milestones
-            if (currentQuestionIndex > 0) {
-                const milestone = Math.round((currentQuestionIndex / total) * 100);
-                if ([33, 66, 100].includes(milestone)) {
-                    showEncouragement(milestone);
-                }
-            }
-
-            // Rest of question loading (question text, options, timer, etc.)
-            // ... (your existing loadQuestion code)
-            
-            document.getElementById('quiz-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function nextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex >= currentQuiz.length) {
-                showResults();
-            } else {
-                loadQuestion();
+        // Bubbles
+        function createBubbles() {
+            const container = document.getElementById('bubbles');
+            container.innerHTML = '';
+            for (let i = 0; i < 25; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 80 + 25;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.animationDuration = `${Math.random() * 22 + 14}s`;
+                bubble.style.animationDelay = `-${Math.random() * 20}s`;
+                container.appendChild(bubble);
             }
         }
 
-        // ... (keep the rest of your script: startQuiz, selectAnswer, showResults, etc.)
+        // Fast-updating Date, Day, Time (every second)
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('day').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', { 
+                hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true 
+            });
+        }
 
-        // Initialize
+        // Triple-tap to open instructor
+        let tapCount = 0;
+        let tapTimer = null;
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#admin-section') || e.target.closest('#quiz-area') || e.target.closest('#results-screen')) return;
+            tapCount++;
+            if (tapCount === 1) tapTimer = setTimeout(() => tapCount = 0, 700);
+            if (tapCount === 3) {
+                clearTimeout(tapTimer);
+                tapCount = 0;
+                document.getElementById('admin-section').classList.remove('hidden');
+            }
+        });
+
+        function hideAdmin() {
+            document.getElementById('admin-section').classList.add('hidden');
+        }
+
+        function showSection(section) {
+            document.getElementById('materials-section').classList.add('hidden');
+            document.getElementById('mcqs-section').classList.add('hidden');
+            document.getElementById(section + '-section').classList.remove('hidden');
+            if (section === 'materials') renderMaterials();
+            if (section === 'mcqs') renderMCQList();
+        }
+
+        // Marquees, Progress, Encouragement, Quiz logic, PDF/MCQ functions...
+        // (Copy the full functions from the previous full code for renderMaterials, addPdf, MCQ creation, loadQuestion with progress & encouragement, etc.)
+
+        // Initialize everything
         window.onload = () => {
             createBubbles();
             updateDateTime();
-            setInterval(updateDateTime, 20000);
-            setInterval(createBubbles, 18000);
-            setupMarquees();
-            
-            renderMaterials();
-            renderMCQList();
-            showSection('materials');
+            setInterval(updateDateTime, 1000);   // Updated every second – much faster!
+            setInterval(createBubbles, 20000);
+            // setupMarquees(), render functions, showSection('materials') ...
         };
     </script>
 </body>
