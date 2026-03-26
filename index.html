@@ -30,8 +30,12 @@
             100% { transform: translateY(-120vh) scale(0.4); opacity: 0; } 
         }
        
-        .card-hover { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .card-hover:hover { transform: translateY(-8px) scale(1.02); }
+        .card-hover { 
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        .card-hover:hover { 
+            transform: translateY(-8px) scale(1.02); 
+        }
 
         .pill-btn {
             padding: 12px 20px;
@@ -128,9 +132,7 @@
         <!-- Self Assessment - Learner View -->
         <div id="assessment-section" class="hidden">
             <h2 class="text-4xl font-bold text-center mb-8">Self Assessment</h2>
-            <div id="mcq-area" class="max-w-2xl mx-auto bg-white/10 backdrop-blur-xl rounded-3xl p-8">
-                <!-- MCQ will load here for learners -->
-            </div>
+            <div id="mcq-area" class="max-w-2xl mx-auto bg-white/10 backdrop-blur-xl rounded-3xl p-8"></div>
         </div>
     </div>
 
@@ -146,11 +148,11 @@
                 <i class="fas fa-cog"></i> Admin Panel
             </h2>
             
-            <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="flex gap-3 mb-6">
                 <button onclick="showAdminTab('upload')" 
-                        class="py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📤 Upload PDF</button>
+                        class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📤 Upload PDF</button>
                 <button onclick="showAdminTab('mcq')" 
-                        class="py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📝 Manage MCQ</button>
+                        class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📝 Manage MCQ</button>
             </div>
 
             <!-- Upload Tab -->
@@ -174,13 +176,20 @@
                 </div>
             </div>
 
-            <!-- MCQ Management Tab -->
+            <!-- MCQ Management Tab (Admin Only) -->
             <div id="admin-mcq-tab" class="hidden">
-                <p class="text-sm opacity-75 mb-4">MCQ creation coming in next update</p>
-                <div class="text-center py-12 opacity-60">
-                    <div class="text-6xl mb-4">📝</div>
-                    <p>MCQ Creator will be available here</p>
-                </div>
+                <h3 class="font-bold mb-4">Create / Edit MCQs</h3>
+                <textarea id="mcq-input" rows="12" 
+                          class="w-full p-4 rounded-2xl bg-white/20 text-white font-mono text-sm"
+                          placeholder='Example format:
+[
+  {"q": "What is the capital of Kenya?", "options": ["Mombasa", "Nairobi", "Kisumu"], "answer": 1},
+  {"q": "What is 12 × 5?", "options": ["50", "60", "55"], "answer": 1}
+]'></textarea>
+                <button onclick="saveMCQs()" 
+                        class="mt-4 w-full bg-emerald-500 hover:bg-emerald-600 py-4 rounded-3xl font-bold">
+                    Save MCQs
+                </button>
             </div>
 
             <button onclick="hideAdmin()" 
@@ -192,9 +201,10 @@
 
     <script>
         let extendedWorks = JSON.parse(localStorage.getItem('learnsphere_extended')) || [];
+        let mcqQuestions = JSON.parse(localStorage.getItem('learnsphere_mcqs')) || [];
         let isAdminMode = false;
 
-        const announcements = ["🇰🇪 Karibu LearnSphere", "Triple-tap to upload PDFs (Admin)", "Master every topic", "Keep shining!"];
+        const announcements = ["🇰🇪 Karibu LearnSphere", "Triple-tap for Admin", "Master every topic", "Keep shining!"];
 
         function createBubbles() {
             const container = document.getElementById('bubbles');
@@ -229,7 +239,6 @@
                 if (tapCount === 3) hideAdmin();
                 return;
             }
-
             tapCount++;
             if (tapCount === 1) tapTimer = setTimeout(() => tapCount = 0, 700);
             if (tapCount === 3) {
@@ -257,14 +266,12 @@
         function uploadPDF() {
             const fileInput = document.getElementById('file-input');
             const nameInput = document.getElementById('file-name').value.trim();
-           
             if (!fileInput.files.length) return alert("Please select a PDF file");
             const file = fileInput.files[0];
             if (file.type !== "application/pdf") return alert("Only PDF files allowed!");
             if (file.size > 10 * 1024 * 1024) return alert("Maximum file size is 10MB");
 
             const displayName = nameInput || file.name.replace('.pdf', '');
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64 = e.target.result.split(',')[1];
@@ -277,6 +284,19 @@
                 alert(`"${displayName}.pdf" uploaded successfully!`);
             };
             reader.readAsDataURL(file);
+        }
+
+        function saveMCQs() {
+            try {
+                const input = document.getElementById('mcq-input').value.trim();
+                if (!input) return alert("Please enter MCQ data");
+                mcqQuestions = JSON.parse(input);
+                localStorage.setItem('learnsphere_mcqs', JSON.stringify(mcqQuestions));
+                alert("MCQs saved successfully! Learners can now take the assessment.");
+                hideAdmin();
+            } catch (e) {
+                alert("Invalid JSON format. Please check your MCQ data.");
+            }
         }
 
         function viewPDF(base64, filename) {
@@ -334,18 +354,15 @@
                             <p class="text-xs opacity-75">${(item.size / 1024 / 1024).toFixed(1)} MB</p>
                         </div>
                     </div>
-                    
                     <div class="bg-black/40 rounded-2xl mb-6 h-44 flex items-center justify-center border border-red-400/30">
                         <i class="fas fa-file-pdf text-6xl text-red-400"></i>
                     </div>
-
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
                                 class="pill-btn bg-white text-black hover:bg-gray-100">👁️ View</button>
                         <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
                                 class="pill-btn bg-white text-black hover:bg-gray-100">⬇️ Download</button>
                     </div>
-                    
                     ${isAdminMode ? `
                     <button onclick="deleteWork(${index})" 
                             class="w-full mt-4 border border-red-400 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400">
@@ -356,16 +373,20 @@
             });
         }
 
-        // Simple MCQ for learners
-        const mcqQuestions = [
-            { q: "What is the capital of Kenya?", options: ["Mombasa", "Nairobi", "Kisumu", "Eldoret"], answer: 1 },
-            { q: "What is 12 × 5?", options: ["50", "60", "55", "65"], answer: 1 }
-        ];
-
+        // Learner MCQ Assessment
         function loadMCQ() {
             const container = document.getElementById('mcq-area');
+            if (mcqQuestions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 opacity-75">
+                        <div class="text-6xl mb-6">❓</div>
+                        <p class="text-xl">No MCQs available yet.</p>
+                        <p class="text-sm mt-2">Admin needs to add questions first.</p>
+                    </div>`;
+                return;
+            }
+
             let html = `<div class="space-y-8">`;
-            
             mcqQuestions.forEach((item, i) => {
                 html += `
                     <div>
@@ -380,13 +401,7 @@
                         </div>
                     </div>`;
             });
-
-            html += `
-                <button onclick="submitMCQ()" 
-                        class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg mt-6">
-                    Submit Answers
-                </button>
-            </div>`;
+            html += `<button onclick="submitMCQ()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg mt-6">Submit Answers</button></div>`;
             container.innerHTML = html;
         }
 
