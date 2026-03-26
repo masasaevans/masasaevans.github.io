@@ -125,16 +125,15 @@
             <div id="extended-empty" class="text-center py-20">
                 <div class="text-8xl mb-6">📚</div>
                 <h3 class="text-2xl font-semibold">No PDFs yet</h3>
-                <p class="opacity-80">Triple-tap anywhere to upload</p>
+                <p class="opacity-80">Triple-tap anywhere to upload (Admin only)</p>
             </div>
         </div>
 
-        <!-- Self Assessment -->
+        <!-- Self Assessment - MCQ with auto grading -->
         <div id="assessment-section" class="hidden">
             <h2 class="text-4xl font-bold text-center mb-8">Self Assessment</h2>
-            <div class="text-center py-20 opacity-75">
-                <div class="text-8xl mb-6">❓</div>
-                <p class="text-xl">Self Assessment feature coming soon</p>
+            <div id="mcq-area" class="max-w-2xl mx-auto bg-white/10 backdrop-blur-xl rounded-3xl p-8">
+                <!-- MCQ content will be loaded here -->
             </div>
         </div>
     </div>
@@ -148,7 +147,7 @@
     <div id="admin-section" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
         <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 max-w-lg w-full">
             <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
-                <i class="fas fa-upload"></i> Upload PDF
+                <i class="fas fa-upload"></i> Upload PDF (Admin)
             </h2>
            
             <div class="space-y-6">
@@ -184,7 +183,7 @@
 
         const announcements = [
             "🇰🇪 Karibu LearnSphere",
-            "Triple-tap to upload PDFs",
+            "Triple-tap to upload PDFs (Admin)",
             "Master every topic",
             "Keep shining!"
         ];
@@ -219,7 +218,6 @@
         let tapTimer = null;
         document.addEventListener('click', (e) => {
             if (e.target.closest('#admin-section')) {
-                // Triple click inside admin modal = logout
                 tapCount++;
                 if (tapCount === 3) {
                     clearTimeout(tapTimer);
@@ -229,7 +227,6 @@
                 return;
             }
 
-            // Normal triple click anywhere = open admin
             tapCount++;
             if (tapCount === 1) tapTimer = setTimeout(() => tapCount = 0, 700);
             if (tapCount === 3) {
@@ -262,11 +259,7 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64 = e.target.result.split(',')[1];
-                extendedWorks.push({
-                    name: displayName,
-                    base64: base64,
-                    size: file.size
-                });
+                extendedWorks.push({ name: displayName, base64: base64, size: file.size });
                 localStorage.setItem('learnsphere_extended', JSON.stringify(extendedWorks));
                 renderExtended();
                 hideAdmin();
@@ -280,9 +273,7 @@
         function viewPDF(base64, filename) {
             const byteCharacters = atob(base64);
             const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
+            for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
             const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
             const tab = window.open(url, '_blank');
@@ -293,9 +284,7 @@
         function downloadPDF(base64, filename) {
             const byteCharacters = atob(base64);
             const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
+            for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
             const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -343,13 +332,9 @@
 
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
-                                class="pill-btn bg-white text-black hover:bg-gray-100">
-                            👁️ View
-                        </button>
+                                class="pill-btn bg-white text-black hover:bg-gray-100">👁️ View</button>
                         <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
-                                class="pill-btn bg-white text-black hover:bg-gray-100">
-                            ⬇️ Download
-                        </button>
+                                class="pill-btn bg-white text-black hover:bg-gray-100">⬇️ Download</button>
                     </div>
                     
                     ${isAdminMode ? `
@@ -362,12 +347,97 @@
             });
         }
 
+        // ==================== MCQ SYSTEM ====================
+        const sampleQuestions = [
+            {
+                q: "What is the capital city of Kenya?",
+                options: ["Nairobi", "Mombasa", "Kisumu", "Eldoret"],
+                answer: 0
+            },
+            {
+                q: "What is 15 + 27?",
+                options: ["32", "42", "52", "62"],
+                answer: 1
+            },
+            {
+                q: "Which is the largest county in Kenya by area?",
+                options: ["Turkana", "Marsabit", "Isiolo", "Garissa"],
+                answer: 0
+            }
+        ];
+
+        function loadMCQ() {
+            const container = document.getElementById('mcq-area');
+            let html = `<div class="space-y-8">`;
+
+            sampleQuestions.forEach((item, i) => {
+                html += `
+                    <div>
+                        <p class="font-semibold mb-4 text-lg">Q${i+1}. ${item.q}</p>
+                        <div class="space-y-3">
+                            ${item.options.map((opt, j) => `
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" name="q${i}" value="${j}" class="w-5 h-5 accent-emerald-400">
+                                    <span>${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                <button onclick="submitMCQ()" 
+                        class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg mt-6">
+                    Submit & Get Results
+                </button>
+            </div>`;
+
+            container.innerHTML = html;
+        }
+
+        function submitMCQ() {
+            let score = 0;
+            sampleQuestions.forEach((item, i) => {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && parseInt(selected.value) === item.answer) {
+                    score++;
+                }
+            });
+
+            const percentage = Math.round((score / sampleQuestions.length) * 100);
+            
+            let message = "";
+            if (percentage >= 80) message = "Excellent work! You're doing great! 🎉";
+            else if (percentage >= 60) message = "Good job! Keep practicing! 👏";
+            else message = "Nice effort! Review the topics and try again 💪";
+
+            const container = document.getElementById('mcq-area');
+            container.innerHTML = `
+                <div class="text-center py-10">
+                    <div class="text-6xl mb-6">🏆</div>
+                    <h3 class="text-3xl font-bold mb-2">Your Score</h3>
+                    <div class="text-7xl font-black text-emerald-300 mb-4">${percentage}%</div>
+                    <div class="w-full bg-white/20 h-4 rounded-full mb-6 overflow-hidden">
+                        <div class="h-full bg-emerald-400 rounded-full transition-all duration-1000" 
+                             style="width: ${percentage}%"></div>
+                    </div>
+                    <p class="text-xl font-medium">${message}</p>
+                    <button onclick="loadMCQ()" 
+                            class="mt-10 px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">
+                        Try Again
+                    </button>
+                </div>
+            `;
+        }
+
         function showSection(section) {
             document.getElementById('extended-section').classList.add('hidden');
             document.getElementById('assessment-section').classList.add('hidden');
             document.getElementById(section + '-section').classList.remove('hidden');
             
             if (section === 'extended') renderExtended();
+            if (section === 'assessment') loadMCQ();
         }
 
         function setupMarquees() {
@@ -376,8 +446,9 @@
             document.getElementById('bottom-marquee').innerHTML = html + html;
         }
 
-        // Initialize
+        // Initialize - Always start in learner area
         window.onload = () => {
+            isAdminMode = false;
             createBubbles();
             updateDateTime();
             setInterval(updateDateTime, 1000);
