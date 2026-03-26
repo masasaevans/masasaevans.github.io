@@ -6,6 +6,8 @@ let pdfs = JSON.parse(localStorage.getItem("pdfs")) || [];
 // BUBBLES
 function createBubbles(){
     const container = document.getElementById("bubbles");
+    container.innerHTML = "";
+
     for(let i=0;i<20;i++){
         let b=document.createElement("div");
         let size=Math.random()*50+10;
@@ -19,45 +21,59 @@ function createBubbles(){
 // TIME
 function updateTime(){
     let now=new Date();
-    day.innerText=now.toDateString();
-    date.innerText=now.toLocaleDateString();
-    time.innerText=now.toLocaleTimeString();
+    document.getElementById("day").innerText = now.toDateString();
+    document.getElementById("date").innerText = now.toLocaleDateString();
+    document.getElementById("time").innerText = now.toLocaleTimeString();
 }
 
 // MARQUEE
 function setupMarquee(){
-    let text=announcements.join(" • ");
-    top-marquee.innerText=text;
-    bottom-marquee.innerText=text;
+    let text = announcements.join(" • ");
+    document.getElementById("top-marquee").innerText = text;
+    document.getElementById("bottom-marquee").innerText = text;
 }
 
-// ADMIN TOGGLE
-document.addEventListener("click",()=>{
-    if(event.detail===3){
+// ADMIN (TRIPLE CLICK)
+let clickCount = 0;
+let timer;
+
+document.addEventListener("click", () => {
+    clickCount++;
+    if(clickCount === 1){
+        timer = setTimeout(()=>clickCount=0,600);
+    }
+    if(clickCount === 3){
+        clearTimeout(timer);
+        clickCount = 0;
         toggleAdmin();
     }
 });
 
 function toggleAdmin(){
-    admin.classList.toggle("hidden");
+    document.getElementById("admin").classList.toggle("hidden");
 }
 
 // ANNOUNCEMENTS
 function addAnnouncement(){
-    let val=document.getElementById("announcement-input").value;
+    let val = document.getElementById("announcement-input").value.trim();
+    if(!val) return;
+
     announcements.push(val);
-    localStorage.setItem("announcements",JSON.stringify(announcements));
+    localStorage.setItem("announcements", JSON.stringify(announcements));
+    document.getElementById("announcement-input").value="";
     setupMarquee();
 }
 
 // PDF
 function uploadPDF(){
-    let file=document.getElementById("file-input").files[0];
-    let name=document.getElementById("file-name").value;
+    let file = document.getElementById("file-input").files[0];
+    let name = document.getElementById("file-name").value;
+
+    if(!file) return alert("Select file");
 
     let reader=new FileReader();
     reader.onload=function(e){
-        pdfs.push({name, data:e.target.result});
+        pdfs.push({name,data:e.target.result});
         localStorage.setItem("pdfs",JSON.stringify(pdfs));
         renderPDF();
     };
@@ -67,6 +83,7 @@ function uploadPDF(){
 function renderPDF(){
     let grid=document.getElementById("extended-grid");
     grid.innerHTML="";
+
     pdfs.forEach(p=>{
         let btn=document.createElement("button");
         btn.innerText=p.name;
@@ -81,10 +98,17 @@ function addMCQ(){
     let opts=[...document.querySelectorAll(".mcq-option")].map(x=>x.value);
     let ans=parseInt(document.getElementById("mcq-answer").value)-1;
 
+    if(!q || opts.some(o=>!o) || isNaN(ans)){
+        alert("Fill all MCQ fields");
+        return;
+    }
+
     mcqs.push({q,opts,ans});
     localStorage.setItem("mcqs",JSON.stringify(mcqs));
+    alert("MCQ added!");
 }
 
+// LOAD MCQ
 function loadMCQ(){
     let box=document.getElementById("mcq-area");
     box.innerHTML="";
@@ -104,25 +128,27 @@ function loadMCQ(){
 
 function submitMCQ(){
     let score=0;
+
     mcqs.forEach((m,i)=>{
-        let sel=document.querySelector(`input[name=q${i}]:checked`);
+        let sel=document.querySelector(`input[name="q${i}"]:checked`);
         if(sel && parseInt(sel.value)===m.ans) score++;
     });
+
     alert("Score: "+score+"/"+mcqs.length);
 }
 
 // NAV
-function showSection(s){
-    extended-section.classList.add("hidden");
-    assessment-section.classList.add("hidden");
+function showSection(section){
+    document.getElementById("extended-section").classList.add("hidden");
+    document.getElementById("assessment-section").classList.add("hidden");
 
-    document.getElementById(s+"-section").classList.remove("hidden");
+    document.getElementById(section+"-section").classList.remove("hidden");
 
-    if(s==="assessment") loadMCQ();
+    if(section==="assessment") loadMCQ();
 }
 
 // INIT
-window.onload=()=>{
+window.onload = () => {
     createBubbles();
     updateTime();
     setInterval(updateTime,1000);
