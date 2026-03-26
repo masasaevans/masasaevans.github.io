@@ -39,9 +39,9 @@
         }
 
         .pill-btn {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 9999px;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             font-weight: 600;
             transition: all 0.3s ease;
         }
@@ -214,6 +214,7 @@
             });
         }
 
+        // Triple tap to open upload
         let tapCount = 0;
         let tapTimer = null;
         document.addEventListener('click', (e) => {
@@ -261,7 +262,7 @@
             reader.readAsDataURL(file);
         }
 
-        // Download to browser's Downloads folder with correct name
+        // Auto-download without "Save As" dialog
         function downloadPDF(base64, filename) {
             try {
                 const byteCharacters = atob(base64);
@@ -271,20 +272,18 @@
                 }
                 const byteArray = new Uint8Array(byteNumbers);
                 const blob = new Blob([byteArray], { type: 'application/pdf' });
-                const blobUrl = URL.createObjectURL(blob);
 
                 const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = filename + ".pdf";   // This forces download with correct name
+                link.href = URL.createObjectURL(blob);
+                link.download = filename + ".pdf";     // Forces automatic download with correct name
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
 
-                // Cleanup
-                setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                // Cleanup memory
+                setTimeout(() => URL.revokeObjectURL(link.href), 5000);
             } catch (err) {
-                alert("Failed to download PDF. Please try again.");
-                console.error(err);
+                alert("Download failed. Please try again.");
             }
         }
 
@@ -315,12 +314,10 @@
                         <i class="fas fa-file-pdf text-6xl text-red-400"></i>
                     </div>
 
-                    <div class="flex gap-3">
-                        <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
-                                class="pill-btn flex-1 bg-white text-black text-center hover:bg-gray-100">
-                            ⬇️ Download
-                        </button>
-                    </div>
+                    <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
+                            class="pill-btn w-full bg-white text-black text-center hover:bg-gray-100">
+                        ⬇️ Download PDF
+                    </button>
                     
                     <button onclick="deleteWork(${index})" 
                             class="w-full mt-4 border border-white/70 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400 text-sm">
