@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 LearnSphere</title>
+    <title>🚀 LearnSphere | Extended Learning for Kenyan Students</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
-        
+       
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #6b21a8, #db2777, #22d3ee);
@@ -16,36 +16,70 @@
             color: white;
             overflow-x: hidden;
         }
-        
-        .bubble { position: absolute; background: rgba(255,255,255,0.18); border-radius: 50%; pointer-events: none; animation: float 20s infinite linear; box-shadow: 0 0 25px rgba(255,255,255,0.35); }
-        @keyframes float { 0% { transform: translateY(120vh) scale(1); opacity: 0.85; } 100% { transform: translateY(-120vh) scale(0.4); opacity: 0; } }
-        
-        .card-hover { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .card-hover:hover { transform: translateY(-10px) scale(1.03); box-shadow: 0 25px 50px -12px rgba(236, 72, 153, 0.5); }
-        
+       
+        .bubble { 
+            position: absolute; 
+            background: rgba(255,255,255,0.18); 
+            border-radius: 50%; 
+            pointer-events: none; 
+            animation: float 20s infinite linear; 
+            box-shadow: 0 0 25px rgba(255,255,255,0.35); 
+        }
+        @keyframes float { 
+            0% { transform: translateY(120vh) scale(1); opacity: 0.85; } 
+            100% { transform: translateY(-120vh) scale(0.4); opacity: 0; } 
+        }
+       
+        .card-hover { 
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        .card-hover:hover { 
+            transform: translateY(-10px) scale(1.03); 
+            box-shadow: 0 25px 50px -12px rgba(236, 72, 153, 0.5); 
+        }
+       
         .glow { text-shadow: 0 0 20px rgba(165, 243, 252, 0.8); }
-        .datetime-card { background: rgba(255,255,255,0.16); backdrop-filter: blur(12px); border: 2px solid rgba(255,255,255,0.3); }
-        
+        .datetime-card { 
+            background: rgba(255,255,255,0.16); 
+            backdrop-filter: blur(12px); 
+            border: 2px solid rgba(255,255,255,0.3); 
+        }
+
         /* Kenya Flag */
         .kenya-flag {
-            width: 52px; height: 32px; border: 2px solid rgba(255,255,255,0.7); border-radius: 4px; overflow: hidden; position: relative;
+            width: 52px; 
+            height: 32px; 
+            border: 2px solid rgba(255,255,255,0.7); 
+            border-radius: 4px; 
+            overflow: hidden; 
+            position: relative;
         }
         .kenya-flag .black { background: #000; height: 33%; }
         .kenya-flag .red { background: #ef4444; height: 34%; }
         .kenya-flag .green { background: #22c55e; height: 33%; }
         .kenya-flag .shield {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 18px; height: 18px; background: #facc15; border: 3px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            width: 18px; 
+            height: 18px; 
+            background: #facc15; 
+            border: 3px solid #000; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 10px;
         }
     </style>
 </head>
 <body class="relative">
-
     <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
 
     <!-- Top Marquee -->
-    <div class="marquee bg-white/10 py-3 text-sm border-b border-white/20">
-        <div id="top-marquee" class="marquee-content flex items-center gap-12 text-cyan-200"></div>
+    <div class="bg-white/10 py-3 text-sm border-b border-white/20 overflow-hidden">
+        <div id="top-marquee" class="flex items-center gap-12 text-cyan-200 whitespace-nowrap"></div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative z-10">
@@ -61,7 +95,7 @@
         </div>
         <p class="text-center text-xl sm:text-2xl opacity-90 mb-10">Extended Learning for Kenyan Students ✨</p>
 
-        <!-- Date, Day & Time - Updates every second -->
+        <!-- Live Date, Day & Time -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
             <div class="datetime-card rounded-3xl p-6 text-center card-hover">
                 <i class="fas fa-calendar-alt text-4xl mb-3 text-cyan-300"></i>
@@ -80,64 +114,72 @@
             </div>
         </div>
 
+        <!-- Navigation Buttons -->
         <div class="flex flex-wrap justify-center gap-4 mb-10">
-            <button onclick="showSection('extended')" class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📖 Extended Class Work</button>
-            <button onclick="showSection('assessment')" class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📝 Self Assessment</button>
+            <button onclick="showSection('extended')" 
+                    class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">
+                📖 Extended Class Work
+            </button>
+            <button onclick="showSection('assessment')" 
+                    class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">
+                📝 Self Assessment
+            </button>
         </div>
 
         <!-- Extended Class Work Section -->
         <div id="extended-section">
             <h2 class="text-4xl font-bold text-center mb-8">📖 Extended Class Work</h2>
             <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            
             <div id="extended-empty" class="text-center py-20">
                 <div class="text-8xl mb-6">📚</div>
-                <h3 class="text-2xl font-semibold">No PDFs yet</h3>
-                <p class="opacity-80">Triple-tap anywhere to upload PDFs</p>
+                <h3 class="text-2xl font-semibold">No PDFs uploaded yet</h3>
+                <p class="opacity-80 mt-2">Triple-tap anywhere on the screen to upload PDFs</p>
             </div>
         </div>
 
-        <!-- Self Assessment (placeholder) -->
+        <!-- Self Assessment Section -->
         <div id="assessment-section" class="hidden">
             <h2 class="text-4xl font-bold text-center mb-8">📝 Self Assessment</h2>
             <div class="text-center py-20 opacity-75">
                 <div class="text-8xl mb-6">❓</div>
-                <p>Self Assessment feature coming in next update</p>
+                <p class="text-xl">Self Assessment feature is coming soon in the next update ✨</p>
             </div>
         </div>
     </div>
 
     <!-- Bottom Marquee -->
-    <div class="marquee bg-white/10 py-3 text-sm border-t border-white/20">
-        <div id="bottom-marquee" class="marquee-content flex items-center gap-12 text-pink-200"></div>
+    <div class="bg-white/10 py-3 text-sm border-t border-white/20 overflow-hidden">
+        <div id="bottom-marquee" class="flex items-center gap-12 text-pink-200 whitespace-nowrap"></div>
     </div>
 
-    <!-- Instructor Upload Form - Triple Click Opens This -->
+    <!-- Upload Modal -->
     <div id="admin-section" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
         <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 max-w-lg w-full">
             <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
-                <i class="fas fa-upload"></i> Upload PDF - Extended Class Work
+                <i class="fas fa-upload"></i> Upload New PDF
             </h2>
-            
+           
             <div class="space-y-6">
                 <div>
-                    <label class="block text-sm mb-2 font-medium">PDF Name</label>
-                    <input id="file-name" type="text" placeholder="e.g. Week 1 Mathematics Notes" 
+                    <label class="block text-sm mb-2 font-medium">PDF Title</label>
+                    <input id="file-name" type="text" placeholder="e.g. Form 2 Biology Notes - Week 5"
                            class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300 focus:outline-none">
                 </div>
-                
+               
                 <div>
-                    <label class="block text-sm mb-2 font-medium">Select PDF File</label>
-                    <input id="file-input" type="file" accept=".pdf" 
-                           class="w-full px-5 py-4 bg-white/20 rounded-2xl text-white file:mr-4 file:py-3 file:px-6 file:rounded-2xl file:border-0 file:bg-emerald-600 file:text-white">
-                    <p class="text-xs text-emerald-200 mt-2">📌 PDF files only</p>
+                    <label class="block text-sm mb-2 font-medium">Choose PDF File</label>
+                    <input id="file-input" type="file" accept=".pdf"
+                           class="w-full px-5 py-4 bg-white/20 rounded-2xl text-white">
+                    <p class="text-xs text-emerald-200 mt-2">Only PDF files • Maximum 10MB</p>
                 </div>
-                
+               
                 <button onclick="uploadPDF()" 
                         class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg transition-colors">
-                    📤 Upload PDF Now
+                    📤 Upload PDF
                 </button>
             </div>
-            
+           
             <button onclick="hideAdmin()" 
                     class="mt-8 w-full bg-red-500 hover:bg-red-600 py-4 rounded-3xl font-bold">
                     Cancel
@@ -146,14 +188,10 @@
     </div>
 
     <script>
-        // === CHANGE THESE ===
-        const REPO_USERNAME = "YOUR_GITHUB_USERNAME";
-        const REPO_NAME = "YOUR_REPO_NAME";
-
         let extendedWorks = JSON.parse(localStorage.getItem('learnsphere_extended')) || [];
 
         const announcements = [
-            "🇰🇪 Karibu LearnSphere - Extended Learning!",
+            "🇰🇪 Karibu LearnSphere!",
             "🌟 Triple-tap anywhere to upload PDFs",
             "📖 Extended Class Work helps you master every topic",
             "Keep shining, Kenyan students! ✨"
@@ -179,12 +217,12 @@
             const now = new Date();
             document.getElementById('day').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
             document.getElementById('date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', { 
-                hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true 
+            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', {
+                hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
             });
         }
 
-        // Triple-click to open PDF upload form
+        // Triple-click to open upload modal
         let tapCount = 0;
         let tapTimer = null;
         document.addEventListener('click', (e) => {
@@ -203,42 +241,45 @@
             document.getElementById('admin-section').classList.add('hidden');
         }
 
-        // Upload PDF only
         function uploadPDF() {
             const fileInput = document.getElementById('file-input');
             const nameInput = document.getElementById('file-name').value.trim();
-            
+           
             if (!fileInput.files.length) {
                 alert("Please select a PDF file");
                 return;
             }
-            
+           
             const file = fileInput.files[0];
             if (file.type !== "application/pdf") {
                 alert("Only PDF files are allowed!");
                 return;
             }
-            
+            if (file.size > 10 * 1024 * 1024) {
+                alert("File too large! Maximum size is 10MB.");
+                return;
+            }
+           
             const displayName = nameInput || file.name.replace('.pdf', '');
-            
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const base64 = e.target.result.split(',')[1];
-                
+               
                 extendedWorks.push({
                     name: displayName,
                     base64: base64,
-                    size: file.size
+                    size: file.size,
+                    uploadedAt: new Date().toISOString()
                 });
-                
+               
                 localStorage.setItem('learnsphere_extended', JSON.stringify(extendedWorks));
                 renderExtended();
                 hideAdmin();
-                
-                // Clear inputs
+               
                 document.getElementById('file-name').value = '';
                 fileInput.value = '';
-                
+               
                 alert(`✅ "${displayName}.pdf" uploaded successfully!`);
             };
             reader.readAsDataURL(file);
@@ -248,36 +289,41 @@
             const grid = document.getElementById('extended-grid');
             const empty = document.getElementById('extended-empty');
             grid.innerHTML = '';
-            
+
             if (extendedWorks.length === 0) {
                 empty.classList.remove('hidden');
                 return;
             }
             empty.classList.add('hidden');
-            
+
             extendedWorks.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = 'card-hover bg-white/10 backdrop-blur-xl rounded-3xl p-6';
                 card.innerHTML = `
                     <div class="flex items-center gap-3 mb-6">
                         <i class="fas fa-file-pdf text-5xl text-red-400"></i>
-                        <h3 class="font-bold text-xl">${item.name}</h3>
-                    </div>
-                    <div class="bg-black/40 rounded-2xl mb-6 h-48 flex items-center justify-center border border-red-400/30">
-                        <div class="text-center">
-                            <i class="fas fa-file-pdf text-6xl text-red-400"></i>
-                            <p class="text-xs mt-3 opacity-75">PDF Document</p>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-xl">${item.name}</h3>
+                            <p class="text-xs opacity-75">${(item.size / 1024 / 1024).toFixed(1)} MB</p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-black/40 rounded-2xl mb-6 h-48 flex items-center justify-center border border-red-400/30">
+                        <i class="fas fa-file-pdf text-6xl text-red-400"></i>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
                         <a href="data:application/pdf;base64,${item.base64}" 
+                           target="_blank"
+                           class="bg-white text-black font-bold py-4 rounded-2xl text-center hover:bg-gray-100">
+                            👁️ View PDF
+                        </a>
+                        <a href="data:application/pdf;base64,${item.base64}"
                            download="${item.name}.pdf"
-                           class="bg-white text-black font-bold py-4 rounded-2xl text-center flex items-center justify-center gap-2">
+                           class="bg-white text-black font-bold py-4 rounded-2xl text-center hover:bg-gray-100">
                             <i class="fas fa-download"></i> Download
                         </a>
                         <button onclick="deleteWork(${index})" 
-                                class="border-2 border-white/70 font-bold py-4 rounded-2xl text-center text-red-300 hover:text-red-400">
-                            Delete
+                                class="col-span-2 border-2 border-white/70 font-bold py-4 rounded-2xl text-red-300 hover:text-red-400">
+                            🗑️ Delete
                         </button>
                     </div>
                 `;
@@ -306,11 +352,11 @@
             document.getElementById('bottom-marquee').innerHTML = html + html;
         }
 
-        // Initialize
+        // Initialize the app
         window.onload = () => {
             createBubbles();
             updateDateTime();
-            setInterval(updateDateTime, 1000);        // Fast update every second
+            setInterval(updateDateTime, 1000);
             setInterval(createBubbles, 25000);
             setupMarquees();
             renderExtended();
