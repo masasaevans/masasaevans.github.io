@@ -35,7 +35,6 @@
         }
         .card-hover:hover { 
             transform: translateY(-8px) scale(1.02); 
-            box-shadow: 0 20px 40px -12px rgba(236, 72, 153, 0.4); 
         }
 
         .pill-btn {
@@ -72,7 +71,6 @@
 <body class="relative">
     <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
 
-    <!-- Top Marquee -->
     <div class="bg-white/10 py-2 text-sm border-b border-white/20 overflow-hidden">
         <div id="top-marquee" class="flex items-center gap-12 text-cyan-200 whitespace-nowrap"></div>
     </div>
@@ -88,7 +86,6 @@
             <h1 class="text-5xl sm:text-6xl font-black glow tracking-tighter">LEARNSPHERE</h1>
         </div>
 
-        <!-- Date & Time -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
             <div class="datetime-card rounded-3xl p-6 text-center card-hover">
                 <i class="fas fa-calendar-alt text-4xl mb-3 text-cyan-300"></i>
@@ -118,7 +115,6 @@
             </button>
         </div>
 
-        <!-- Extended Class Work -->
         <div id="extended-section">
             <h2 class="text-4xl font-bold text-center mb-8">Extended Class Work</h2>
             <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -130,7 +126,6 @@
             </div>
         </div>
 
-        <!-- Self Assessment -->
         <div id="assessment-section" class="hidden">
             <h2 class="text-4xl font-bold text-center mb-8">Self Assessment</h2>
             <div class="text-center py-20 opacity-75">
@@ -140,7 +135,6 @@
         </div>
     </div>
 
-    <!-- Bottom Marquee -->
     <div class="bg-white/10 py-2 text-sm border-t border-white/20 overflow-hidden">
         <div id="bottom-marquee" class="flex items-center gap-12 text-pink-200 whitespace-nowrap"></div>
     </div>
@@ -245,10 +239,9 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const base64 = e.target.result.split(',')[1];
                 extendedWorks.push({
                     name: displayName,
-                    base64: base64,
+                    base64: e.target.result.split(',')[1],
                     size: file.size
                 });
                 localStorage.setItem('learnsphere_extended', JSON.stringify(extendedWorks));
@@ -261,52 +254,39 @@
             reader.readAsDataURL(file);
         }
 
-        // View in new tab (cleaner method)
+        // View in new tab
         function viewPDF(base64, filename) {
-            try {
-                const byteCharacters = atob(base64);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'application/pdf' });
-                const blobUrl = URL.createObjectURL(blob);
-
-                const newTab = window.open(blobUrl, '_blank');
-                if (newTab) {
-                    setTimeout(() => {
-                        try { newTab.document.title = filename + ".pdf"; } catch(e) {}
-                    }, 800);
-                }
-                setTimeout(() => URL.revokeObjectURL(blobUrl), 120000);
-            } catch (err) {
-                alert("Could not open PDF for viewing. Try Download instead.");
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
             }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const tab = window.open(url, '_blank');
+            if (tab) tab.document.title = filename + ".pdf";
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
         }
 
-        // Automatic download to Downloads folder (no Save As dialog)
+        // Automatic download (no Save As dialog)
         function downloadPDF(base64, filename) {
-            try {
-                const byteCharacters = atob(base64);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'application/pdf' });
-
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = filename + ".pdf";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-            } catch (err) {
-                alert("Download failed. Please try again.");
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
             }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/pdf' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename + ".pdf";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            setTimeout(() => URL.revokeObjectURL(link.href), 5000);
         }
 
         function renderExtended() {
