@@ -30,12 +30,8 @@
             100% { transform: translateY(-120vh) scale(0.4); opacity: 0; } 
         }
        
-        .card-hover { 
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
-        }
-        .card-hover:hover { 
-            transform: translateY(-8px) scale(1.02); 
-        }
+        .card-hover { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .card-hover:hover { transform: translateY(-8px) scale(1.02); }
 
         .pill-btn {
             padding: 12px 20px;
@@ -129,11 +125,11 @@
             </div>
         </div>
 
-        <!-- Self Assessment - MCQ -->
+        <!-- Self Assessment - Learner View -->
         <div id="assessment-section" class="hidden">
             <h2 class="text-4xl font-bold text-center mb-8">Self Assessment</h2>
             <div id="mcq-area" class="max-w-2xl mx-auto bg-white/10 backdrop-blur-xl rounded-3xl p-8">
-                <!-- MCQ will load here -->
+                <!-- MCQ will load here for learners -->
             </div>
         </div>
     </div>
@@ -147,29 +143,46 @@
     <div id="admin-section" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
         <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 max-w-lg w-full">
             <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
-                <i class="fas fa-upload"></i> Upload PDF (Admin)
+                <i class="fas fa-cog"></i> Admin Panel
             </h2>
-           
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-sm mb-2">PDF Title</label>
-                    <input id="file-name" type="text" placeholder="e.g. Mathematics Notes"
-                           class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300 focus:outline-none">
-                </div>
-               
-                <div>
-                    <label class="block text-sm mb-2">Select PDF File</label>
-                    <input id="file-input" type="file" accept=".pdf"
-                           class="w-full px-5 py-4 bg-white/20 rounded-2xl text-white">
-                    <p class="text-xs text-emerald-200 mt-2">Max 10MB • PDF only</p>
-                </div>
-               
-                <button onclick="uploadPDF()" 
-                        class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">
-                    Upload Now
-                </button>
+            
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <button onclick="showAdminTab('upload')" 
+                        class="py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📤 Upload PDF</button>
+                <button onclick="showAdminTab('mcq')" 
+                        class="py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📝 Manage MCQ</button>
             </div>
-           
+
+            <!-- Upload Tab -->
+            <div id="admin-upload-tab">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm mb-2">PDF Title</label>
+                        <input id="file-name" type="text" placeholder="e.g. Mathematics Notes"
+                               class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-2">Select PDF File</label>
+                        <input id="file-input" type="file" accept=".pdf"
+                               class="w-full px-5 py-4 bg-white/20 rounded-2xl text-white">
+                        <p class="text-xs text-emerald-200 mt-2">Max 10MB • PDF only</p>
+                    </div>
+                    <button onclick="uploadPDF()" 
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">
+                        Upload Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- MCQ Management Tab -->
+            <div id="admin-mcq-tab" class="hidden">
+                <p class="text-sm opacity-75 mb-4">MCQ creation coming in next update</p>
+                <div class="text-center py-12 opacity-60">
+                    <div class="text-6xl mb-4">📝</div>
+                    <p>MCQ Creator will be available here</p>
+                </div>
+            </div>
+
             <button onclick="hideAdmin()" 
                     class="mt-8 w-full bg-red-500 hover:bg-red-600 py-4 rounded-3xl font-bold">
                     Cancel / Logout
@@ -181,12 +194,7 @@
         let extendedWorks = JSON.parse(localStorage.getItem('learnsphere_extended')) || [];
         let isAdminMode = false;
 
-        const announcements = [
-            "🇰🇪 Karibu LearnSphere",
-            "Triple-tap to upload PDFs (Admin)",
-            "Master every topic",
-            "Keep shining!"
-        ];
+        const announcements = ["🇰🇪 Karibu LearnSphere", "Triple-tap to upload PDFs (Admin)", "Master every topic", "Keep shining!"];
 
         function createBubbles() {
             const container = document.getElementById('bubbles');
@@ -213,7 +221,6 @@
             });
         }
 
-        // Triple click handler
         let tapCount = 0;
         let tapTimer = null;
         document.addEventListener('click', (e) => {
@@ -230,7 +237,7 @@
                 tapCount = 0;
                 isAdminMode = true;
                 document.getElementById('admin-section').classList.remove('hidden');
-                document.getElementById('file-name').focus();
+                showAdminTab('upload');
                 renderExtended();
             }
         });
@@ -239,6 +246,12 @@
             isAdminMode = false;
             document.getElementById('admin-section').classList.add('hidden');
             renderExtended();
+        }
+
+        function showAdminTab(tab) {
+            document.getElementById('admin-upload-tab').classList.add('hidden');
+            document.getElementById('admin-mcq-tab').classList.add('hidden');
+            document.getElementById('admin-' + tab + '-tab').classList.remove('hidden');
         }
 
         function uploadPDF() {
@@ -343,11 +356,10 @@
             });
         }
 
-        // ==================== MCQ ====================
+        // Simple MCQ for learners
         const mcqQuestions = [
             { q: "What is the capital of Kenya?", options: ["Mombasa", "Nairobi", "Kisumu", "Eldoret"], answer: 1 },
-            { q: "What is 12 × 5?", options: ["50", "60", "55", "65"], answer: 1 },
-            { q: "Which is the longest river in Kenya?", options: ["Tana River", "Nile", "Athi River", "Ewaso Ng'iro"], answer: 0 }
+            { q: "What is 12 × 5?", options: ["50", "60", "55", "65"], answer: 1 }
         ];
 
         function loadMCQ() {
@@ -423,7 +435,6 @@
             document.getElementById('bottom-marquee').innerHTML = html + html;
         }
 
-        // Initialize - Always start in learner area
         window.onload = () => {
             isAdminMode = false;
             createBubbles();
