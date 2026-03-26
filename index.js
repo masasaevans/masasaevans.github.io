@@ -1,9 +1,24 @@
+// index.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  orderBy 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// ✅ YOUR CONFIG
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
+
+import { 
+  getAuth, 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  signOut,
+  onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyC_HOU827BDT-QRDJMJU0QBF1GznxuT3rM",
   authDomain: "masasa-online.firebaseapp.com",
@@ -19,101 +34,111 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
 
-// UI
 const overlay = document.getElementById("overlay");
 const appUI = document.getElementById("app");
 const header = document.getElementById("header");
-const adminPanel = document.getElementById("adminPanel");
+const materialsDiv = document.getElementById("materials");
 
-// ROLE
-window.enterStudent = () => {
-  localStorage.setItem("role", "student");
-  startApp();
-};
+let currentUser = null;
 
-window.showAdminLogin = () => {
-  document.getElementById("adminBox").classList.remove("hidden");
-};
-
-window.loginAdmin = () => {
-  const pass = document.getElementById("adminPass").value;
-
-  if (pass === "1234") {
-    localStorage.setItem("role", "admin");
-    startApp();
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  if (user) {
+    if (user.email === "realmasasa@gmail.com") {
+      overlay.classList.add("hidden");
+      appUI.classList.remove("hidden");
+      header.classList.remove("hidden");
+      loadMaterials();
+    } else {
+      alert("Access Denied!\n\nOnly realmasasa@gmail.com is allowed to use this app.");
+      signOut(auth);
+    }
   } else {
-    alert("Wrong password");
+    overlay.classList.remove("hidden");
+    appUI.classList.add("hidden");
+    header.classList.add("hidden");
   }
-};
+});
 
 window.googleLogin = async () => {
-  await signInWithPopup(auth, new GoogleAuthProvider());
-  localStorage.setItem("role", "student");
-  startApp();
-};
-
-function startApp() {
-  overlay.classList.add("hidden");
-  appUI.classList.remove("hidden");
-  header.classList.remove("hidden");
-
-  if (localStorage.getItem("role") === "admin") {
-    adminPanel.classList.remove("hidden");
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch (err) {
+    alert("Google login failed: " + err.message);
   }
-
-  loadMaterials();
-}
+};
 
 window.logout = () => {
-  localStorage.clear();
-  signOut(auth);
-  location.reload();
+  if (confirm("Logout?")) {
+    signOut(auth);
+  }
 };
 
-// UPLOAD
+// Upload (only for realmasasa@gmail.com)
 window.upload = async () => {
-  if (localStorage.getItem("role") !== "admin") return alert("Admin only");
+  if (!currentUser || currentUser.email !== "realmasasa@gmail.com") {
+    return alert("Access Denied! Only realmasasa@gmail.com can upload.");
+  }
 
-  const title = document.getElementById("title").value;
+  const title = document.getElementById("title").value.trim();
   const file = document.getElementById("file").files[0];
 
-  const storageRef = ref(storage, "pdfs/" + file.name);
-  await uploadBytes(storageRef, file);
+  if (!title || !file) {
+    return alert("Please enter a title and select a PDF file");
+  }
 
-  const url = await getDownloadURL(storageRef);
+  try {
+    const storageRef = ref(storage, `materials/${Date.now()}-${file.name}`);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
 
-  await addDoc(collection(db, "materials"), { title, url });
+    await addDoc(collection(db, "materials"), {
+      title: title,
+      url: url,
+      created: Date.now(),
+      uploadedBy: currentUser.email
+    });
 
-  alert("Uploaded!");
-  loadMaterials();
+    alert("✅ PDF uploaded successfully!");
+    document.getElementById("title").value = "";
+    document.getElementById("file").value = "";
+    loadMaterials();
+  } catch (err) {
+    alert("Upload failed: " + err.message);
+  }
 };
 
-// LOAD
 async function loadMaterials() {
-  const el = document.getElementById("materials");
-  el.innerHTML = "Loading...";
+  materialsDiv.innerHTML = `<p class="text-gray-500">Loading materials...</p>`;
 
-  const snap = await getDocs(collection(db, "materials"));
+  try {
+    const q = query(collection(db, "materials"), orderBy("created", "desc"));
+    const snap = await getDocs(q);
 
-  el.innerHTML = "";
-  snap.forEach(doc => {
-    const m = doc.data();
-    el.innerHTML += `
-      <div class="card">
-        ${m.title}<br>
-        <a href="${m.url}" target="_blank">Open</a>
-      </div>
-    `;
-  });
+    materialsDiv.innerHTML = "";
+    if (snap.empty) {
+      materialsDiv.innerHTML = `<p class="text-gray-500 p-8 text-center bg-white rounded-3xl">No materials yet.</p>`;
+      return;
+    }
+
+    snap.forEach(doc => {
+      const m = doc.data();
+      materialsDiv.innerHTML += `
+        <div class="card">
+          <strong class="text-lg">${m.title}</strong><br>
+          <a href="${m.url}" target="_blank" class="text-orange-600 underline hover:text-orange-700 mt-2 inline-block">
+            📥 Download PDF
+          </a>
+        </div>`;
+    });
+  } catch (err) {
+    materialsDiv.innerHTML = `<p class="text-red-500">Error loading materials</p>`;
+  }
 }
 
-// TIME
+// Live Time
 setInterval(() => {
-  document.getElementById("time").innerText =
-    new Date().toLocaleString();
+  const timeEl = document.getElementById("time");
+  if (timeEl) timeEl.textContent = new Date().toLocaleString("en-GB");
 }, 1000);
-
-// INIT
-window.onload = () => {
-  if (localStorage.getItem("role")) startApp();
-};
