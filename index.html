@@ -3,88 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Masasa Online - Learn Smarter</title>
+  <title>Masasa Online</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="index.css">
 </head>
+
 <body class="bg-gradient-to-br from-orange-50 to-indigo-50 min-h-screen">
 
-<!-- ROLE OVERLAY -->
-<div id="role-overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-  <div class="bg-white rounded-3xl p-10 max-w-md w-full text-center shadow-2xl">
-    <h1 class="text-4xl font-black mb-8 text-orange-600">Masasa Online 🚀</h1>
+<!-- ROLE SELECT -->
+<div id="overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center">
+  <div class="bg-white p-10 rounded-3xl text-center">
+    <h1 class="text-3xl font-bold mb-6 text-orange-600">Masasa Online 🚀</h1>
 
-    <button onclick="continueStudent()" class="w-full bg-orange-500 text-white py-5 rounded-3xl mb-4 font-bold">
-      👨‍🎓 Continue as Student
+    <button onclick="enterStudent()" class="block w-full bg-orange-500 text-white py-4 rounded mb-4">
+      Student
     </button>
 
-    <button onclick="showAdminLogin()" class="w-full bg-indigo-600 text-white py-5 rounded-3xl mb-4 font-bold">
-      👨‍💼 Admin Login
+    <button onclick="showAdminLogin()" class="block w-full bg-indigo-600 text-white py-4 rounded mb-4">
+      Admin
     </button>
 
-    <button onclick="signInWithGoogle()" class="w-full border py-5 rounded-3xl font-bold">
-      Sign in with Google
+    <button onclick="googleLogin()" class="block w-full border py-4 rounded">
+      Google Login
     </button>
   </div>
 </div>
 
 <!-- ADMIN LOGIN -->
-<div id="admin-login" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-  <div class="bg-white rounded-3xl p-8 max-w-sm w-full">
-    <h2 class="text-2xl font-black mb-6 text-center">Admin Login</h2>
-
-    <input id="admin-pass" type="password" placeholder="Enter admin password"
-      class="w-full p-4 border rounded-2xl mb-6">
-
-    <button onclick="validateAdmin()" class="w-full bg-indigo-600 text-white py-3 rounded-2xl mb-3">
-      Login
-    </button>
-
-    <button onclick="hideAdminLogin()" class="w-full bg-gray-200 py-3 rounded-2xl">
-      Cancel
-    </button>
+<div id="adminBox" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+  <div class="bg-white p-6 rounded-2xl">
+    <input id="adminPass" type="password" placeholder="Admin password" class="p-3 border mb-4 w-full">
+    <button onclick="loginAdmin()" class="bg-indigo-600 text-white px-6 py-2 w-full">Login</button>
   </div>
 </div>
 
-<!-- HEADER -->
-<header id="main-header" class="hidden bg-white shadow sticky top-0 z-40">
-  <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between">
-    <h1 class="text-xl font-black text-orange-600">📚 Masasa Online</h1>
-    <div class="flex gap-4 items-center">
-      <span id="live-time"></span>
-      <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-xl">Logout</button>
-    </div>
+<header class="hidden p-4 bg-white shadow flex justify-between" id="header">
+  <h1 class="font-bold text-orange-600">Masasa</h1>
+  <div>
+    <span id="time"></span>
+    <button onclick="logout()" class="ml-4 bg-red-500 text-white px-3 py-1">Logout</button>
   </div>
 </header>
 
-<main id="main-content" class="hidden max-w-6xl mx-auto px-6 py-10">
+<main id="app" class="hidden p-6">
 
-<!-- ADMIN -->
-<div id="admin-tools" class="hidden bg-white p-6 rounded-3xl shadow mb-10">
-  <h2 class="text-2xl font-bold mb-6">Admin Dashboard</h2>
-
-  <input id="pdf-title" placeholder="PDF Title" class="w-full p-3 border rounded mb-3">
-  <input id="pdf-file" type="file" accept="application/pdf" class="mb-3">
-  <button onclick="uploadPDF()" class="bg-green-600 text-white px-6 py-2 rounded">Upload PDF</button>
+<div id="adminPanel" class="hidden mb-6 bg-white p-6 rounded shadow">
+  <h2 class="font-bold mb-3">Upload PDF</h2>
+  <input id="title" placeholder="Title" class="border p-2 w-full mb-2">
+  <input id="file" type="file" class="mb-2">
+  <button onclick="upload()" class="bg-green-600 text-white px-4 py-2">Upload</button>
 </div>
 
-<!-- STUDENT -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-  <div>
-    <h2 class="font-bold mb-3">Materials</h2>
-    <div id="material-list"></div>
-  </div>
-
-  <div>
-    <h2 class="font-bold mb-3">Quizzes</h2>
-    <div id="quiz-list"></div>
-  </div>
-
-  <div>
-    <h2 class="font-bold mb-3">My Results</h2>
-    <div id="results-list"></div>
-  </div>
-</div>
+<h2 class="font-bold mb-3">Materials</h2>
+<div id="materials"></div>
 
 </main>
 
