@@ -129,11 +129,11 @@
             </div>
         </div>
 
-        <!-- Self Assessment with MCQ -->
+        <!-- Self Assessment - MCQ -->
         <div id="assessment-section" class="hidden">
             <h2 class="text-4xl font-bold text-center mb-8">Self Assessment</h2>
             <div id="mcq-area" class="max-w-2xl mx-auto bg-white/10 backdrop-blur-xl rounded-3xl p-8">
-                <!-- MCQ loaded by JS -->
+                <!-- MCQ will load here -->
             </div>
         </div>
     </div>
@@ -181,7 +181,12 @@
         let extendedWorks = JSON.parse(localStorage.getItem('learnsphere_extended')) || [];
         let isAdminMode = false;
 
-        const announcements = ["🇰🇪 Karibu LearnSphere", "Triple-tap to upload PDFs (Admin)", "Master every topic", "Keep shining!"];
+        const announcements = [
+            "🇰🇪 Karibu LearnSphere",
+            "Triple-tap to upload PDFs (Admin)",
+            "Master every topic",
+            "Keep shining!"
+        ];
 
         function createBubbles() {
             const container = document.getElementById('bubbles');
@@ -214,11 +219,7 @@
         document.addEventListener('click', (e) => {
             if (e.target.closest('#admin-section')) {
                 tapCount++;
-                if (tapCount === 3) {
-                    clearTimeout(tapTimer);
-                    tapCount = 0;
-                    hideAdmin();
-                }
+                if (tapCount === 3) hideAdmin();
                 return;
             }
 
@@ -342,7 +343,7 @@
             });
         }
 
-        // ==================== MCQ SYSTEM ====================
+        // ==================== MCQ ====================
         const mcqQuestions = [
             { q: "What is the capital of Kenya?", options: ["Mombasa", "Nairobi", "Kisumu", "Eldoret"], answer: 1 },
             { q: "What is 12 × 5?", options: ["50", "60", "55", "65"], answer: 1 },
@@ -385,9 +386,9 @@
             });
 
             const percentage = Math.round((score / mcqQuestions.length) * 100);
-            let appreciation = percentage >= 80 ? "Excellent! You're doing very well! 🎉" :
-                               percentage >= 60 ? "Good job! Keep it up! 👏" : 
-                               "Nice effort! Review and try again 💪";
+            const appreciation = percentage >= 80 ? "Excellent! You're doing very well! 🎉" :
+                                percentage >= 60 ? "Good job! Keep practicing! 👏" : 
+                                "Nice effort! Review the topics and try again 💪";
 
             const container = document.getElementById('mcq-area');
             container.innerHTML = `
@@ -395,13 +396,10 @@
                     <div class="text-7xl mb-4">🏆</div>
                     <h3 class="text-3xl font-bold mb-3">Your Score</h3>
                     <div class="text-8xl font-black text-emerald-300 mb-6">${percentage}%</div>
-                    
                     <div class="w-full bg-white/20 h-5 rounded-full mb-8 overflow-hidden">
                         <div class="h-full bg-emerald-400 rounded-full transition-all duration-1000" style="width: ${percentage}%"></div>
                     </div>
-                    
                     <p class="text-xl font-medium">${appreciation}</p>
-                    
                     <button onclick="loadMCQ()" 
                             class="mt-10 px-10 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">
                         Try Again
