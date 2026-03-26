@@ -1,462 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LearnSphere</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
-       
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #6b21a8, #db2777, #22d3ee);
-            min-height: 100vh;
-            color: white;
-            overflow-x: hidden;
-        }
-       
-        .bubble { 
-            position: absolute; 
-            background: rgba(255,255,255,0.18); 
-            border-radius: 50%; 
-            pointer-events: none; 
-            animation: float 20s infinite linear; 
-            box-shadow: 0 0 25px rgba(255,255,255,0.35); 
-        }
-        @keyframes float { 
-            0% { transform: translateY(120vh) scale(1); opacity: 0.85; } 
-            100% { transform: translateY(-120vh) scale(0.4); opacity: 0; } 
-        }
-       
-        .card-hover { 
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
-        }
-        .card-hover:hover { 
-            transform: translateY(-8px) scale(1.02); 
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnSphere</title>
 
-        .pill-btn {
-            padding: 12px 20px;
-            border-radius: 9999px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-       
-        .glow { text-shadow: 0 0 20px rgba(165, 243, 252, 0.8); }
-        .datetime-card { 
-            background: rgba(255,255,255,0.16); 
-            backdrop-filter: blur(12px); 
-            border: 2px solid rgba(255,255,255,0.3); 
-        }
-
-        .kenya-flag {
-            width: 52px; height: 32px; 
-            border: 2px solid rgba(255,255,255,0.7); 
-            border-radius: 4px; overflow: hidden; position: relative;
-        }
-        .kenya-flag .black { background: #000; height: 33%; }
-        .kenya-flag .red { background: #ef4444; height: 34%; }
-        .kenya-flag .green { background: #22c55e; height: 33%; }
-        .kenya-flag .shield {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 18px; height: 18px; background: #facc15; 
-            border: 3px solid #000; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; font-size: 10px;
-        }
-    </style>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-<body class="relative">
-    <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
 
-    <!-- Top Marquee -->
-    <div class="bg-white/10 py-2 text-sm border-b border-white/20 overflow-hidden">
-        <div id="top-marquee" class="flex items-center gap-12 text-cyan-200 whitespace-nowrap"></div>
+<body>
+
+<div id="bubbles"></div>
+
+<!-- HEADER MARQUEE -->
+<div class="marquee">
+    <div id="top-marquee"></div>
+</div>
+
+<div class="container">
+
+    <h1 class="title">LEARNSPHERE</h1>
+
+    <!-- DATE -->
+    <div class="datetime">
+        <div id="day"></div>
+        <div id="date"></div>
+        <div id="time"></div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative z-10">
-        <div class="flex items-center justify-center gap-4 mb-10">
-            <div class="kenya-flag">
-                <div class="black"></div>
-                <div class="red"></div>
-                <div class="green"></div>
-                <div class="shield">🛡️</div>
-            </div>
-            <h1 class="text-5xl sm:text-6xl font-black glow tracking-tighter">LEARNSPHERE</h1>
-        </div>
-
-        <!-- Date & Time -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
-            <div class="datetime-card rounded-3xl p-6 text-center card-hover">
-                <i class="fas fa-calendar-alt text-4xl mb-3 text-cyan-300"></i>
-                <div id="day" class="text-3xl font-bold"></div>
-                <div class="text-xs opacity-75">DAY</div>
-            </div>
-            <div class="datetime-card rounded-3xl p-6 text-center card-hover">
-                <i class="fas fa-clock text-4xl mb-3 text-pink-300"></i>
-                <div id="date" class="text-3xl font-bold"></div>
-                <div class="text-xs opacity-75">DATE</div>
-            </div>
-            <div class="datetime-card rounded-3xl p-6 text-center card-hover">
-                <i class="fas fa-hourglass-half text-4xl mb-3 text-yellow-300"></i>
-                <div id="time" class="text-3xl font-bold font-mono"></div>
-                <div class="text-xs opacity-75">TIME</div>
-            </div>
-        </div>
-
-        <div class="flex flex-wrap justify-center gap-4 mb-10">
-            <button onclick="showSection('extended')" 
-                    class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">
-                📖 Extended Class Work
-            </button>
-            <button onclick="showSection('assessment')" 
-                    class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">
-                📝 Self Assessment
-            </button>
-        </div>
-
-        <!-- Extended Class Work -->
-        <div id="extended-section">
-            <h2 class="text-4xl font-bold text-center mb-8">Extended Class Work</h2>
-            <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            
-            <div id="extended-empty" class="text-center py-20">
-                <div class="text-8xl mb-6">📚</div>
-                <h3 class="text-2xl font-semibold">No PDFs yet</h3>
-                <p class="opacity-80">Triple-tap anywhere to upload (Admin only)</p>
-            </div>
-        </div>
-
-        <!-- Self Assessment - MCQ with auto grading -->
-        <div id="assessment-section" class="hidden">
-            <h2 class="text-4xl font-bold text-center mb-8">Self Assessment</h2>
-            <div id="mcq-area" class="max-w-2xl mx-auto bg-white/10 backdrop-blur-xl rounded-3xl p-8">
-                <!-- MCQ content will be loaded here -->
-            </div>
-        </div>
+    <!-- BUTTONS -->
+    <div class="buttons">
+        <button onclick="showSection('extended')">📖 Extended Work</button>
+        <button onclick="showSection('assessment')">📝 Assessment</button>
     </div>
 
-    <!-- Bottom Marquee -->
-    <div class="bg-white/10 py-2 text-sm border-t border-white/20 overflow-hidden">
-        <div id="bottom-marquee" class="flex items-center gap-12 text-pink-200 whitespace-nowrap"></div>
+    <!-- EXTENDED -->
+    <div id="extended-section">
+        <div id="extended-grid"></div>
     </div>
 
-    <!-- Admin Modal -->
-    <div id="admin-section" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-        <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 max-w-lg w-full">
-            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
-                <i class="fas fa-upload"></i> Upload PDF (Admin)
-            </h2>
-           
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-sm mb-2">PDF Title</label>
-                    <input id="file-name" type="text" placeholder="e.g. Mathematics Notes"
-                           class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300 focus:outline-none">
-                </div>
-               
-                <div>
-                    <label class="block text-sm mb-2">Select PDF File</label>
-                    <input id="file-input" type="file" accept=".pdf"
-                           class="w-full px-5 py-4 bg-white/20 rounded-2xl text-white">
-                    <p class="text-xs text-emerald-200 mt-2">Max 10MB • PDF only</p>
-                </div>
-               
-                <button onclick="uploadPDF()" 
-                        class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">
-                    Upload Now
-                </button>
-            </div>
-           
-            <button onclick="hideAdmin()" 
-                    class="mt-8 w-full bg-red-500 hover:bg-red-600 py-4 rounded-3xl font-bold">
-                    Cancel / Logout
-            </button>
-        </div>
+    <!-- MCQ -->
+    <div id="assessment-section" class="hidden">
+        <div id="mcq-area"></div>
     </div>
 
-    <script>
-        let extendedWorks = JSON.parse(localStorage.getItem('learnsphere_extended')) || [];
-        let isAdminMode = false;
+</div>
 
-        const announcements = [
-            "🇰🇪 Karibu LearnSphere",
-            "Triple-tap to upload PDFs (Admin)",
-            "Master every topic",
-            "Keep shining!"
-        ];
+<!-- FOOTER MARQUEE -->
+<div class="marquee">
+    <div id="bottom-marquee"></div>
+</div>
 
-        function createBubbles() {
-            const container = document.getElementById('bubbles');
-            container.innerHTML = '';
-            for (let i = 0; i < 18; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                const size = Math.random() * 70 + 20;
-                bubble.style.width = `${size}px`;
-                bubble.style.height = `${size}px`;
-                bubble.style.left = `${Math.random() * 100}vw`;
-                bubble.style.animationDuration = `${Math.random() * 22 + 14}s`;
-                bubble.style.animationDelay = `-${Math.random() * 18}s`;
-                container.appendChild(bubble);
-            }
-        }
+<!-- ADMIN -->
+<div id="admin" class="hidden">
+    <div class="admin-box">
 
-        function updateDateTime() {
-            const now = new Date();
-            document.getElementById('day').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
-            document.getElementById('date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', {
-                hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
-            });
-        }
+        <h2>ADMIN PANEL</h2>
 
-        // Triple click handler
-        let tapCount = 0;
-        let tapTimer = null;
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('#admin-section')) {
-                tapCount++;
-                if (tapCount === 3) {
-                    clearTimeout(tapTimer);
-                    tapCount = 0;
-                    hideAdmin();
-                }
-                return;
-            }
+        <!-- ANNOUNCEMENTS -->
+        <input id="announcement-input" placeholder="Announcement">
+        <button onclick="addAnnouncement()">Add Announcement</button>
 
-            tapCount++;
-            if (tapCount === 1) tapTimer = setTimeout(() => tapCount = 0, 700);
-            if (tapCount === 3) {
-                clearTimeout(tapTimer);
-                tapCount = 0;
-                isAdminMode = true;
-                document.getElementById('admin-section').classList.remove('hidden');
-                document.getElementById('file-name').focus();
-                renderExtended();
-            }
-        });
+        <!-- PDF -->
+        <input id="file-name" placeholder="PDF Name">
+        <input id="file-input" type="file">
+        <button onclick="uploadPDF()">Upload PDF</button>
 
-        function hideAdmin() {
-            isAdminMode = false;
-            document.getElementById('admin-section').classList.add('hidden');
-            renderExtended();
-        }
+        <!-- MCQ -->
+        <input id="mcq-question" placeholder="Question">
 
-        function uploadPDF() {
-            const fileInput = document.getElementById('file-input');
-            const nameInput = document.getElementById('file-name').value.trim();
-           
-            if (!fileInput.files.length) return alert("Please select a PDF file");
-            const file = fileInput.files[0];
-            if (file.type !== "application/pdf") return alert("Only PDF files allowed!");
-            if (file.size > 10 * 1024 * 1024) return alert("Maximum file size is 10MB");
+        <input class="mcq-option" placeholder="Option 1">
+        <input class="mcq-option" placeholder="Option 2">
+        <input class="mcq-option" placeholder="Option 3">
+        <input class="mcq-option" placeholder="Option 4">
 
-            const displayName = nameInput || file.name.replace('.pdf', '');
+        <input id="mcq-answer" type="number" placeholder="Answer (1-4)">
+        <button onclick="addMCQ()">Add MCQ</button>
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64 = e.target.result.split(',')[1];
-                extendedWorks.push({ name: displayName, base64: base64, size: file.size });
-                localStorage.setItem('learnsphere_extended', JSON.stringify(extendedWorks));
-                renderExtended();
-                hideAdmin();
-                document.getElementById('file-name').value = '';
-                fileInput.value = '';
-                alert(`"${displayName}.pdf" uploaded successfully!`);
-            };
-            reader.readAsDataURL(file);
-        }
+        <button onclick="toggleAdmin()">Close</button>
 
-        function viewPDF(base64, filename) {
-            const byteCharacters = atob(base64);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
-            const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
-            const tab = window.open(url, '_blank');
-            if (tab) tab.document.title = filename + ".pdf";
-            setTimeout(() => URL.revokeObjectURL(url), 60000);
-        }
+    </div>
+</div>
 
-        function downloadPDF(base64, filename) {
-            const byteCharacters = atob(base64);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
-            const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename + ".pdf";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-        }
-
-        function deleteWork(index) {
-            if (confirm("Delete this PDF?")) {
-                extendedWorks.splice(index, 1);
-                localStorage.setItem('learnsphere_extended', JSON.stringify(extendedWorks));
-                renderExtended();
-            }
-        }
-
-        function renderExtended() {
-            const grid = document.getElementById('extended-grid');
-            const empty = document.getElementById('extended-empty');
-            grid.innerHTML = '';
-
-            if (extendedWorks.length === 0) {
-                empty.classList.remove('hidden');
-                return;
-            }
-            empty.classList.add('hidden');
-
-            extendedWorks.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = 'card-hover bg-white/10 backdrop-blur-xl rounded-3xl p-6';
-                card.innerHTML = `
-                    <div class="flex items-center gap-3 mb-6">
-                        <i class="fas fa-file-pdf text-5xl text-red-400"></i>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-bold text-lg truncate">${item.name}</h3>
-                            <p class="text-xs opacity-75">${(item.size / 1024 / 1024).toFixed(1)} MB</p>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-black/40 rounded-2xl mb-6 h-44 flex items-center justify-center border border-red-400/30">
-                        <i class="fas fa-file-pdf text-6xl text-red-400"></i>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
-                                class="pill-btn bg-white text-black hover:bg-gray-100">👁️ View</button>
-                        <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
-                                class="pill-btn bg-white text-black hover:bg-gray-100">⬇️ Download</button>
-                    </div>
-                    
-                    ${isAdminMode ? `
-                    <button onclick="deleteWork(${index})" 
-                            class="w-full mt-4 border border-red-400 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400">
-                        🗑️ Delete (Admin only)
-                    </button>` : ''}
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        // ==================== MCQ SYSTEM ====================
-        const sampleQuestions = [
-            {
-                q: "What is the capital city of Kenya?",
-                options: ["Nairobi", "Mombasa", "Kisumu", "Eldoret"],
-                answer: 0
-            },
-            {
-                q: "What is 15 + 27?",
-                options: ["32", "42", "52", "62"],
-                answer: 1
-            },
-            {
-                q: "Which is the largest county in Kenya by area?",
-                options: ["Turkana", "Marsabit", "Isiolo", "Garissa"],
-                answer: 0
-            }
-        ];
-
-        function loadMCQ() {
-            const container = document.getElementById('mcq-area');
-            let html = `<div class="space-y-8">`;
-
-            sampleQuestions.forEach((item, i) => {
-                html += `
-                    <div>
-                        <p class="font-semibold mb-4 text-lg">Q${i+1}. ${item.q}</p>
-                        <div class="space-y-3">
-                            ${item.options.map((opt, j) => `
-                                <label class="flex items-center gap-3 cursor-pointer">
-                                    <input type="radio" name="q${i}" value="${j}" class="w-5 h-5 accent-emerald-400">
-                                    <span>${opt}</span>
-                                </label>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            });
-
-            html += `
-                <button onclick="submitMCQ()" 
-                        class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg mt-6">
-                    Submit & Get Results
-                </button>
-            </div>`;
-
-            container.innerHTML = html;
-        }
-
-        function submitMCQ() {
-            let score = 0;
-            sampleQuestions.forEach((item, i) => {
-                const selected = document.querySelector(`input[name="q${i}"]:checked`);
-                if (selected && parseInt(selected.value) === item.answer) {
-                    score++;
-                }
-            });
-
-            const percentage = Math.round((score / sampleQuestions.length) * 100);
-            
-            let message = "";
-            if (percentage >= 80) message = "Excellent work! You're doing great! 🎉";
-            else if (percentage >= 60) message = "Good job! Keep practicing! 👏";
-            else message = "Nice effort! Review the topics and try again 💪";
-
-            const container = document.getElementById('mcq-area');
-            container.innerHTML = `
-                <div class="text-center py-10">
-                    <div class="text-6xl mb-6">🏆</div>
-                    <h3 class="text-3xl font-bold mb-2">Your Score</h3>
-                    <div class="text-7xl font-black text-emerald-300 mb-4">${percentage}%</div>
-                    <div class="w-full bg-white/20 h-4 rounded-full mb-6 overflow-hidden">
-                        <div class="h-full bg-emerald-400 rounded-full transition-all duration-1000" 
-                             style="width: ${percentage}%"></div>
-                    </div>
-                    <p class="text-xl font-medium">${message}</p>
-                    <button onclick="loadMCQ()" 
-                            class="mt-10 px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">
-                        Try Again
-                    </button>
-                </div>
-            `;
-        }
-
-        function showSection(section) {
-            document.getElementById('extended-section').classList.add('hidden');
-            document.getElementById('assessment-section').classList.add('hidden');
-            document.getElementById(section + '-section').classList.remove('hidden');
-            
-            if (section === 'extended') renderExtended();
-            if (section === 'assessment') loadMCQ();
-        }
-
-        function setupMarquees() {
-            const html = announcements.map(t => `<span class="mx-10">${t}</span>`).join('');
-            document.getElementById('top-marquee').innerHTML = html + html;
-            document.getElementById('bottom-marquee').innerHTML = html + html;
-        }
-
-        // Initialize - Always start in learner area
-        window.onload = () => {
-            isAdminMode = false;
-            createBubbles();
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-            setInterval(createBubbles, 25000);
-            setupMarquees();
-            renderExtended();
-            showSection('extended');
-        };
-    </script>
+<script src="index.js"></script>
 </body>
 </html>
