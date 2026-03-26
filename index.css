@@ -1,37 +1,15 @@
 body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: system-ui, sans-serif;
 }
 
 .card {
   background: white;
-  padding: 20px;
-  margin-bottom: 16px;
-  border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 .hidden {
   display: none !important;
-}
-
-#temp-questions-list {
-  background: #fff7ed;
-  border: 2px dashed #f97316;
-  color: #c2410c;
-}
-
-button {
-  transition: all 0.2s ease;
-}
-
-input:focus, select:focus {
-  outline: none;
-  border-color: #f97316;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
 }
