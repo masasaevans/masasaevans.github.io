@@ -34,8 +34,16 @@
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
         .card-hover:hover { 
-            transform: translateY(-10px) scale(1.03); 
-            box-shadow: 0 25px 50px -12px rgba(236, 72, 153, 0.5); 
+            transform: translateY(-8px) scale(1.02); 
+            box-shadow: 0 20px 40px -12px rgba(236, 72, 153, 0.4); 
+        }
+
+        .pill-btn {
+            padding: 10px 20px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
        
         .glow { text-shadow: 0 0 20px rgba(165, 243, 252, 0.8); }
@@ -81,7 +89,7 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative z-10">
-        <!-- Simple Header -->
+        <!-- Header -->
         <div class="flex items-center justify-center gap-4 mb-10">
             <div class="kenya-flag">
                 <div class="black"></div>
@@ -92,7 +100,7 @@
             <h1 class="text-5xl sm:text-6xl font-black glow tracking-tighter">LEARNSPHERE</h1>
         </div>
 
-        <!-- Live Date & Time -->
+        <!-- Date & Time -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
             <div class="datetime-card rounded-3xl p-6 text-center card-hover">
                 <i class="fas fa-calendar-alt text-4xl mb-3 text-cyan-300"></i>
@@ -123,7 +131,7 @@
             </button>
         </div>
 
-        <!-- Extended Class Work -->
+        <!-- Extended Class Work Section -->
         <div id="extended-section">
             <h2 class="text-4xl font-bold text-center mb-8">Extended Class Work</h2>
             <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -219,6 +227,7 @@
             });
         }
 
+        // Triple tap to open upload
         let tapCount = 0;
         let tapTimer = null;
         document.addEventListener('click', (e) => {
@@ -242,6 +251,7 @@
             const nameInput = document.getElementById('file-name').value.trim();
            
             if (!fileInput.files.length) return alert("Please select a PDF file");
+            
             const file = fileInput.files[0];
             if (file.type !== "application/pdf") return alert("Only PDF files allowed!");
             if (file.size > 10 * 1024 * 1024) return alert("Maximum file size is 10MB");
@@ -287,19 +297,29 @@
                             <p class="text-xs opacity-75">${(item.size / 1024 / 1024).toFixed(1)} MB</p>
                         </div>
                     </div>
+                    
                     <div class="bg-black/40 rounded-2xl mb-6 h-44 flex items-center justify-center border border-red-400/30">
                         <i class="fas fa-file-pdf text-6xl text-red-400"></i>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <a href="data:application/pdf;base64,${item.base64}" target="_blank"
-                           class="bg-white text-black font-bold py-4 rounded-2xl text-center text-sm">View</a>
-                        <a href="data:application/pdf;base64,${item.base64}" download="${item.name}.pdf"
-                           class="bg-white text-black font-bold py-4 rounded-2xl text-center text-sm">Download</a>
-                        <button onclick="deleteWork(${index})" 
-                                class="col-span-2 border border-white/70 font-bold py-4 rounded-2xl text-red-300 text-sm">
-                            Delete
-                        </button>
+
+                    <!-- Small Pill Buttons -->
+                    <div class="flex gap-3">
+                        <a href="data:application/pdf;base64,${item.base64}" 
+                           target="_blank"
+                           class="pill-btn flex-1 bg-white text-black text-center hover:bg-gray-100">
+                            👁️ View
+                        </a>
+                        <a href="data:application/pdf;base64,${item.base64}" 
+                           download="${item.name}.pdf"
+                           class="pill-btn flex-1 bg-white text-black text-center hover:bg-gray-100">
+                            ⬇️ Download
+                        </a>
                     </div>
+                    
+                    <button onclick="deleteWork(${index})" 
+                            class="w-full mt-4 border border-white/70 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400 text-sm">
+                        Delete
+                    </button>
                 `;
                 grid.appendChild(card);
             });
