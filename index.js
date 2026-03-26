@@ -38,6 +38,7 @@ const overlay = document.getElementById("overlay");
 const appUI = document.getElementById("app");
 const header = document.getElementById("header");
 const materialsDiv = document.getElementById("materials");
+const uploadBtn = document.getElementById("uploadBtn");
 
 let currentUser = null;
 
@@ -50,7 +51,7 @@ onAuthStateChanged(auth, (user) => {
       header.classList.remove("hidden");
       loadMaterials();
     } else {
-      alert("Access Denied!\n\nOnly realmasasa@gmail.com is allowed to use this app.");
+      alert("Access Denied!\n\nOnly realmasasa@gmail.com is allowed.");
       signOut(auth);
     }
   } else {
@@ -65,31 +66,34 @@ window.googleLogin = async () => {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
   } catch (err) {
+    console.error(err);
     alert("Google login failed: " + err.message);
   }
 };
 
 window.logout = () => {
-  if (confirm("Logout?")) {
-    signOut(auth);
-  }
+  if (confirm("Logout?")) signOut(auth);
 };
 
-// Upload (only for realmasasa@gmail.com)
 window.upload = async () => {
   if (!currentUser || currentUser.email !== "realmasasa@gmail.com") {
     return alert("Access Denied! Only realmasasa@gmail.com can upload.");
   }
 
   const title = document.getElementById("title").value.trim();
-  const file = document.getElementById("file").files[0];
+  const fileInput = document.getElementById("file");
+  const file = fileInput.files[0];
 
-  if (!title || !file) {
-    return alert("Please enter a title and select a PDF file");
-  }
+  if (!title) return alert("Please enter a material title");
+  if (!file) return alert("Please select a PDF file");
+
+  // Disable button during upload
+  uploadBtn.disabled = true;
+  uploadBtn.textContent = "Uploading... Please wait";
 
   try {
     const storageRef = ref(storage, `materials/${Date.now()}-${file.name}`);
+    
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
 
@@ -101,16 +105,23 @@ window.upload = async () => {
     });
 
     alert("✅ PDF uploaded successfully!");
+
+    // Clear form
     document.getElementById("title").value = "";
-    document.getElementById("file").value = "";
+    fileInput.value = "";
+
     loadMaterials();
   } catch (err) {
-    alert("Upload failed: " + err.message);
+    console.error("Upload error:", err);
+    alert("Upload failed.\n\nError: " + err.message + "\n\nPlease try again.");
+  } finally {
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = "Upload PDF";
   }
 };
 
 async function loadMaterials() {
-  materialsDiv.innerHTML = `<p class="text-gray-500">Loading materials...</p>`;
+  materialsDiv.innerHTML = `<p class="text-gray-500 p-8 text-center">Loading materials...</p>`;
 
   try {
     const q = query(collection(db, "materials"), orderBy("created", "desc"));
@@ -118,7 +129,7 @@ async function loadMaterials() {
 
     materialsDiv.innerHTML = "";
     if (snap.empty) {
-      materialsDiv.innerHTML = `<p class="text-gray-500 p-8 text-center bg-white rounded-3xl">No materials yet.</p>`;
+      materialsDiv.innerHTML = `<p class="text-gray-500 p-8 text-center bg-white rounded-3xl">No materials uploaded yet.</p>`;
       return;
     }
 
@@ -133,7 +144,8 @@ async function loadMaterials() {
         </div>`;
     });
   } catch (err) {
-    materialsDiv.innerHTML = `<p class="text-red-500">Error loading materials</p>`;
+    console.error(err);
+    materialsDiv.innerHTML = `<p class="text-red-500 p-8 text-center">Error loading materials. Please refresh.</p>`;
   }
 }
 
