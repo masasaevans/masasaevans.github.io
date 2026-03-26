@@ -261,8 +261,8 @@
             reader.readAsDataURL(file);
         }
 
-        // Reliable PDF Viewer Function
-        function viewPDF(base64, filename) {
+        // Download to browser's Downloads folder with correct name
+        function downloadPDF(base64, filename) {
             try {
                 const byteCharacters = atob(base64);
                 const byteNumbers = new Array(byteCharacters.length);
@@ -273,20 +273,17 @@
                 const blob = new Blob([byteArray], { type: 'application/pdf' });
                 const blobUrl = URL.createObjectURL(blob);
 
-                // Open in new tab
-                const newTab = window.open(blobUrl, '_blank');
-                
-                // Try to set title (works in many cases)
-                if (newTab) {
-                    setTimeout(() => {
-                        if (newTab.document) newTab.document.title = filename + ".pdf";
-                    }, 500);
-                }
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename + ".pdf";   // This forces download with correct name
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
 
                 // Cleanup
-                setTimeout(() => URL.revokeObjectURL(blobUrl), 120000);
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
             } catch (err) {
-                alert("Failed to open PDF. Try downloading instead.");
+                alert("Failed to download PDF. Please try again.");
                 console.error(err);
             }
         }
@@ -319,15 +316,10 @@
                     </div>
 
                     <div class="flex gap-3">
-                        <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
+                        <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
                                 class="pill-btn flex-1 bg-white text-black text-center hover:bg-gray-100">
-                            👁️ View PDF
-                        </button>
-                        <a href="data:application/pdf;base64,${item.base64}" 
-                           download="${item.name}.pdf"
-                           class="pill-btn flex-1 bg-white text-black text-center hover:bg-gray-100">
                             ⬇️ Download
-                        </a>
+                        </button>
                     </div>
                     
                     <button onclick="deleteWork(${index})" 
