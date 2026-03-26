@@ -1,52 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Masasa Online</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="index.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 LearnSphere - Course Materials</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a, #7e22ce, #ec4899);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .bubble { position: absolute; background: rgba(255,255,255,0.15); border-radius: 50%; pointer-events: none; animation: float 15s infinite linear; box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        @keyframes float { 0% { transform: translateY(100vh) scale(1); opacity: 0.8; } 100% { transform: translateY(-100vh) scale(0.5); opacity: 0; } }
+        
+        .material-card { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .material-card:hover { transform: translateY(-12px) scale(1.03); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4); }
+        
+        .pdf-frame { border: 3px solid #c026d3; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(192,38,211,0.3); }
+        .glow { text-shadow: 0 0 20px rgba(236,72,153,0.8); }
+        
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 1000; }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-orange-50 to-indigo-50 min-h-screen">
+<body class="text-white">
 
-  <!-- LOGIN OVERLAY -->
-  <div id="overlay" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-    <div class="bg-white p-10 rounded-3xl text-center max-w-md w-full shadow-2xl">
-      <h1 class="text-4xl font-black mb-8 text-orange-600">Masasa Online 🚀</h1>
-      <button onclick="googleLogin()" 
-              class="w-full bg-white border-2 border-orange-500 py-5 rounded-3xl font-bold text-lg">
-        Sign in with Google
-      </button>
-      <p class="text-sm text-gray-500 mt-6">Only realmasasa@gmail.com is allowed</p>
+    <!-- Floating Bubbles -->
+    <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <div class="max-w-6xl mx-auto px-4 py-8 relative z-10">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4 glow">🚀 LearnSphere</h1>
+            <p class="text-xl md:text-2xl opacity-90">Your exciting learning journey starts here!</p>
+            <div id="datetime" class="mt-6 inline-flex items-center gap-6 bg-white/10 backdrop-blur-md px-8 py-3 rounded-3xl text-lg font-medium"></div>
+        </div>
+
+        <!-- Materials Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="materials-grid">
+            <!-- Add your material cards here (same as before) -->
+            <!-- Example: -->
+            <div class="material-card bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-pink-500 rounded-2xl flex items-center justify-center text-3xl">📚</div>
+                    <div>
+                        <h2 class="text-2xl font-semibold">Week 1: Introduction</h2>
+                        <p class="text-sm opacity-75">Monday • 45 mins</p>
+                    </div>
+                </div>
+                <div class="pdf-frame aspect-video mb-6 bg-gray-900">
+                    <iframe src="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/materials/week1/lecture.pdf" 
+                            class="w-full h-full" title="PDF Preview"></iframe>
+                </div>
+                <div class="flex gap-3">
+                    <a href="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/materials/week1/lecture.pdf" download 
+                       class="flex-1 bg-white text-purple-700 font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-pink-300">📥 Download</a>
+                    <a href="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/materials/week1/lecture.pdf" target="_blank"
+                       class="flex-1 bg-transparent border-2 border-white/80 font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-white/20">👁 View</a>
+                </div>
+            </div>
+            <!-- Duplicate cards for more weeks and update paths -->
+        </div>
+
+        <!-- Admin Upload Section (hidden until unlocked) -->
+        <div id="admin-section" class="hidden mt-20 p-8 bg-white/10 backdrop-blur-lg rounded-3xl border border-white/30">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3"><i class="fas fa-shield-alt"></i> Instructor Area - Mr. Evans Masasa</h2>
+            <p class="mb-6">Upload new PDFs via GitHub:</p>
+            <ol class="list-decimal pl-6 space-y-3 text-lg">
+                <li>Visit your repo: <a href="https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME" target="_blank" class="underline hover:text-pink-300">github.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME</a></li>
+                <li>Click <strong>Add file → Upload files</strong></li>
+                <li>Place PDFs in the <code>/materials/</code> folder</li>
+                <li>Refresh this page after uploading</li>
+            </ol>
+            <button onclick="hideAdmin()" class="mt-8 bg-red-500 hover:bg-red-600 px-8 py-4 rounded-2xl font-semibold">Close Admin Mode</button>
+        </div>
     </div>
-  </div>
 
-  <!-- HEADER -->
-  <header id="header" class="hidden bg-white shadow sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-black text-orange-600">📚 Masasa Online</h1>
-      <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-2xl text-sm">Logout</button>
-    </div>
-  </header>
-
-  <!-- MAIN APP -->
-  <main id="app" class="hidden max-w-6xl mx-auto px-6 py-10">
-    <div class="bg-white p-8 rounded-3xl shadow mb-10">
-      <h2 class="text-2xl font-bold mb-6">Upload New Material</h2>
-      <input id="title" placeholder="Material Title" 
-             class="w-full p-4 border rounded-2xl mb-4">
-      <input id="file" type="file" accept="application/pdf" 
-             class="block w-full mb-6">
-      <button onclick="upload()" id="uploadBtn"
-              class="w-full bg-green-600 hover:bg-green-700 text-white py-5 rounded-3xl font-bold text-lg">
-        Upload PDF
-      </button>
+    <!-- Secret Modal -->
+    <div id="secret-modal" class="modal">
+        <div class="bg-white text-gray-900 rounded-3xl p-8 max-w-sm w-full mx-4">
+            <h3 class="text-2xl font-bold mb-2 text-center">Verification Required</h3>
+            <p class="text-center text-gray-600 mb-6">Are you Mr. Evans Masasa?</p>
+            <input id="secret-input" type="password" placeholder="Enter access code" 
+                   class="w-full px-6 py-4 rounded-2xl border border-gray-300 focus:outline-none focus:border-purple-600 text-lg mb-6">
+            <div id="attempts" class="text-red-500 text-sm text-center mb-4"></div>
+            <div class="flex gap-4">
+                <button onclick="checkSecret()" class="flex-1 bg-purple-600 text-white py-4 rounded-2xl font-semibold hover:bg-purple-700">Unlock</button>
+                <button onclick="hideModal()" class="flex-1 bg-gray-300 text-gray-800 py-4 rounded-2xl font-semibold hover:bg-gray-400">Cancel</button>
+            </div>
+        </div>
     </div>
 
-    <h2 class="text-2xl font-bold mb-6">📄 Available Materials</h2>
-    <div id="materials" class="space-y-4"></div>
-  </main>
+    <script>
+        // === Configuration ===
+        const CORRECT_HASH = "f7c3bc1d808e04732adf679965ccc34ca7ae3441a8a4b8b2f0e5e4d3c2b1a09f"; // SHA-256 of "1989"
+        let attempts = 0;
+        const MAX_ATTEMPTS = 3;
 
-  <script type="module" src="index.js"></script>
+        // Floating bubbles
+        function createBubbles() {
+            const container = document.getElementById('bubbles');
+            for (let i = 0; i < 25; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 80 + 20;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.animationDuration = `${Math.random() * 20 + 15}s`;
+                bubble.style.animationDelay = `-${Math.random() * 20}s`;
+                container.appendChild(bubble);
+                setTimeout(() => bubble.remove(), 40000);
+            }
+        }
+
+        // Live Date & Time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            const dateStr = now.toLocaleDateString('en-US', options);
+            const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            document.getElementById('datetime').innerHTML = `
+                <span><i class="fas fa-calendar"></i> ${dateStr}</span>
+                <span><i class="fas fa-clock"></i> ${timeStr}</span>
+            `;
+        }
+
+        // Triple-click detection
+        let clickCount = 0;
+        let clickTimer = null;
+        document.addEventListener('click', (e) => {
+            // Ignore clicks inside modal or admin section
+            if (e.target.closest('#secret-modal') || e.target.closest('#admin-section')) return;
+            
+            clickCount++;
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => { clickCount = 0; }, 700);
+            }
+            if (clickCount === 3) {
+                clearTimeout(clickTimer);
+                clickCount = 0;
+                if (attempts < MAX_ATTEMPTS) {
+                    document.getElementById('secret-modal').style.display = 'flex';
+                    document.getElementById('secret-input').focus();
+                } else {
+                    alert("Too many attempts. Refresh the page to try again.");
+                }
+            }
+        });
+
+        // Simple SHA-256 hash function (using Web Crypto API)
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Check secret
+        async function checkSecret() {
+            if (attempts >= MAX_ATTEMPTS) return;
+            
+            const input = document.getElementById('secret-input').value.trim();
+            if (!input) return;
+
+            attempts++;
+            document.getElementById('attempts').textContent = `${MAX_ATTEMPTS - attempts} attempts remaining`;
+
+            const inputHash = await sha256(input);
+            
+            if (inputHash === CORRECT_HASH) {
+                hideModal();
+                document.getElementById('admin-section').classList.remove('hidden');
+                document.getElementById('admin-section').scrollIntoView({ behavior: 'smooth' });
+                attempts = 0; // Reset on success
+            } else {
+                document.getElementById('secret-input').value = '';
+                if (attempts >= MAX_ATTEMPTS) {
+                    hideModal();
+                    alert("Maximum attempts reached. Please refresh the page.");
+                } else {
+                    alert(`Incorrect code. ${MAX_ATTEMPTS - attempts} attempts left.`);
+                }
+            }
+        }
+
+        function hideModal() {
+            document.getElementById('secret-modal').style.display = 'none';
+            document.getElementById('secret-input').value = '';
+        }
+
+        function hideAdmin() {
+            document.getElementById('admin-section').classList.add('hidden');
+        }
+
+        // Initialize
+        window.onload = () => {
+            createBubbles();
+            updateDateTime();
+            setInterval(updateDateTime, 30000);
+            setInterval(createBubbles, 15000);
+        };
+    </script>
 </body>
 </html>
