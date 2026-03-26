@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 LearnSphere | Extended Learning for Kenyan Students</title>
+    <title>LearnSphere</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -59,11 +59,9 @@
         .kenya-flag .green { background: #22c55e; height: 33%; }
         .kenya-flag .shield {
             position: absolute; 
-            top: 50%; 
-            left: 50%; 
+            top: 50%; left: 50%; 
             transform: translate(-50%, -50%);
-            width: 18px; 
-            height: 18px; 
+            width: 18px; height: 18px; 
             background: #facc15; 
             border: 3px solid #000; 
             border-radius: 50%; 
@@ -78,24 +76,23 @@
     <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
 
     <!-- Top Marquee -->
-    <div class="bg-white/10 py-3 text-sm border-b border-white/20 overflow-hidden">
+    <div class="bg-white/10 py-2 text-sm border-b border-white/20 overflow-hidden">
         <div id="top-marquee" class="flex items-center gap-12 text-cyan-200 whitespace-nowrap"></div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 relative z-10">
-        <!-- Header with Kenya Flag -->
-        <div class="flex items-center justify-center gap-4 mb-8">
+        <!-- Simple Header -->
+        <div class="flex items-center justify-center gap-4 mb-10">
             <div class="kenya-flag">
                 <div class="black"></div>
                 <div class="red"></div>
                 <div class="green"></div>
                 <div class="shield">🛡️</div>
             </div>
-            <h1 class="text-5xl sm:text-6xl md:text-7xl font-black glow tracking-tighter">LEARNSPHERE</h1>
+            <h1 class="text-5xl sm:text-6xl font-black glow tracking-tighter">LEARNSPHERE</h1>
         </div>
-        <p class="text-center text-xl sm:text-2xl opacity-90 mb-10">Extended Learning for Kenyan Students ✨</p>
 
-        <!-- Live Date, Day & Time -->
+        <!-- Live Date & Time -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
             <div class="datetime-card rounded-3xl p-6 text-center card-hover">
                 <i class="fas fa-calendar-alt text-4xl mb-3 text-cyan-300"></i>
@@ -114,7 +111,7 @@
             </div>
         </div>
 
-        <!-- Navigation Buttons -->
+        <!-- Navigation -->
         <div class="flex flex-wrap justify-center gap-4 mb-10">
             <button onclick="showSection('extended')" 
                     class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">
@@ -126,30 +123,30 @@
             </button>
         </div>
 
-        <!-- Extended Class Work Section -->
+        <!-- Extended Class Work -->
         <div id="extended-section">
-            <h2 class="text-4xl font-bold text-center mb-8">📖 Extended Class Work</h2>
+            <h2 class="text-4xl font-bold text-center mb-8">Extended Class Work</h2>
             <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             
             <div id="extended-empty" class="text-center py-20">
                 <div class="text-8xl mb-6">📚</div>
-                <h3 class="text-2xl font-semibold">No PDFs uploaded yet</h3>
-                <p class="opacity-80 mt-2">Triple-tap anywhere on the screen to upload PDFs</p>
+                <h3 class="text-2xl font-semibold">No PDFs yet</h3>
+                <p class="opacity-80">Triple-tap anywhere to upload</p>
             </div>
         </div>
 
-        <!-- Self Assessment Section -->
+        <!-- Self Assessment -->
         <div id="assessment-section" class="hidden">
-            <h2 class="text-4xl font-bold text-center mb-8">📝 Self Assessment</h2>
+            <h2 class="text-4xl font-bold text-center mb-8">Self Assessment</h2>
             <div class="text-center py-20 opacity-75">
                 <div class="text-8xl mb-6">❓</div>
-                <p class="text-xl">Self Assessment feature is coming soon in the next update ✨</p>
+                <p class="text-xl">Coming soon</p>
             </div>
         </div>
     </div>
 
     <!-- Bottom Marquee -->
-    <div class="bg-white/10 py-3 text-sm border-t border-white/20 overflow-hidden">
+    <div class="bg-white/10 py-2 text-sm border-t border-white/20 overflow-hidden">
         <div id="bottom-marquee" class="flex items-center gap-12 text-pink-200 whitespace-nowrap"></div>
     </div>
 
@@ -157,26 +154,26 @@
     <div id="admin-section" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
         <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 max-w-lg w-full">
             <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
-                <i class="fas fa-upload"></i> Upload New PDF
+                <i class="fas fa-upload"></i> Upload PDF
             </h2>
            
             <div class="space-y-6">
                 <div>
-                    <label class="block text-sm mb-2 font-medium">PDF Title</label>
-                    <input id="file-name" type="text" placeholder="e.g. Form 2 Biology Notes - Week 5"
+                    <label class="block text-sm mb-2">PDF Title</label>
+                    <input id="file-name" type="text" placeholder="e.g. Mathematics Notes"
                            class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300 focus:outline-none">
                 </div>
                
                 <div>
-                    <label class="block text-sm mb-2 font-medium">Choose PDF File</label>
+                    <label class="block text-sm mb-2">Select PDF File</label>
                     <input id="file-input" type="file" accept=".pdf"
                            class="w-full px-5 py-4 bg-white/20 rounded-2xl text-white">
-                    <p class="text-xs text-emerald-200 mt-2">Only PDF files • Maximum 10MB</p>
+                    <p class="text-xs text-emerald-200 mt-2">Max 10MB • PDF only</p>
                 </div>
                
                 <button onclick="uploadPDF()" 
-                        class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg transition-colors">
-                    📤 Upload PDF
+                        class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">
+                    Upload Now
                 </button>
             </div>
            
@@ -191,24 +188,24 @@
         let extendedWorks = JSON.parse(localStorage.getItem('learnsphere_extended')) || [];
 
         const announcements = [
-            "🇰🇪 Karibu LearnSphere!",
-            "🌟 Triple-tap anywhere to upload PDFs",
-            "📖 Extended Class Work helps you master every topic",
-            "Keep shining, Kenyan students! ✨"
+            "🇰🇪 Karibu LearnSphere",
+            "Triple-tap to upload PDFs",
+            "Master every topic",
+            "Keep shining!"
         ];
 
         function createBubbles() {
             const container = document.getElementById('bubbles');
             container.innerHTML = '';
-            for (let i = 0; i < 22; i++) {
+            for (let i = 0; i < 18; i++) {
                 const bubble = document.createElement('div');
                 bubble.className = 'bubble';
-                const size = Math.random() * 80 + 25;
+                const size = Math.random() * 70 + 20;
                 bubble.style.width = `${size}px`;
                 bubble.style.height = `${size}px`;
                 bubble.style.left = `${Math.random() * 100}vw`;
-                bubble.style.animationDuration = `${Math.random() * 25 + 15}s`;
-                bubble.style.animationDelay = `-${Math.random() * 20}s`;
+                bubble.style.animationDuration = `${Math.random() * 22 + 14}s`;
+                bubble.style.animationDelay = `-${Math.random() * 18}s`;
                 container.appendChild(bubble);
             }
         }
@@ -222,7 +219,6 @@
             });
         }
 
-        // Triple-click to open upload modal
         let tapCount = 0;
         let tapTimer = null;
         document.addEventListener('click', (e) => {
@@ -245,42 +241,26 @@
             const fileInput = document.getElementById('file-input');
             const nameInput = document.getElementById('file-name').value.trim();
            
-            if (!fileInput.files.length) {
-                alert("Please select a PDF file");
-                return;
-            }
-           
+            if (!fileInput.files.length) return alert("Please select a PDF file");
             const file = fileInput.files[0];
-            if (file.type !== "application/pdf") {
-                alert("Only PDF files are allowed!");
-                return;
-            }
-            if (file.size > 10 * 1024 * 1024) {
-                alert("File too large! Maximum size is 10MB.");
-                return;
-            }
-           
+            if (file.type !== "application/pdf") return alert("Only PDF files allowed!");
+            if (file.size > 10 * 1024 * 1024) return alert("Maximum file size is 10MB");
+
             const displayName = nameInput || file.name.replace('.pdf', '');
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const base64 = e.target.result.split(',')[1];
-               
                 extendedWorks.push({
                     name: displayName,
-                    base64: base64,
-                    size: file.size,
-                    uploadedAt: new Date().toISOString()
+                    base64: e.target.result.split(',')[1],
+                    size: file.size
                 });
-               
                 localStorage.setItem('learnsphere_extended', JSON.stringify(extendedWorks));
                 renderExtended();
                 hideAdmin();
-               
                 document.getElementById('file-name').value = '';
                 fileInput.value = '';
-               
-                alert(`✅ "${displayName}.pdf" uploaded successfully!`);
+                alert(`"${displayName}.pdf" uploaded successfully!`);
             };
             reader.readAsDataURL(file);
         }
@@ -302,28 +282,22 @@
                 card.innerHTML = `
                     <div class="flex items-center gap-3 mb-6">
                         <i class="fas fa-file-pdf text-5xl text-red-400"></i>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-xl">${item.name}</h3>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-lg truncate">${item.name}</h3>
                             <p class="text-xs opacity-75">${(item.size / 1024 / 1024).toFixed(1)} MB</p>
                         </div>
                     </div>
-                    <div class="bg-black/40 rounded-2xl mb-6 h-48 flex items-center justify-center border border-red-400/30">
+                    <div class="bg-black/40 rounded-2xl mb-6 h-44 flex items-center justify-center border border-red-400/30">
                         <i class="fas fa-file-pdf text-6xl text-red-400"></i>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <a href="data:application/pdf;base64,${item.base64}" 
-                           target="_blank"
-                           class="bg-white text-black font-bold py-4 rounded-2xl text-center hover:bg-gray-100">
-                            👁️ View PDF
-                        </a>
-                        <a href="data:application/pdf;base64,${item.base64}"
-                           download="${item.name}.pdf"
-                           class="bg-white text-black font-bold py-4 rounded-2xl text-center hover:bg-gray-100">
-                            <i class="fas fa-download"></i> Download
-                        </a>
+                        <a href="data:application/pdf;base64,${item.base64}" target="_blank"
+                           class="bg-white text-black font-bold py-4 rounded-2xl text-center text-sm">View</a>
+                        <a href="data:application/pdf;base64,${item.base64}" download="${item.name}.pdf"
+                           class="bg-white text-black font-bold py-4 rounded-2xl text-center text-sm">Download</a>
                         <button onclick="deleteWork(${index})" 
-                                class="col-span-2 border-2 border-white/70 font-bold py-4 rounded-2xl text-red-300 hover:text-red-400">
-                            🗑️ Delete
+                                class="col-span-2 border border-white/70 font-bold py-4 rounded-2xl text-red-300 text-sm">
+                            Delete
                         </button>
                     </div>
                 `;
@@ -347,12 +321,12 @@
         }
 
         function setupMarquees() {
-            const html = announcements.map(t => `<span class="mx-12">${t}</span>`).join('');
+            const html = announcements.map(t => `<span class="mx-10">${t}</span>`).join('');
             document.getElementById('top-marquee').innerHTML = html + html;
             document.getElementById('bottom-marquee').innerHTML = html + html;
         }
 
-        // Initialize the app
+        // Initialize
         window.onload = () => {
             createBubbles();
             updateDateTime();
