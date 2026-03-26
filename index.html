@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
-       
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #6b21a8, #db2777, #22d3ee);
@@ -16,7 +15,6 @@
             color: white;
             overflow-x: hidden;
         }
-       
         .bubble { 
             position: absolute; 
             background: rgba(255,255,255,0.18); 
@@ -29,14 +27,8 @@
             0% { transform: translateY(120vh) scale(1); opacity: 0.85; } 
             100% { transform: translateY(-120vh) scale(0.4); opacity: 0; } 
         }
-       
-        .card-hover { 
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
-        }
-        .card-hover:hover { 
-            transform: translateY(-8px) scale(1.02); 
-        }
-
+        .card-hover { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .card-hover:hover { transform: translateY(-8px) scale(1.02); }
         .pill-btn {
             padding: 12px 20px;
             border-radius: 9999px;
@@ -44,14 +36,12 @@
             font-weight: 600;
             transition: all 0.3s ease;
         }
-       
         .glow { text-shadow: 0 0 20px rgba(165, 243, 252, 0.8); }
         .datetime-card { 
             background: rgba(255,255,255,0.16); 
             backdrop-filter: blur(12px); 
             border: 2px solid rgba(255,255,255,0.3); 
         }
-
         .kenya-flag {
             width: 52px; height: 32px; 
             border: 2px solid rgba(255,255,255,0.7); 
@@ -71,7 +61,6 @@
 <body class="relative">
     <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
 
-    <!-- Top Marquee -->
     <div class="bg-white/10 py-2 text-sm border-b border-white/20 overflow-hidden">
         <div id="top-marquee" class="flex items-center gap-12 text-cyan-200 whitespace-nowrap"></div>
     </div>
@@ -87,7 +76,6 @@
             <h1 class="text-5xl sm:text-6xl font-black glow tracking-tighter">LEARNSPHERE</h1>
         </div>
 
-        <!-- Date & Time -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
             <div class="datetime-card rounded-3xl p-6 text-center card-hover">
                 <i class="fas fa-calendar-alt text-4xl mb-3 text-cyan-300"></i>
@@ -107,21 +95,14 @@
         </div>
 
         <div class="flex flex-wrap justify-center gap-4 mb-10">
-            <button onclick="showSection('extended')" 
-                    class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">
-                📖 Extended Class Work
-            </button>
-            <button onclick="showSection('assessment')" 
-                    class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">
-                📝 Self Assessment
-            </button>
+            <button onclick="showSection('extended')" class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📖 Extended Class Work</button>
+            <button onclick="showSection('assessment')" class="flex-1 sm:flex-none px-8 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📝 Self Assessment</button>
         </div>
 
         <!-- Extended Class Work -->
         <div id="extended-section">
             <h2 class="text-4xl font-bold text-center mb-8">Extended Class Work</h2>
             <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            
             <div id="extended-empty" class="text-center py-20">
                 <div class="text-8xl mb-6">📚</div>
                 <h3 class="text-2xl font-semibold">No PDFs yet</h3>
@@ -129,7 +110,7 @@
             </div>
         </div>
 
-        <!-- Self Assessment - Learner View -->
+        <!-- Self Assessment -->
         <div id="assessment-section" class="hidden">
             <h2 class="text-4xl font-bold text-center mb-8">Self Assessment</h2>
             <div id="mcq-area" class="max-w-2xl mx-auto bg-white/10 backdrop-blur-xl rounded-3xl p-8"></div>
@@ -144,15 +125,11 @@
     <!-- Admin Modal -->
     <div id="admin-section" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
         <div class="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 max-w-lg w-full">
-            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
-                <i class="fas fa-cog"></i> Admin Panel
-            </h2>
+            <h2 class="text-3xl font-bold mb-6">Admin Panel</h2>
             
             <div class="flex gap-3 mb-6">
-                <button onclick="showAdminTab('upload')" 
-                        class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📤 Upload PDF</button>
-                <button onclick="showAdminTab('mcq')" 
-                        class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">📝 Manage MCQ</button>
+                <button onclick="showAdminTab('upload')" class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">Upload PDF</button>
+                <button onclick="showAdminTab('mcq')" class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">Manage MCQ</button>
             </div>
 
             <!-- Upload Tab -->
@@ -160,78 +137,41 @@
                 <div class="space-y-6">
                     <div>
                         <label class="block text-sm mb-2">PDF Title</label>
-                        <input id="file-name" type="text" placeholder="e.g. Mathematics Notes"
-                               class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300 focus:outline-none">
+                        <input id="file-name" type="text" placeholder="e.g. Mathematics Notes" class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300">
                     </div>
                     <div>
                         <label class="block text-sm mb-2">Select PDF File</label>
-                        <input id="file-input" type="file" accept=".pdf"
-                               class="w-full px-5 py-4 bg-white/20 rounded-2xl text-white">
-                        <p class="text-xs text-emerald-200 mt-2">Max 10MB • PDF only</p>
+                        <input id="file-input" type="file" accept=".pdf" class="w-full px-5 py-4 bg-white/20 rounded-2xl text-white">
                     </div>
-                    <button onclick="uploadPDF()" 
-                            class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">
-                        Upload Now
-                    </button>
+                    <button onclick="uploadPDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold">Upload Now</button>
                 </div>
             </div>
 
-            <!-- Easy MCQ Form -->
+            <!-- MCQ Form Tab -->
             <div id="admin-mcq-tab" class="hidden">
-                <h3 class="font-bold mb-4">Add New MCQ Question</h3>
+                <h3 class="font-bold mb-4">Add New Question</h3>
+                <input id="new-q" type="text" placeholder="Question" class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white mb-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="opt0" type="text" placeholder="Option A" class="px-5 py-4 rounded-2xl bg-white/20 text-white">
+                    <input id="opt1" type="text" placeholder="Option B" class="px-5 py-4 rounded-2xl bg-white/20 text-white">
+                    <input id="opt2" type="text" placeholder="Option C" class="px-5 py-4 rounded-2xl bg-white/20 text-white">
+                    <input id="opt3" type="text" placeholder="Option D" class="px-5 py-4 rounded-2xl bg-white/20 text-white">
+                </div>
+                <select id="correct" class="w-full mt-4 px-5 py-4 rounded-2xl bg-white/20 text-white">
+                    <option value="0">A is correct</option>
+                    <option value="1">B is correct</option>
+                    <option value="2">C is correct</option>
+                    <option value="3">D is correct</option>
+                </select>
+                <button onclick="addMCQ()" class="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 py-4 rounded-3xl font-bold">Add Question</button>
                 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm mb-2">Question</label>
-                        <input id="new-question" type="text" placeholder="Type the question"
-                               class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300">
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-sm mb-2">Option A</label>
-                            <input id="opt-a" type="text" placeholder="Option A" class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white">
-                        </div>
-                        <div>
-                            <label class="block text-sm mb-2">Option B</label>
-                            <input id="opt-b" type="text" placeholder="Option B" class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white">
-                        </div>
-                        <div>
-                            <label class="block text-sm mb-2">Option C</label>
-                            <input id="opt-c" type="text" placeholder="Option C" class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white">
-                        </div>
-                        <div>
-                            <label class="block text-sm mb-2">Option D</label>
-                            <input id="opt-d" type="text" placeholder="Option D" class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm mb-2">Correct Answer</label>
-                        <select id="correct-answer" class="w-full px-5 py-4 rounded-2xl bg-white/20 text-white">
-                            <option value="0">Option A</option>
-                            <option value="1">Option B</option>
-                            <option value="2">Option C</option>
-                            <option value="3">Option D</option>
-                        </select>
-                    </div>
-
-                    <button onclick="addMCQ()" 
-                            class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">
-                        Add This Question
-                    </button>
-
-                    <div class="mt-6 pt-4 border-t border-white/30">
-                        <h4 class="font-medium mb-3">Current Questions (${mcqQuestions.length})</h4>
-                        <div id="current-mcqs" class="text-sm max-h-60 overflow-y-auto space-y-2"></div>
-                    </div>
+                <div class="mt-6">
+                    <h4 class="mb-2">Current Questions (${mcqQuestions.length})</h4>
+                    <div id="mcq-list" class="text-sm"></div>
                 </div>
             </div>
 
-            <button onclick="hideAdmin()" 
-                    class="mt-8 w-full bg-red-500 hover:bg-red-600 py-4 rounded-3xl font-bold">
-                    Cancel / Logout
-            </button>
+            <button onclick="hideAdmin()" class="mt-8 w-full bg-red-500 hover:bg-red-600 py-4 rounded-3xl font-bold">Cancel / Logout</button>
         </div>
     </div>
 
@@ -260,9 +200,7 @@
             const now = new Date();
             document.getElementById('day').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
             document.getElementById('date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', {
-                hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
-            });
+            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
         }
 
         let tapCount = 0;
@@ -304,7 +242,7 @@
             if (!fileInput.files.length) return alert("Please select a PDF file");
             const file = fileInput.files[0];
             if (file.type !== "application/pdf") return alert("Only PDF files allowed!");
-            if (file.size > 10 * 1024 * 1024) return alert("Maximum file size is 10MB");
+            if (file.size > 10*1024*1024) return alert("Maximum file size is 10MB");
 
             const displayName = nameInput || file.name.replace('.pdf', '');
             const reader = new FileReader();
@@ -322,58 +260,53 @@
         }
 
         function addMCQ() {
-            const q = document.getElementById('new-question').value.trim();
-            const a = document.getElementById('opt-a').value.trim();
-            const b = document.getElementById('opt-b').value.trim();
-            const c = document.getElementById('opt-c').value.trim();
-            const d = document.getElementById('opt-d').value.trim();
-            const correct = parseInt(document.getElementById('correct-answer').value);
+            const q = document.getElementById('new-q').value.trim();
+            const opt0 = document.getElementById('opt0').value.trim();
+            const opt1 = document.getElementById('opt1').value.trim();
+            const opt2 = document.getElementById('opt2').value.trim();
+            const opt3 = document.getElementById('opt3').value.trim();
+            const correct = parseInt(document.getElementById('correct').value);
 
-            if (!q || !a || !b || !c || !d) {
+            if (!q || !opt0 || !opt1 || !opt2 || !opt3) {
                 alert("Please fill all fields");
                 return;
             }
 
             mcqQuestions.push({
                 q: q,
-                options: [a, b, c, d],
+                options: [opt0, opt1, opt2, opt3],
                 answer: correct
             });
 
             localStorage.setItem('learnsphere_mcqs', JSON.stringify(mcqQuestions));
-            alert("Question added successfully!");
-            
-            // Clear form
-            document.getElementById('new-question').value = '';
-            document.getElementById('opt-a').value = '';
-            document.getElementById('opt-b').value = '';
-            document.getElementById('opt-c').value = '';
-            document.getElementById('opt-d').value = '';
-
+            alert("Question added!");
             loadCurrentMCQs();
+
+            // Clear form
+            document.getElementById('new-q').value = '';
+            document.getElementById('opt0').value = '';
+            document.getElementById('opt1').value = '';
+            document.getElementById('opt2').value = '';
+            document.getElementById('opt3').value = '';
         }
 
         function loadCurrentMCQs() {
-            const container = document.getElementById('current-mcqs');
-            if (mcqQuestions.length === 0) {
-                container.innerHTML = '<p class="opacity-60 text-center py-4">No questions added yet</p>';
-                return;
-            }
-
-            let html = '';
+            const container = document.getElementById('mcq-list');
+            container.innerHTML = '';
             mcqQuestions.forEach((item, i) => {
-                html += `
-                    <div class="bg-white/10 p-3 rounded-2xl flex justify-between items-center">
-                        <div class="text-sm pr-2">${i+1}. ${item.q.substring(0, 55)}${item.q.length > 55 ? '...' : ''}</div>
-                        <button onclick="deleteMCQ(${i})" class="text-red-400 text-xs px-3 py-1">Delete</button>
-                    </div>`;
+                const div = document.createElement('div');
+                div.className = "bg-white/10 p-3 rounded-2xl flex justify-between";
+                div.innerHTML = `
+                    <span class="text-sm">${i+1}. ${item.q.substring(0,50)}${item.q.length > 50 ? '...' : ''}</span>
+                    <button onclick="deleteMCQ(${i})" class="text-red-400 text-xs">Delete</button>
+                `;
+                container.appendChild(div);
             });
-            container.innerHTML = html;
         }
 
-        function deleteMCQ(index) {
+        function deleteMCQ(i) {
             if (confirm("Delete this question?")) {
-                mcqQuestions.splice(index, 1);
+                mcqQuestions.splice(i, 1);
                 localStorage.setItem('learnsphere_mcqs', JSON.stringify(mcqQuestions));
                 loadCurrentMCQs();
             }
@@ -438,31 +371,19 @@
                         <i class="fas fa-file-pdf text-6xl text-red-400"></i>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
-                                class="pill-btn bg-white text-black hover:bg-gray-100">👁️ View</button>
-                        <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" 
-                                class="pill-btn bg-white text-black hover:bg-gray-100">⬇️ Download</button>
+                        <button onclick="viewPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" class="pill-btn bg-white text-black hover:bg-gray-100">👁️ View</button>
+                        <button onclick="downloadPDF('${item.base64}', '${item.name.replace(/'/g, "\\'")}')" class="pill-btn bg-white text-black hover:bg-gray-100">⬇️ Download</button>
                     </div>
-                    ${isAdminMode ? `
-                    <button onclick="deleteWork(${index})" 
-                            class="w-full mt-4 border border-red-400 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400">
-                        🗑️ Delete (Admin only)
-                    </button>` : ''}
+                    ${isAdminMode ? `<button onclick="deleteWork(${index})" class="w-full mt-4 border border-red-400 font-bold py-3 rounded-3xl text-red-300 hover:text-red-400">🗑️ Delete</button>` : ''}
                 `;
                 grid.appendChild(card);
             });
         }
 
-        // Learner MCQ Assessment
         function loadMCQ() {
             const container = document.getElementById('mcq-area');
             if (mcqQuestions.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-16 opacity-75">
-                        <div class="text-6xl mb-6">❓</div>
-                        <p class="text-xl">No MCQs available yet.</p>
-                        <p class="text-sm mt-2">Admin has not added any questions yet.</p>
-                    </div>`;
+                container.innerHTML = `<div class="text-center py-16"><div class="text-6xl mb-6">❓</div><p>No MCQs yet. Admin must add questions.</p></div>`;
                 return;
             }
 
@@ -481,7 +402,7 @@
                         </div>
                     </div>`;
             });
-            html += `<button onclick="submitMCQ()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg mt-6">Submit Answers</button></div>`;
+            html += `<button onclick="submitMCQ()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold mt-6">Submit</button></div>`;
             container.innerHTML = html;
         }
 
@@ -493,24 +414,18 @@
             });
 
             const percentage = Math.round((score / mcqQuestions.length) * 100);
-            const appreciation = percentage >= 80 ? "Excellent! You're doing very well! 🎉" :
-                                percentage >= 60 ? "Good job! Keep practicing! 👏" : 
-                                "Nice effort! Review the topics and try again 💪";
+            const msg = percentage >= 80 ? "Excellent work! 🎉" : percentage >= 60 ? "Good job! 👏" : "Nice effort! Try again 💪";
 
-            const container = document.getElementById('mcq-area');
-            container.innerHTML = `
+            document.getElementById('mcq-area').innerHTML = `
                 <div class="text-center py-12">
                     <div class="text-7xl mb-4">🏆</div>
-                    <h3 class="text-3xl font-bold mb-3">Your Score</h3>
+                    <h3 class="text-3xl font-bold mb-2">Your Score</h3>
                     <div class="text-8xl font-black text-emerald-300 mb-6">${percentage}%</div>
-                    <div class="w-full bg-white/20 h-5 rounded-full mb-8 overflow-hidden">
-                        <div class="h-full bg-emerald-400 rounded-full transition-all duration-1000" style="width: ${percentage}%"></div>
+                    <div class="w-full bg-white/20 h-5 rounded-full mb-8">
+                        <div class="h-full bg-emerald-400 rounded-full" style="width:${percentage}%"></div>
                     </div>
-                    <p class="text-xl font-medium">${appreciation}</p>
-                    <button onclick="loadMCQ()" 
-                            class="mt-10 px-10 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">
-                        Try Again
-                    </button>
+                    <p class="text-xl">${msg}</p>
+                    <button onclick="loadMCQ()" class="mt-10 px-10 py-4 bg-white/20 hover:bg-white/30 rounded-3xl font-bold">Try Again</button>
                 </div>
             `;
         }
@@ -519,7 +434,6 @@
             document.getElementById('extended-section').classList.add('hidden');
             document.getElementById('assessment-section').classList.add('hidden');
             document.getElementById(section + '-section').classList.remove('hidden');
-            
             if (section === 'extended') renderExtended();
             if (section === 'assessment') loadMCQ();
         }
