@@ -1,374 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LearnSphere • Kenya</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap');
-        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #4c1d95, #9f1239, #0e7490); min-height: 100vh; color: white; overflow-x: hidden; }
-        .bubble { position: absolute; background: rgba(255,255,255,0.18); border-radius: 50%; pointer-events: none; animation: float 22s infinite linear; box-shadow: 0 0 30px rgba(165, 243, 252, 0.4); }
-        @keyframes float { 0% { transform: translateY(120vh) scale(1); opacity: 0.9; } 100% { transform: translateY(-120vh) scale(0.3); opacity: 0; } }
-        .card-hover { transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .card-hover:hover { transform: translateY(-12px) scale(1.04); }
-        .glow { text-shadow: 0 0 40px rgba(103, 232, 249, 0.9), 0 0 70px rgba(236, 72, 153, 0.6); }
-        .kenya-flag { width: 64px; height: 40px; border: 3px solid rgba(255,255,255,0.95); border-radius: 6px; overflow: hidden; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
-        .marquee { animation: marquee 28s linear infinite; }
-        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        .glass { background: rgba(255,255,255,0.12); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.25); }
-        .firework-container { position: fixed; inset: 0; pointer-events: none; z-index: 100; overflow: hidden; }
-        .emoji-pop { position: absolute; font-size: 2.8rem; animation: fireworksPop 4s ease-out forwards; text-shadow: 0 0 20px rgba(255,255,255,0.9); user-select: none; }
-        @keyframes fireworksPop { 0% { transform: translateY(150px) scale(0.1) rotate(0deg); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-650px) scale(1.3) rotate(720deg); opacity: 0; } }
-    </style>
-</head>
-<body class="relative">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChuckleClock</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
-    <div id="bubbles" class="fixed inset-0 pointer-events-none z-0"></div>
+    :root {
+      --primary: #a855f7;
+      --accent: #ec4899;
+      --glass: rgba(255, 255, 255, 0.1);
+    }
 
-    <!-- Top Marquee -->
-    <div class="bg-white/10 py-3 text-sm border-b border-white/20 overflow-hidden backdrop-blur-md">
-        <div id="top-marquee" class="flex items-center gap-12 text-cyan-200 whitespace-nowrap marquee"></div>
-    </div>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-    <div class="max-w-7xl mx-auto px-6 py-10 relative z-10">
-        <!-- Header -->
-        <div class="flex items-center justify-center gap-4 mb-10">
-            <div class="kenya-flag">
-                <div class="h-[33%] bg-black"></div>
-                <div class="h-[34%] bg-red-600"></div>
-                <div class="h-[33%] bg-green-600"></div>
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl">🛡️</div>
-            </div>
-            <h1 class="text-5xl sm:text-6xl font-black glow tracking-tighter">LEARNSPHERE</h1>
-        </div>
+    body {
+      font-family: 'Inter', system_ui, sans-serif;
+      background: linear-gradient(135deg, #1e0533, #0f172a, #2a0a4a);
+      color: #f3e8ff;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
 
-        <!-- Date & Time -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
-            <div class="glass rounded-3xl p-6 text-center card-hover"><i class="fas fa-calendar-alt text-4xl mb-3 text-cyan-300"></i><div id="day" class="text-3xl font-bold"></div><div class="text-xs opacity-75 tracking-widest">DAY</div></div>
-            <div class="glass rounded-3xl p-6 text-center card-hover"><i class="fas fa-clock text-4xl mb-3 text-pink-300"></i><div id="date" class="text-3xl font-bold"></div><div class="text-xs opacity-75 tracking-widest">DATE</div></div>
-            <div class="glass rounded-3xl p-6 text-center card-hover"><i class="fas fa-hourglass-half text-4xl mb-3 text-yellow-300"></i><div id="time" class="text-3xl font-bold font-mono"></div><div class="text-xs opacity-75 tracking-widest">TIME</div></div>
-        </div>
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.25), transparent 60%);
+      z-index: -1;
+    }
 
-        <!-- Navigation -->
-        <div class="flex flex-wrap justify-center gap-4 mb-12">
-            <button onclick="showSection('extended')" class="flex-1 sm:flex-none px-10 py-5 bg-white/20 hover:bg-white/30 rounded-3xl font-bold text-lg transition-all active:scale-95">📖 Extended Class Work</button>
-            <button onclick="showSection('assessment')" class="flex-1 sm:flex-none px-10 py-5 bg-white/20 hover:bg-white/30 rounded-3xl font-bold text-lg transition-all active:scale-95">📝 Self Assessment</button>
-        </div>
-
-        <!-- Extended Class Work -->
-        <div id="extended-section" class="hidden">
-            <h2 class="text-4xl font-bold text-center mb-10">Extended Class Work</h2>
-            <div id="extended-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            <div id="extended-empty" class="hidden text-center py-20"><div class="text-8xl mb-6">📚</div><h3 class="text-2xl font-semibold mb-2">No materials yet</h3><p class="opacity-80">Triple tap → Add PDF links</p></div>
-        </div>
-
-        <!-- Self Assessment -->
-        <div id="assessment-section" class="hidden">
-            <h2 class="text-4xl font-bold text-center mb-10">Self Assessment</h2>
-            <div id="mcq-area" class="max-w-2xl mx-auto glass rounded-3xl p-8 min-h-[400px]"></div>
-        </div>
-    </div>
-
-    <!-- Bottom Marquee -->
-    <div class="bg-white/10 py-3 text-sm border-t border-white/20 overflow-hidden mt-12">
-        <div id="bottom-marquee" class="flex items-center gap-12 text-pink-200 whitespace-nowrap marquee"></div>
-    </div>
-
-    <!-- Fireworks -->
-    <div id="fireworks" class="firework-container hidden"></div>
-
-    <!-- Admin Modal -->
-    <div id="admin-section" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-        <div class="glass max-w-lg w-full rounded-3xl p-8 border border-white/20">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold">Admin Panel • Global Mode</h2>
-                <button onclick="hideAdmin()" class="text-red-400 hover:text-red-500 text-3xl">✕</button>
-            </div>
-            
-            <div class="flex gap-3 mb-8">
-                <button onclick="showAdminTab('pdf')" id="tab-pdf" class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">📤 PDF Links</button>
-                <button onclick="showAdminTab('mcq')" id="tab-mcq" class="flex-1 py-3 bg-white/20 hover:bg-white/30 rounded-3xl font-bold transition-all">📝 MCQs</button>
-            </div>
-
-            <!-- PDF Tab -->
-            <div id="admin-pdf-tab">
-                <div class="space-y-6">
-                    <div>
-                        <label class="block text-sm mb-2 opacity-90">PDF Title</label>
-                        <input id="pdf-title" type="text" placeholder="e.g. Mathematics Notes - Form 3" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300">
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-2 opacity-90">Direct PDF Link (Google Drive, WordPress Media, etc.)</label>
-                        <input id="pdf-url" type="text" placeholder="https://" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white placeholder-gray-300">
-                    </div>
-                    <button onclick="addPDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">Add PDF Link</button>
-                    <button onclick="copyPDFsJSON()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-3xl font-bold text-sm">📋 Copy pdfs.json for GitHub</button>
-                </div>
-            </div>
-
-            <!-- MCQ Tab -->
-            <div id="admin-mcq-tab" class="hidden">
-                <h3 class="font-bold mb-5 text-lg" id="mcq-form-title">Add New Question</h3>
-                <div class="space-y-5">
-                    <div><label class="block text-sm mb-2">Question</label><input id="new-q" type="text" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white"></div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="block text-sm mb-2">Option A</label><input id="opt0" type="text" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white"></div>
-                        <div><label class="block text-sm mb-2">Option B</label><input id="opt1" type="text" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white"></div>
-                        <div><label class="block text-sm mb-2">Option C</label><input id="opt2" type="text" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white"></div>
-                        <div><label class="block text-sm mb-2">Option D</label><input id="opt3" type="text" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white"></div>
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-2">Correct Answer</label>
-                        <select id="correct" class="w-full px-6 py-4 rounded-2xl bg-white/20 text-white">
-                            <option value="0">Option A</option>
-                            <option value="1">Option B</option>
-                            <option value="2">Option C</option>
-                            <option value="3">Option D</option>
-                        </select>
-                    </div>
-                    <button onclick="saveMCQ()" class="w-full bg-emerald-500 hover:bg-emerald-600 py-5 rounded-3xl font-bold text-lg">Add Question</button>
-                    <button onclick="copyMCQsJSON()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-3xl font-bold text-sm">📋 Copy mcqs.json for GitHub</button>
-                </div>
-
-                <div class="mt-8 pt-6 border-t border-white/30">
-                    <h4 class="font-medium mb-4 flex justify-between">Current Questions <span id="mcq-count" class="bg-white/20 px-3 py-1 rounded-full text-xs">0</span></h4>
-                    <div id="mcq-list" class="text-sm max-h-64 overflow-y-auto space-y-3 pr-2"></div>
-                </div>
-            </div>
-
-            <button onclick="hideAdmin()" class="mt-6 w-full bg-red-500/80 hover:bg-red-600 py-4 rounded-3xl font-bold">Close Admin Panel</button>
-        </div>
-    </div>
-
-    <script>
-        // ==================== YOUR REPO CONFIG ====================
-        const BASE_URL = "https://masasaevans.github.io";
-
-        let pdfLinks = [];
-        let mcqs = [];
-        let editingMCQId = null;
-
-        const announcements = ["🇰🇪 Karibu LearnSphere - Your Learning Companion","Master every topic with confidence","Keep shining! Education is the key to success","Practice makes perfect"];
-        const celebratoryEmojis = ['🎉','🥳','🌟','✨','💥','🚀','🏆','🔥','👏','🙌','💯','⭐','🌈'];
-
-        // Load data from GitHub
-        async function loadGlobalData() {
-            try {
-                const pdfRes = await fetch(`\( {BASE_URL}/pdfs.json?t= \){Date.now()}`);
-                if (pdfRes.ok) pdfLinks = await pdfRes.json();
-
-                const mcqRes = await fetch(`\( {BASE_URL}/mcqs.json?t= \){Date.now()}`);
-                if (mcqRes.ok) mcqs = await mcqRes.json();
-            } catch (e) {
-                console.log("First time or offline - using empty data");
-            }
-            renderExtended();
-            renderAssessment();
-        }
-
-        // ==================== UI HELPERS ====================
-        function createBubbles() {
-            const container = document.getElementById('bubbles');
-            container.innerHTML = '';
-            for (let i = 0; i < 20; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                const size = Math.random() * 80 + 25;
-                bubble.style.width = `${size}px`;
-                bubble.style.height = `${size}px`;
-                bubble.style.left = `${Math.random() * 100}vw`;
-                bubble.style.animationDuration = `${Math.random() * 25 + 18}s`;
-                bubble.style.animationDelay = `-${Math.random() * 20}s`;
-                container.appendChild(bubble);
-            }
-        }
-
-        function updateDateTime() {
-            const now = new Date();
-            document.getElementById('day').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
-            document.getElementById('date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
-        }
-
-        function launchFireworks(count = 25) {
-            const container = document.getElementById('fireworks');
-            container.classList.remove('hidden');
-            for (let i = 0; i < count; i++) {
-                setTimeout(() => {
-                    const emoji = document.createElement('div');
-                    emoji.className = 'emoji-pop';
-                    emoji.textContent = celebratoryEmojis[Math.floor(Math.random() * celebratoryEmojis.length)];
-                    emoji.style.left = `${Math.random() * 100}vw`;
-                    emoji.style.bottom = `-${Math.random() * 100}px`;
-                    container.appendChild(emoji);
-                    setTimeout(() => emoji.remove(), 6000);
-                }, i * 80);
-            }
-            setTimeout(() => container.classList.add('hidden'), 7000);
-        }
-
-        function populateMarquees() {
-            const html = announcements.map(a => `<span class="inline-block mx-8">${a}</span>`).join('');
-            document.getElementById('top-marquee').innerHTML = html + html;
-            document.getElementById('bottom-marquee').innerHTML = html + html;
-        }
-
-        // Triple tap to open admin
-        let tapCount = 0, tapTimer = null;
-        document.addEventListener('click', () => {
-            if (!document.getElementById('admin-section').classList.contains('hidden')) return;
-            tapCount++;
-            if (tapCount === 1) tapTimer = setTimeout(() => tapCount = 0, 800);
-            if (tapCount === 3) {
-                clearTimeout(tapTimer); tapCount = 0;
-                document.getElementById('admin-section').classList.remove('hidden');
-                showAdminTab('pdf');
-                loadMCQsList();
-            }
-        });
-
-        function hideAdmin() {
-            document.getElementById('admin-section').classList.add('hidden');
-        }
-
-        function showAdminTab(tab) {
-            document.getElementById('admin-pdf-tab').classList.toggle('hidden', tab !== 'pdf');
-            document.getElementById('admin-mcq-tab').classList.toggle('hidden', tab !== 'mcq');
-        }
-
-        // ==================== PDF FUNCTIONS ====================
-        function addPDF() {
-            const title = document.getElementById('pdf-title').value.trim();
-            const url = document.getElementById('pdf-url').value.trim();
-            if (!title || !url) return alert("Please fill title and PDF link");
-            pdfLinks.push({ title, url, id: Date.now() });
-            renderExtended();
-            alert("✅ PDF added! Now click 'Copy pdfs.json for GitHub' and update your repo.");
-        }
-
-        function copyPDFsJSON() {
-            const jsonStr = JSON.stringify(pdfLinks, null, 2);
-            navigator.clipboard.writeText(jsonStr).then(() => {
-                alert("✅ pdfs.json copied to clipboard!\n\nGo to GitHub → edit pdfs.json → paste → commit changes.");
-            });
-        }
-
-        function renderExtended() {
-            const grid = document.getElementById('extended-grid');
-            const empty = document.getElementById('extended-empty');
-            grid.innerHTML = '';
-            if (pdfLinks.length === 0) {
-                empty.classList.remove('hidden');
-                return;
-            }
-            empty.classList.add('hidden');
-
-            pdfLinks.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'glass rounded-3xl p-6 card-hover text-center';
-                card.innerHTML = `
-                    <div class="text-6xl mb-4">📘</div>
-                    <h3 class="font-semibold mb-3">${item.title}</h3>
-                    <a href="${item.url}" target="_blank" class="inline-block bg-white/20 hover:bg-white/30 px-8 py-3 rounded-2xl font-medium text-sm">📥 Open PDF</a>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        // ==================== MCQ FUNCTIONS ====================
-        function saveMCQ() {
-            const question = document.getElementById('new-q').value.trim();
-            const opt0 = document.getElementById('opt0').value.trim();
-            const opt1 = document.getElementById('opt1').value.trim();
-            const opt2 = document.getElementById('opt2').value.trim();
-            const opt3 = document.getElementById('opt3').value.trim();
-            const correct = parseInt(document.getElementById('correct').value);
-
-            if (!question || !opt0 || !opt1 || !opt2 || !opt3) return alert("Please fill all fields");
-
-            mcqs.push({
-                id: Date.now(),
-                question,
-                opt0,
-                opt1,
-                opt2,
-                opt3,
-                correct
-            });
-
-            loadMCQsList();
-            renderAssessment();
-            alert("✅ Question added! Click 'Copy mcqs.json for GitHub' to make it global.");
-        }
-
-        function copyMCQsJSON() {
-            const jsonStr = JSON.stringify(mcqs, null, 2);
-            navigator.clipboard.writeText(jsonStr).then(() => {
-                alert("✅ mcqs.json copied!\n\nGo to GitHub → edit mcqs.json → paste → commit.");
-            });
-        }
-
-        function loadMCQsList() {
-            const list = document.getElementById('mcq-list');
-            list.innerHTML = '';
-            document.getElementById('mcq-count').textContent = mcqs.length;
-
-            mcqs.forEach(q => {
-                const div = document.createElement('div');
-                div.className = 'glass p-4 rounded-2xl';
-                div.innerHTML = `<p class="font-medium">${q.question}</p>`;
-                list.appendChild(div);
-            });
-        }
-
-        function renderAssessment() {
-            const area = document.getElementById('mcq-area');
-            if (mcqs.length === 0) {
-                area.innerHTML = `<div class="text-center py-12"><div class="text-6xl mb-4">❓</div><p>No questions yet.<br>Triple tap → Add in Admin Panel</p></div>`;
-                return;
-            }
-
-            const q = mcqs[Math.floor(Math.random() * mcqs.length)];
-            let html = `<div class="mb-8"><p class="text-lg font-semibold mb-6">${q.question}</p><div class="space-y-3">`;
-
-            ['opt0','opt1','opt2','opt3'].forEach((opt, i) => {
-                html += `
-                    <label onclick="checkAnswer(this, ${i}, ${q.correct})" class="block p-5 glass rounded-2xl cursor-pointer hover:bg-white/20 transition-all">
-                        ${String.fromCharCode(65 + i)}. ${q[opt]}
-                    </label>`;
-            });
-
-            html += `</div></div><button onclick="renderAssessment()" class="w-full py-4 bg-white/20 rounded-3xl font-bold">Next Question</button>`;
-            area.innerHTML = html;
-        }
-
-        window.checkAnswer = function(el, selected, correct) {
-            if (selected === correct) {
-                el.classList.add('!bg-emerald-500/70');
-                launchFireworks(15);
-            } else {
-                el.classList.add('!bg-red-500/70');
-            }
-        };
-
-        function showSection(section) {
-            document.getElementById('extended-section').classList.toggle('hidden', section !== 'extended');
-            document.getElementById('assessment-section').classList.toggle('hidden', section !== 'assessment');
-            if (section === 'extended') renderExtended();
-            if (section === 'assessment') renderAssessment();
-        }
-
-        // Init
-        window.onload = () => {
-            createBubbles();
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-            populateMarquees();
-            loadGlobalData();
-            showSection('extended');
-        };
-    </script>
-</body>
-</html>
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      padding: 1.5rem;
