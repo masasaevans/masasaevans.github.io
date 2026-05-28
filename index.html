@@ -9,10 +9,8 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', system-ui, sans-serif; }
-        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .card-hover:hover { transform: translateY(-6px); box-shadow: 0 15px 20px -5px rgb(0 0 0 / 0.1); }
-        .homework-card { transition: all 0.25s ease; }
-        .homework-card:hover { border-color: #6366f1; }
+        .homework-card { transition: all 0.25s ease; position: relative; }
+        .homework-card:hover { border-color: #6366f1; transform: translateY(-4px); }
         .deadline-soon { animation: pulse 1.8s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
         @keyframes spiralHide {
@@ -21,6 +19,14 @@
         }
         .spiral-hide { animation: spiralHide 0.7s forwards; }
         .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .delete-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        .homework-card:hover .delete-btn { opacity: 1; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen">
@@ -69,6 +75,7 @@
         </div>
     </div>
 
+    <!-- Homework Modal -->
     <div id="homeworkModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
         <div class="bg-white rounded-3xl max-w-lg w-full mx-4 overflow-hidden">
             <div class="p-6">
@@ -94,6 +101,7 @@
         </div>
     </div>
 
+    <!-- Add Homework Modal -->
     <div id="addHomeworkModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
         <div class="bg-white rounded-3xl w-full max-w-md mx-4 p-6">
             <h3 class="text-xl font-semibold mb-5">Add Homework</h3>
@@ -148,6 +156,7 @@
         let addButtonTimeout = null;
 
         function calculateDaysLeft(deadline) {
+            if (!deadline) return "No deadline";
             const diff = Math.ceil((new Date(deadline) - new Date()) / 86400000);
             return diff > 0 ? diff : "Overdue";
         }
@@ -155,19 +164,22 @@
         function renderHomework(filtered = homeworkList) {
             const container = document.getElementById('homeworkContainer');
             container.innerHTML = '';
+            
             if (filtered.length === 0) {
                 document.getElementById('emptyState').classList.remove('hidden');
                 document.getElementById('homeworkCount').textContent = '';
                 showRandomJoke();
                 return;
             }
+            
             document.getElementById('emptyState').classList.add('hidden');
             document.getElementById('homeworkCount').textContent = `\( {filtered.length} assignment \){filtered.length > 1 ? 's' : ''}`;
+
             filtered.forEach(hw => {
                 const days = calculateDaysLeft(hw.deadline);
                 const urgent = typeof days === 'number' && days <= 3;
                 const div = document.createElement('div');
-                div.className = `bg-white border-2 ${urgent ? 'border-red-400' : 'border-gray-100'} rounded-3xl p-5 homework-card cursor-pointer`;
+                div.className = `bg-white border-2 ${urgent ? 'border-red-400 deadline-soon' : 'border-gray-100'} rounded-3xl p-5 homework-card cursor-pointer`;
                 div.innerHTML = `
                     <div class="flex justify-between">
                         <span class="text-xs font-bold px-3 py-1 bg-amber-100 text-amber-700 rounded-full">${hw.type}</span>
@@ -179,6 +191,10 @@
                         <span class="\( {urgent ? 'text-red-600 font-bold' : 'text-gray-500'}"> \){days} day${days === 1 ? '' : 's'} left</span>
                         <span class="text-indigo-600 text-xs">View →</span>
                     </div>
+                    <button onclick="deleteHomework(${hw.id}); event.stopImmediatePropagation()" 
+                            class="delete-btn text-red-500 hover:text-red-600 text-xl">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
                 `;
                 div.onclick = () => openHomework(hw.id);
                 container.appendChild(div);
@@ -188,14 +204,18 @@
         function openHomework(id) {
             const hw = homeworkList.find(h => h.id === id);
             if (!hw) return;
+            
             document.getElementById('modalTitle').textContent = hw.title;
-            document.getElementById('modalDesc').textContent = hw.description;
+            document.getElementById('modalDesc').textContent = hw.description || "No description available.";
             document.getElementById('modalType').textContent = hw.type;
+            
             const days = calculateDaysLeft(hw.deadline);
-            document.getElementById('modalDeadline').innerHTML = `Due • \( {new Date(hw.deadline).toLocaleDateString()} <span class="text-xs">( \){days} days)</span>`;
-            const link = document.getElementById('modalLink');
-            link.href = hw.content;
-            document.getElementById('modalLinkText').textContent = "Open Homework";
+            document.getElementById('modalDeadline').innerHTML = `Due • \( {new Date(hw.deadline).toLocaleDateString()} <span class="text-xs">( \){days})</span>`;
+
+            const linkEl = document.getElementById('modalLink');
+            linkEl.href = hw.content;
+            document.getElementById('modalLinkText').textContent = hw.type.includes("Text") ? "View Text" : "Open Homework";
+            
             document.getElementById('homeworkModal').classList.remove('hidden');
         }
 
@@ -204,7 +224,11 @@
         }
 
         function toggleAddHomeworkModal() {
-            document.getElementById('addHomeworkModal').classList.toggle('hidden');
+            const modal = document.getElementById('addHomeworkModal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                document.getElementById('hwTitle').focus();
+            }
         }
 
         function toggleContentInput() {
@@ -216,19 +240,42 @@
         function addHomework() {
             const title = document.getElementById('hwTitle').value.trim() || "Current Homework";
             const deadline = document.getElementById('hwDeadline').value;
-            if (!deadline) return alert("Please select a deadline");
+            if (!deadline) {
+                alert("Please select a deadline");
+                return;
+            }
+            
             const isLink = document.getElementById('contentType').value === 'link';
-            const content = isLink ? document.getElementById('hwUrl').value.trim() : "data:text/plain," + encodeURIComponent(document.getElementById('hwText').value.trim());
+            let content = "#";
+            
+            if (isLink) {
+                content = document.getElementById('hwUrl').value.trim() || "https://example.com";
+            } else {
+                const textContent = document.getElementById('hwText').value.trim();
+                content = "data:text/plain;charset=utf-8," + encodeURIComponent(textContent || "No content provided.");
+            }
+
             homeworkList.unshift({
                 id: Date.now(),
                 title: title,
-                content: content || "#",
+                content: content,
                 deadline: deadline,
-                description: "Assignment added",
+                description: "Assignment added by teacher",
                 type: isLink ? "PDF/Link" : "Text"
             });
+
             renderHomework();
             toggleAddHomeworkModal();
+            
+            document.getElementById('hwTitle').value = '';
+            document.getElementById('hwUrl').value = '';
+            document.getElementById('hwText').value = '';
+        }
+
+        function deleteHomework(id) {
+            if (!confirm("Delete this homework?")) return;
+            homeworkList = homeworkList.filter(hw => hw.id !== id);
+            renderHomework();
         }
 
         function showRandomJoke() {
@@ -240,25 +287,35 @@
         }
 
         function handleSearch(e) {
-            const term = e.target.value.toLowerCase();
-            const filtered = homeworkList.filter(hw => hw.title.toLowerCase().includes(term));
+            const term = e.target.value.toLowerCase().trim();
+            if (!term) {
+                renderHomework(homeworkList);
+                return;
+            }
+            const filtered = homeworkList.filter(hw => 
+                hw.title.toLowerCase().includes(term)
+            );
             renderHomework(filtered);
         }
 
         function enableTripleClick() {
-            let count = 0, last = 0;
+            let count = 0;
+            let lastTime = 0;
             document.addEventListener('click', () => {
                 const now = Date.now();
-                if (now - last > 700) count = 0;
+                if (now - lastTime > 700) count = 0;
                 count++;
-                last = now;
+                lastTime = now;
                 if (count === 3) {
                     const btn = document.getElementById('addBtn');
                     btn.classList.remove('hidden');
                     if (addButtonTimeout) clearTimeout(addButtonTimeout);
                     addButtonTimeout = setTimeout(() => {
                         btn.classList.add('spiral-hide');
-                        setTimeout(() => btn.classList.add('hidden'), 800);
+                        setTimeout(() => {
+                            btn.classList.add('hidden');
+                            btn.classList.remove('spiral-hide');
+                        }, 800);
                     }, 60000);
                     count = 0;
                 }
@@ -269,8 +326,10 @@
             renderHomework();
             enableTripleClick();
             showRandomJoke();
-            document.getElementById('homeworkModal').addEventListener('click', e => {
-                if (e.target === document.getElementById('homeworkModal')) closeModal();
+            
+            const modal = document.getElementById('homeworkModal');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
             });
         };
     </script>
