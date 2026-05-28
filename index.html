@@ -173,7 +173,7 @@
             }
             
             document.getElementById('emptyState').classList.add('hidden');
-            document.getElementById('homeworkCount').textContent = `\( {filtered.length} assignment \){filtered.length > 1 ? 's' : ''}`;
+            document.getElementById('homeworkCount').textContent = `${filtered.length} assignment${filtered.length > 1 ? 's' : ''}`;
 
             filtered.forEach(hw => {
                 const days = calculateDaysLeft(hw.deadline);
@@ -188,7 +188,7 @@
                     <h3 class="font-semibold mt-4 text-base leading-tight">${hw.title}</h3>
                     <p class="text-gray-600 text-sm mt-3 line-clamp-3">${hw.description}</p>
                     <div class="mt-5 pt-4 border-t text-xs flex justify-between items-center">
-                        <span class="\( {urgent ? 'text-red-600 font-bold' : 'text-gray-500'}"> \){days} day${days === 1 ? '' : 's'} left</span>
+                        <span class="${urgent ? 'text-red-600 font-bold' : 'text-gray-500'}">${days} day${days === 1 ? '' : 's'} left</span>
                         <span class="text-indigo-600 text-xs">View →</span>
                     </div>
                     <button onclick="deleteHomework(${hw.id}); event.stopImmediatePropagation()" 
@@ -210,7 +210,7 @@
             document.getElementById('modalType').textContent = hw.type;
             
             const days = calculateDaysLeft(hw.deadline);
-            document.getElementById('modalDeadline').innerHTML = `Due • \( {new Date(hw.deadline).toLocaleDateString()} <span class="text-xs">( \){days})</span>`;
+            document.getElementById('modalDeadline').innerHTML = `Due • ${new Date(hw.deadline).toLocaleDateString()} <span class="text-xs">(${days})</span>`;
 
             const linkEl = document.getElementById('modalLink');
             linkEl.href = hw.content;
