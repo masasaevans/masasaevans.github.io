@@ -1,45 +1,280 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChuckleClock</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnSphere</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" media="print" onload="this.media='all'">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-6px); box-shadow: 0 15px 20px -5px rgb(0 0 0 / 0.1); }
+        .homework-card { transition: all 0.25s ease; }
+        .homework-card:hover { border-color: #6366f1; }
+        .deadline-soon { animation: pulse 1.8s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
+        @keyframes spiralHide {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: scale(0.2) rotate(900deg); opacity: 0; }
+        }
+        .spiral-hide { animation: spiralHide 0.7s forwards; }
+        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
 
-    :root {
-      --primary: #a855f7;
-      --accent: #ec4899;
-      --glass: rgba(255, 255, 255, 0.1);
-    }
+    <nav class="bg-white border-b sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">L</div>
+                    <span class="font-bold text-2xl tracking-tight">LearnSphere</span>
+                </div>
+                <div class="flex-1 max-w-lg mx-6">
+                    <input id="searchInput" type="text" placeholder="Search homework..." 
+                           class="w-full bg-gray-100 border border-gray-200 focus:border-indigo-500 rounded-3xl py-3 px-5 pl-12 text-sm outline-none transition-all"
+                           onkeyup="handleSearch(event)">
+                </div>
+                <button id="addBtn" onclick="toggleAddHomeworkModal()" 
+                        class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-3xl text-sm font-medium flex items-center gap-2 shadow-md">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">Add</span>
+                </button>
+            </div>
+        </div>
+    </nav>
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div class="mb-12">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-3xl font-bold flex items-center gap-3">
+                    📚 <span id="sectionTitle">Current Homework</span>
+                </h2>
+                <span id="homeworkCount" class="text-sm text-gray-500 font-medium"></span>
+            </div>
 
-    body {
-      font-family: 'Inter', system_ui, sans-serif;
-      background: linear-gradient(135deg, #1e0533, #0f172a, #2a0a4a);
-      color: #f3e8ff;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
+            <div id="homeworkContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-    body::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.25), transparent 60%);
-      z-index: -1;
-    }
+            <div id="emptyState" class="hidden text-center py-20">
+                <div class="text-7xl mb-6">⏳</div>
+                <h3 class="text-2xl font-semibold mb-2">No homework yet</h3>
+                <p class="text-gray-600 mb-8">Your teacher will post soon.<br>Stay calm and keep learning!</p>
+                <div id="jokeDisplay" class="bg-white max-w-md mx-auto p-7 rounded-3xl shadow-sm italic text-gray-700 border border-dashed border-gray-200"></div>
+                <button onclick="newJoke()" class="mt-6 text-indigo-600 hover:text-indigo-700 text-sm font-medium flex items-center gap-2 mx-auto">
+                    <i class="fa-solid fa-rotate"></i> New joke
+                </button>
+            </div>
+        </div>
+    </div>
 
-    .container {
-      width: 100%;
-      max-width: 1280px;
-      padding: 1.5rem;
+    <div id="homeworkModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+        <div class="bg-white rounded-3xl max-w-lg w-full mx-4 overflow-hidden">
+            <div class="p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span id="modalType" class="inline-block px-3 py-1 text-xs font-bold rounded-full bg-amber-100 text-amber-700"></span>
+                        <h2 id="modalTitle" class="text-xl font-bold mt-2"></h2>
+                    </div>
+                    <button onclick="closeModal()" class="text-3xl leading-none text-gray-400 hover:text-gray-600">×</button>
+                </div>
+                <p id="modalDesc" class="mt-4 text-gray-600 text-sm"></p>
+                <div class="mt-5 flex items-center gap-2 text-sm text-gray-600">
+                    <i class="fa-solid fa-clock text-red-500"></i>
+                    <span id="modalDeadline"></span>
+                </div>
+            </div>
+            <div class="border-t p-6">
+                <a id="modalLink" href="#" target="_blank" class="block bg-indigo-600 hover:bg-indigo-700 text-white text-center py-4 rounded-3xl font-semibold flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <span id="modalLinkText">Open Homework</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="addHomeworkModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div class="bg-white rounded-3xl w-full max-w-md mx-4 p-6">
+            <h3 class="text-xl font-semibold mb-5">Add Homework</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-medium text-gray-500">TITLE</label>
+                    <input id="hwTitle" type="text" class="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm" placeholder="Teacher's assignment title">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-gray-500">TYPE</label>
+                    <select id="contentType" onchange="toggleContentInput()" class="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm">
+                        <option value="link">Link / PDF</option>
+                        <option value="text">Text Only</option>
+                    </select>
+                </div>
+                <div id="linkInput">
+                    <label class="text-xs font-medium text-gray-500">URL</label>
+                    <input id="hwUrl" type="text" class="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm" placeholder="https://...">
+                </div>
+                <div id="textInput" class="hidden">
+                    <label class="text-xs font-medium text-gray-500">HOMEWORK TEXT</label>
+                    <textarea id="hwText" rows="3" class="w-full border border-gray-200 rounded-3xl px-4 py-3 text-sm" placeholder="Paste the homework content..."></textarea>
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-gray-500">DEADLINE</label>
+                    <input id="hwDeadline" type="date" class="w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mt-8">
+                <button onclick="toggleAddHomeworkModal()" class="py-3.5 border border-gray-300 rounded-3xl text-sm font-medium">Cancel</button>
+                <button onclick="addHomework()" class="py-3.5 bg-indigo-600 text-white rounded-3xl text-sm font-semibold">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let homeworkList = [{
+            id: 1,
+            title: "Mathematics Assignment - Quadratic Equations",
+            content: "https://example.com/math-quad.pdf",
+            deadline: "2026-06-10",
+            description: "Solve questions from page 45-47.",
+            type: "PDF"
+        }];
+
+        const jokes = [
+            "Why did the student eat his homework? Because the teacher said it was a piece of cake!",
+            "Why was the math book sad? It had too many problems.",
+            "I told my computer I needed a break... now it won't stop sending KitKat ads."
+        ];
+
+        let addButtonTimeout = null;
+
+        function calculateDaysLeft(deadline) {
+            const diff = Math.ceil((new Date(deadline) - new Date()) / 86400000);
+            return diff > 0 ? diff : "Overdue";
+        }
+
+        function renderHomework(filtered = homeworkList) {
+            const container = document.getElementById('homeworkContainer');
+            container.innerHTML = '';
+            if (filtered.length === 0) {
+                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('homeworkCount').textContent = '';
+                showRandomJoke();
+                return;
+            }
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('homeworkCount').textContent = `${filtered.length} assignment${filtered.length > 1 ? 's' : ''}`;
+            filtered.forEach(hw => {
+                const days = calculateDaysLeft(hw.deadline);
+                const urgent = typeof days === 'number' && days <= 3;
+                const div = document.createElement('div');
+                div.className = `bg-white border-2 ${urgent ? 'border-red-400' : 'border-gray-100'} rounded-3xl p-5 homework-card cursor-pointer`;
+                div.innerHTML = `
+                    <div class="flex justify-between">
+                        <span class="text-xs font-bold px-3 py-1 bg-amber-100 text-amber-700 rounded-full">${hw.type}</span>
+                        <i class="fa-solid fa-file-pdf text-red-500 text-2xl"></i>
+                    </div>
+                    <h3 class="font-semibold mt-4 text-base leading-tight">${hw.title}</h3>
+                    <p class="text-gray-600 text-sm mt-3 line-clamp-3">${hw.description}</p>
+                    <div class="mt-5 pt-4 border-t text-xs flex justify-between items-center">
+                        <span class="${urgent ? 'text-red-600 font-bold' : 'text-gray-500'}">${days} day${days === 1 ? '' : 's'} left</span>
+                        <span class="text-indigo-600 text-xs">View →</span>
+                    </div>
+                `;
+                div.onclick = () => openHomework(hw.id);
+                container.appendChild(div);
+            });
+        }
+
+        function openHomework(id) {
+            const hw = homeworkList.find(h => h.id === id);
+            if (!hw) return;
+            document.getElementById('modalTitle').textContent = hw.title;
+            document.getElementById('modalDesc').textContent = hw.description;
+            document.getElementById('modalType').textContent = hw.type;
+            const days = calculateDaysLeft(hw.deadline);
+            document.getElementById('modalDeadline').innerHTML = `Due • ${new Date(hw.deadline).toLocaleDateString()} <span class="text-xs">(${days} days)</span>`;
+            const link = document.getElementById('modalLink');
+            link.href = hw.content;
+            document.getElementById('modalLinkText').textContent = "Open Homework";
+            document.getElementById('homeworkModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('homeworkModal').classList.add('hidden');
+        }
+
+        function toggleAddHomeworkModal() {
+            document.getElementById('addHomeworkModal').classList.toggle('hidden');
+        }
+
+        function toggleContentInput() {
+            const isLink = document.getElementById('contentType').value === 'link';
+            document.getElementById('linkInput').classList.toggle('hidden', !isLink);
+            document.getElementById('textInput').classList.toggle('hidden', isLink);
+        }
+
+        function addHomework() {
+            const title = document.getElementById('hwTitle').value.trim() || "Current Homework";
+            const deadline = document.getElementById('hwDeadline').value;
+            if (!deadline) return alert("Please select a deadline");
+            const isLink = document.getElementById('contentType').value === 'link';
+            const content = isLink ? document.getElementById('hwUrl').value.trim() : "data:text/plain," + encodeURIComponent(document.getElementById('hwText').value.trim());
+            homeworkList.unshift({
+                id: Date.now(),
+                title: title,
+                content: content || "#",
+                deadline: deadline,
+                description: "Assignment added",
+                type: isLink ? "PDF/Link" : "Text"
+            });
+            renderHomework();
+            toggleAddHomeworkModal();
+        }
+
+        function showRandomJoke() {
+            document.getElementById('jokeDisplay').textContent = jokes[Math.floor(Math.random() * jokes.length)];
+        }
+
+        function newJoke() {
+            showRandomJoke();
+        }
+
+        function handleSearch(e) {
+            const term = e.target.value.toLowerCase();
+            const filtered = homeworkList.filter(hw => hw.title.toLowerCase().includes(term));
+            renderHomework(filtered);
+        }
+
+        function enableTripleClick() {
+            let count = 0, last = 0;
+            document.addEventListener('click', () => {
+                const now = Date.now();
+                if (now - last > 700) count = 0;
+                count++;
+                last = now;
+                if (count === 3) {
+                    const btn = document.getElementById('addBtn');
+                    btn.classList.remove('hidden');
+                    if (addButtonTimeout) clearTimeout(addButtonTimeout);
+                    addButtonTimeout = setTimeout(() => {
+                        btn.classList.add('spiral-hide');
+                        setTimeout(() => btn.classList.add('hidden'), 800);
+                    }, 60000);
+                    count = 0;
+                }
+            });
+        }
+
+        window.onload = () => {
+            renderHomework();
+            enableTripleClick();
+            showRandomJoke();
+            document.getElementById('homeworkModal').addEventListener('click', e => {
+                if (e.target === document.getElementById('homeworkModal')) closeModal();
+            });
+        };
+    </script>
+</body>
+</html>
+```
